@@ -29,7 +29,6 @@
 #include "bind.h"
 
 Option o_new_button_1, o_single_click;
-static Option o_single_pinboard;
 static Option o_dclick_resizes;
 
 /****************************************************************
@@ -40,7 +39,6 @@ void bind_init(void)
 {
 	option_add_int(&o_new_button_1, "bind_new_button_1", FALSE);
 	option_add_int(&o_single_click, "bind_single_click", TRUE);
-	option_add_int(&o_single_pinboard, "bind_single_pinboard", TRUE);
 	option_add_int(&o_dclick_resizes, "bind_dclick_resizes", TRUE);
 }
 
@@ -63,20 +61,16 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 	gboolean select = b == 1 && !alt; /* (old RISC OS names) */
 	gboolean adjust = b == 2 || (alt && b == 1);
 
-	gboolean icon  = context == BIND_PINBOARD_ICON ||
-				context == BIND_PANEL_ICON;
+	gboolean icon  = FALSE;
 	gboolean item = icon || context == BIND_DIRECTORY_ICON;
-	gboolean background = context == BIND_PINBOARD ||
-				context == BIND_PANEL ||
-				context == BIND_DIRECTORY;
+	gboolean background = context == BIND_DIRECTORY;
 
 	gboolean press = event->type == GDK_BUTTON_PRESS;
 	gboolean release = event->type == GDK_BUTTON_RELEASE;
 
 	gboolean dclick = event->type == GDK_2BUTTON_PRESS;
 	gboolean dclick_mode =
-		(context == BIND_DIRECTORY_ICON && !o_single_click.int_value) ||
-		(context == BIND_PINBOARD_ICON && !o_single_pinboard.int_value);
+		(context == BIND_DIRECTORY_ICON && !o_single_click.int_value);
 
 	if (b > 3)
 		return ACT_IGNORE;
@@ -106,17 +100,11 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 	{
 		gboolean clear = (!ctrl) && (!shift) && select;
 
-		if (context == BIND_PANEL)
-			return ACT_CLEAR_SELECTION;
-
 		return clear ? ACT_LASSO_CLEAR : ACT_LASSO_MODIFY;
 	}
 
 	if ((ctrl && select) || (adjust && dclick_mode))
 		return ACT_PRIME_AND_TOGGLE;
-
-	if (context == BIND_PANEL_ICON && adjust)
-		return ACT_MOVE_ICON;
 
 	return dclick_mode ? ACT_PRIME_AND_SELECT : ACT_PRIME_FOR_DND;
 }

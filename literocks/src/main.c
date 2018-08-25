@@ -65,7 +65,6 @@
 #include "action.h"
 #include "i18n.h"
 #include "remote.h"
-#include "pinboard.h"
 #include "run.h"
 #include "toolbar.h"
 #include "bind.h"
@@ -120,10 +119,9 @@ const char *home_dir, *app_dir;
        "  -h, --help		display this help and exit\n"		\
        "  -m, --mime-type=FILE	print MIME type of FILE and exit\n" \
        "  -n, --new		start new copy; for debugging the filer\n"  \
-       "  -p, --pinboard=PIN	use pinboard PIN as the pinboard\n"	\
        "  -R, --RPC		invoke method call read from stdin\n"	\
        "  -s, --show=FILE	open a directory showing FILE\n"	\
-       "  -S, --rox-session	use default pinboard options, and -n\n"\
+       "  -S, --rox-session	-n\n"\
        "  -u, --user		show user name in each window \n"	\
        "  -U, --url=URL		open file or directory in URI form\n"   \
        "  -v, --version		display the version information and exit\n"   \
@@ -138,7 +136,6 @@ static struct option long_opts[] =
 {
 	{"dir", 1, NULL, 'd'},
 	{"border", 1, NULL, 'b'},
-	{"pinboard", 1, NULL, 'p'},
 	{"help", 0, NULL, 'h'},
 	{"version", 0, NULL, 'v'},
 	{"user", 0, NULL, 'u'},
@@ -154,14 +151,6 @@ static struct option long_opts[] =
 	{NULL, 0, NULL, 0},
 };
 #endif
-
-/* Options used when we are called by ROX-Session */
-enum {
-	SESSION_PANEL_ONLY,
-	SESSION_PINBOARD_ONLY,
-	SESSION_BOTH,
-};
-Option o_session_pinboard_name;
 
 /* Always start a new filer, even if one seems to be already running */
 gboolean new_copy = FALSE;
@@ -183,7 +172,6 @@ static void child_died(int signum);
 static void child_died_callback(void);
 static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition);
 static void xrandr_size_change(GdkScreen *screen, gpointer user_data);
-static void add_default_pinboard(xmlNodePtr body);
 static GList *build_launch(Option *option, xmlNode *node, guchar *label);
 static GList *build_make_script(Option *option, xmlNode *node, guchar *label);
 
@@ -317,8 +305,6 @@ int main(int argc, char **argv)
 		return EXIT_SUCCESS;
 	}
 
-	option_add_string(&o_session_pinboard_name, "session_pinboard_name",
-			  "Default");
 	option_register_widget("launch", build_launch);
 	option_register_widget("make-script", build_make_script);
 
@@ -417,10 +403,6 @@ int main(int argc, char **argv)
 				g_free(dir);
 				g_free(base);
 				break;
-			case 'p':
-				soap_add(body, "Pinboard",
-						"Name", VALUE, NULL, NULL);
-				break;
 			case 'u':
 				show_user = TRUE;
 				break;
@@ -462,7 +444,6 @@ int main(int argc, char **argv)
 
 			case 'S':
 				new_copy = TRUE;
-				add_default_pinboard(body);
 				session_auto_respawn = TRUE;
 				break;
 
@@ -556,8 +537,6 @@ int main(int argc, char **argv)
 	mount_init();
 	type_init();
 	action_init();
-
-	pinboard_init();
 
 	/* When we get a signal, we can't do much right then. Instead,
 	 * we send a char down this pipe, which causes the main loop to
@@ -762,18 +741,6 @@ static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition)
 static void xrandr_size_change(GdkScreen *screen, gpointer user_data)
 {
 	gui_store_screen_geometry(screen);
-
-	pinboard_update_size();
-}
-
-static void add_default_pinboard(xmlNodePtr body)
-{
-	const char *name;
-
-	name=o_session_pinboard_name.value;
-	if (!name[0])
-		name="Default";
-	soap_add(body, "Pinboard","Name", name, NULL, NULL);
 }
 
 static GtkWidget *launch_button_new(const char *label, const char *uri,

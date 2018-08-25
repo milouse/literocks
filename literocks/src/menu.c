@@ -54,7 +54,6 @@
 #include "mount.h"
 #include "minibuffer.h"
 #include "i18n.h"
-#include "pinboard.h"
 #include "dir.h"
 #include "diritem.h"
 #include "appmenu.h"

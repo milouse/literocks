@@ -208,52 +208,7 @@
       </frame>
     </section>
   </section>
-  <section title='Pinboard'>
-    <label help='1'>When using a pinboard, you can drag files and applications onto the desktop background to create shortcuts to them.</label>
-    <frame label='Appearance'>
-      <hbox>
-        <vbox>
-	  <colour name='pinboard_fg_colour' label='Foreground:'/>
-	  <colour name='pinboard_shadow_colour' label='Text shadow:'/>
-	  <colour name='pinboard_bg_colour' label='Background:'/>
-        </vbox>
-	<hbox>
-          <radio-group name='pinboard_shadow_labels'>
-            <radio label='No shadow' value='0'/>
-            <radio label='Thin' value='1'/>
-            <radio label='Thick' value='2'/>
-          </radio-group>
-	</hbox>
-      </hbox>
-      <spacer/>
-      <font override='1' label='Use custom font:' name='label_font'>The font used for the text displayed under the icons</font>
-      <spacer/>
-    </frame>
-    <frame label='Pinboard behaviour'>
-      <toggle name='bind_single_pinboard' label='Single-click to open'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
-      <toggle name='pinboard_clamp_icons' label='Keep icons within screen limits'>If this is set, pinboard icons are always kept completely within screen limits, including the label.</toggle>
-      <hbox label='Icon grid step:'>
-        <radio-group name='pinboard_grid_step'>
-          <radio label='Fine' value='2'>Use a 2-pixel grid for positioning icons on the desktop.</radio>
-          <radio label='Medium' value='16'>Use a 16-pixel grid for positioning icons on the desktop.</radio>
-          <radio label='Coarse' value='32'>Use a 32-pixel grid for positioning icons on the desktop.</radio>
-        </radio-group>
-      </hbox>
-    </frame>
-  </section>
 
-  <section title='Desktop'>
-    <label help='1'>When run by a session manager program (such as ROX-Session) the filer can open up a pinboard.  Here you configure which.</label>
-
-    <frame label='Pinboard'>
-      <entry name='session_pinboard_name'>Enter the name of the pinboard to show here.</entry>
-    </frame>
-
-    <label help='1'>Changes here take effect the next time the filer is run.</label>
-    <label help='1'>The session manager activates these options by
-using the -S or --rox-session argument to rox.</label>
-  </section>
-  
   <section title='Action windows'>
     <label help='1'>Action windows appear when you start a background
 operation, such as copying or deleting some files.</label>

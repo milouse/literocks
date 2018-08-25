@@ -56,7 +56,6 @@ void drag_data_get(GtkWidget      	*widget,
 		   guint32             	time,
 		   gpointer	       	data);
 void make_drop_target(GtkWidget *widget, GtkDestDefaults defaults);
-void drag_set_pinboard_dest(GtkWidget *widget);
 void dnd_init(void);
 gboolean provides(GdkDragContext *context, GdkAtom target);
 

@@ -53,7 +53,6 @@
 #include "mount.h"
 #include "type.h"
 #include "usericons.h"
-#include "pinboard.h"	/* For pinboard_set_backdrop_box */
 
 static gboolean have_primary = FALSE;	/* We own the PRIMARY selection? */
 

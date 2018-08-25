@@ -38,8 +38,7 @@
     <application>ROX-Filer</application> is a graphical file manger for the X
     Window System. Its user interface is based on the RISC OS filer and it
     supports similar features such as application directories and drag-and-drop
-    loading and saving of files. The filer can also act as a pinboard, allowing
-    you to pin frequently used files onto the desktop background.
+    loading and saving of files.
    </para>
   </abstract>
  </bookinfo>
@@ -156,42 +155,7 @@
   </para>
 
   <sect1>
-   <title><anchor id="run_pin" xreflabel="Pinboard support"/>Pinboard support</title>
-   <para>
-
-    If you want the filer to manage your desktop background then you use
-    the <option>--pinboard</option> option and supply a name for the pinboard,
-    eg:
-
-    <screen>$ rox --pinboard=MyPinboard</screen>
-
-    The pinboard configuration is saved in
-    <filename>~/.config/rox.sourceforge.net/ROX-Filer/pb_MyPinboard</filename>
-    as soon as you change it in some way (for example, by dropping a file
-    onto the background). You can have as many pinboards as you like and
-    switch between them by running rox again, eg:
-
-    <screen>$ rox --pinboard=MyOtherPinboard</screen>
-
-    To turn off the pinboard again, set the name to an empty string:
-
-    <screen>$ rox --pinboard=</screen>
-
-    See the <xref linkend="winman"/> if you have trouble getting the icons to
-    display correctly. The pinboard may also be turned on and off by locating
-    <filename>ROX-Filer</filename> in a filer window and choosing <guimenuitem>Enable
-    pinboard</guimenuitem> or <guimenuitem>Disable pinboard</guimenuitem> from the menu.</para>
-  </sect1>
-
-  <sect1>
    <title><anchor id="winman" xreflabel="window manager notes"/>Window manager notes</title>
-   <para>
-    You may have to play around with your window manager a bit to get
-    the pinboard icons to display correctly (eg, without borders
-    and underneath all other windows). In particular, try setting the
-    stacking level / depth to low (or a negative value). Make sure any
-    'Keep transients above other windows' type options are turned off!
-   </para>
 
    <sect2><title>Sawfish / sawmill</title>
     <para>
@@ -222,14 +186,6 @@
       DesktopMenuButton=0 # [0-20]</programlisting>
      Paste these into <filename>~/.icewm/winoptions</filename>:
 
-     <programlisting>
-      # ROX-Filer pinboard
-      ROX-Filer.icon: folder
-      ROX-Pinboard.layer: Below
-      ROX-Pinboard.ignoreWinList: 1
-      ROX-Pinboard.ignoreTaskBar: 1
-      ROX-Pinboard.ignoreQuickSwitch: 1
-      ROX-Filer.layer: Normal</programlisting>
      Restart IceWM and the filer for the new settings to take effect.
 
     </para>
@@ -622,8 +578,7 @@
  <chapter id="menus">
   <title>The menus</title>
   <para>
-   By default, you can open a menu by right clicking over a pinboard or
-   filer window.
+   By default, you can open a menu by right clicking over a filer window.
 
    In filer windows, you may also press <keycap>\</keycap> to open the menu. As
    a shortcut, you can open the File submenu directly by holding down the
@@ -1228,142 +1183,6 @@
    </para>
   </sect1>
 
- </chapter>
-
- <chapter id="icons">
-  <title>The pinboard</title>
-  <para>
-
-   The <xref linkend="run_pin"/> and <xref linkend="run_pan"/> sections explain
-   how to turn the pinboard on. Once on, you may drop items from filer
-   windows onto the them to pin them up. Clicking on a pinned item acts just like
-   clicking on it in a filer window. You can drag pinned icons just like normal
-   icons and you can right-click on one to see the popup menu.
-   </para><para>
-   You can assign keyboard shortcuts to pinboard icons. These can be
-   used to open directories, files or applications quickly, even if another
-   window has the focus.
-   </para><para>
-   Changes to the pinboard are automatically saved. Clicking on pinned
-   icons with <keycap>Control</keycap> held down selects and unselects them.
-   Click on the background to unselect them all.
-  </para>
-
-  <important><para>
-    Pinning a file does <emphasis>not</emphasis> copy it, it merely
-    creates a shortcut to the original file. If you delete the file, then
-    you've lost it! Removing a pinned file from its pinboard 
-    only removes the link. This is different to most other filers...
-  </para></important>
-
-  <sect1>
-   <title>The pinboard menu</title>
-   <para>
-
-    <informaltable><tgroup cols="2">
-      <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
-      <tbody>
-
-       <row><entry>
-         <guimenuitem>ROX-Filer</guimenuitem></entry><entry>
-         Show the filer's help, edit the options or open your home directory.
-       </entry></row>
-
-       <row><entry>
-         <guimenuitem>File `file'</guimenuitem></entry><entry>
-         Offers a smaller version of the filer's submenu of the same name.
-       </entry></row>
-
-       <row><entry>
-         <guimenuitem>Edit Item</guimenuitem></entry><entry>
-         Change the name displayed under the icon, or the pathname the item
-         points to. You can also set a keyboard shortcut for the icon here,
-	 and lock it against accidental deletion. For programs, you can
-	 specify extra arguments to be passed in.
-       </entry></row>
-
-       <row><entry>
-         <guimenuitem>Show Location</guimenuitem></entry><entry>
-         Open a directory viewer showing where the file is stored.
-       </entry></row>
-
-       <row><entry>
-         <guimenuitem>Remove Item(s)</guimenuitem></entry><entry>
-         Remove the selected items from the pinboard.
-       </entry></row>
-
-       <row><entry>
-         <guimenuitem>Backdrop...</guimenuitem></entry><entry>
-	 Set the desktop backdrop image (see below). Only available from
-	 the pinboard menu.
-       </entry></row>
-
-    </tbody></tgroup></informaltable>
-
-    </para><para>
-    If you are setting up the defaults for multiple users and
-    you wish to create a `Home' icon that leads to each user's home directory
-    then you should first create a new icon and then use
-    <guimenuitem>Edit Icon</guimenuitem> to change the location to
-    <filename>~</filename> and the name to `Home'.
-    </para><para>
-    Note that individual applications may add extra menu items to the
-    top of this menu when you click over them &mdash; see <xref linkend="AppDir"/>
-    for details.
-   </para>
-  </sect1>
-
-  <sect1>
-   <title><anchor id="backdropapp" xreflabel="Backdrop applications"/>The pinboard backdrop image</title>
-   <para>
-    You can set any image for the backdrop by choosing <guimenuitem>Backdrop...</guimenuitem>
-    from the pinboard menu (right-click over the desktop background when the pinboard is turned on).
-   </para>
-   <para>
-    To set an image, select <guilabel>Centre</guilabel>, <guilabel>Scale</guilabel>,
-    <guilabel>Stretch</guilabel> or <guilabel>Tile</guilabel> to set the style,
-    and then drag an image onto the marked area.  To return to a solid colour
-    backdrop (as set in the Options box), click on <guibutton>Clear</guibutton>.
-   </para><para>
-    The Wallpaper<citation>Wallpaper</citation> application can be used for more complicated
-    effects, such as choosing a new random image each hour, or rendering an image of the Earth
-    as it is currently lit by the sun.
-   </para>
-   <formalpara><title>For programmers...</title>
-    <para>
-     If you want to create an application to set the backdrop (eg, to choose a
-     random image, or a slideshow) you need to first create an application directory
-     (see <xref linkend="AppDir"/>).
-    </para>
-   </formalpara><para>
-    When run without arguments, the application should invoke the
-    <function>SetBackdropApp</function> SOAP method (see <xref
-    linkend="soap"/>). The filer will immediately run the application again,
-    this time with the <option>--backdrop</option> option.
-   </para><para>
-    When run with <option>--backdrop</option>, the program should write the style and name of
-    the image file to display to its standard output stream, eg:
-    <screen>tile /tmp/image.png</screen>
-    <userinput>centre</userinput> and <userinput>scale</userinput> are the other possible
-    styles. The filer will then load this image and display it. The application does not
-    set the backdrop itself, it only tells the filer what to display.
-   </para><para>
-    In the case of a random backdrop chooser, the program may then quit immediately. If
-    the application created a temporary image then it should read the line "ok\n" from its
-    standard input before deleting the image.
-   </para><para>
-    If the application wishes to show a sequence of images it should still read "ok\n",
-    then wait until it's time to display the next image and then write that filename, and
-    so on.
-   </para><para>
-    The filer will indicate that the program should stop running by closing the two
-    streams. The program should clean up and exit at this point. Be sure to catch
-    SIGPIPE when writing to standard output if you need to delete any temporary files.
-   </para><para>
-    See the Wallpaper<citation>Wallpaper</citation> application for a complete example application
-    (written in python).
-   </para>
-  </sect1>
  </chapter>
 
  <chapter>
@@ -2305,7 +2124,7 @@ generated.
 
    <sect2><title>Setting the run action by drag-and-drop</title>
     <para>
-     Drag the Gimp (from a filer window or the pinboard) onto
+     Drag the Gimp (from a filer window) onto
      the area marked <guilabel>Drop a suitable application here</guilabel>.
      From now on, clicking on a GIF file will load it into the Gimp.
     </para>
@@ -2524,14 +2343,6 @@ generated.
     &lt;Authors&gt;Thomas Leonard y otros&lt;/Authors&gt;
   &lt;/About&gt;
   &lt;AppMenu&gt;
-    &lt;Item option="-p=Default"&gt;
-      &lt;Label&gt;Enable pinboard&lt;/Label&gt;
-      &lt;Label xml:lang="es"&gt;Habilitar el pinboard&lt;/Label&gt;
-    &lt;/Item&gt;
-    &lt;Item option="-p="&gt;
-      &lt;Label&gt;Disable pinboard&lt;/Label&gt;
-      &lt;Label xml:lang="es"&gt;Deshabilitar el pinboard&lt;/Label&gt;
-    &lt;/Item&gt;
   &lt;/AppMenu&gt;
 &lt;/AppInfo&gt;
 </screen>
@@ -2962,10 +2773,6 @@ generated.
       background). This option is mainly useful for debugging.
       </para></listitem></varlistentry>
 
-      <varlistentry><term><option>-p</option></term><term><option>--pinboard=PIN</option></term>
-       <listitem><para>use pinboard PIN as the pinboard.
-      </para></listitem></varlistentry>
-
       <varlistentry><term><option>-R</option></term><term><option>--RPC</option></term>
        <listitem><para>read and invoke SOAP RPC from standard input (see <xref linkend="soap"/>).
       </para></listitem></varlistentry>
@@ -2975,7 +2782,7 @@ generated.
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-S</option></term><term><option>--rox-session</option></term>
-       <listitem><para>run by session manager, open the default pinboard (implies --new).
+       <listitem><para>run by session manager (implies --new).
 If an XSM session manager is running and this option is used then ROX-Filer will ask to be automatically
 restarted if it crashes.
       </para></listitem></varlistentry>
@@ -3168,34 +2975,6 @@ configured setting is used.
 <parameter>Filter</parameter> can be used to filter files shown by
 their name.  For example using a filter of <userinput>*.c</userinput>
 means that only files ending in .c are shown.
-   </para></listitem>
-
-   <listitem><para><function>Pinboard</function>([<parameter>Name</parameter>])
-     Display pinboard <parameter>Name</parameter> on the desktop background.
-     <parameter>Name</parameter> can be a name in  <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename>
-     (eg, <userinput>MyPinboard</userinput>) or a full pathname.
-     If not given, the pinboard is turned off.
-   </para></listitem>
-
-   <listitem><para><function>PinboardAdd</function>(<parameter>Path</parameter>,
-     [<parameter>X</parameter>, <parameter>Y</parameter>,
-<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>, <parameter>Update</parameter>])
-     Add <parameter>Path</parameter> to the pinboard with the (optional) 
-     label <parameter>Label</parameter>. If X or Y are negative or not given, 
-     the icon is placed automatically. The X and Y parameters then indicate 
-     where the icon should go (X=-1: left, X=-2: right, Y=-1: top, Y=-2: 
-     bottom). If X and Y are given, its position is (<parameter>X</parameter>, 
-     <parameter>Y</parameter>). If <parameter>Shortcut</parameter> is given it 
-     is the keyboard shortcut to trigger this item.  If 
-     <parameter>Args</parameter> is given it is the argument string to append 
-     to the item when run if it is a program. If <parameter>Update</parameter> 
-     is true and there is already an icon for the given path on the pinboard, 
-     the new values will be filled in instead of adding a new icon.
-   </para></listitem>
-
-   <listitem><para><function>PinboardRemove</function>(<parameter>Path</parameter>, [<parameter>Label</parameter>])
-     Remove <parameter>Path</parameter> from the pinboard. If <parameter>Label</parameter> is given
-then this must match the label of the item.  If more than one item matches, only one is removed.
    </para></listitem>
 
    <listitem><para><function>SetBackdropApp</function>(<parameter>App</parameter>)
