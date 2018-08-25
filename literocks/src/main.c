@@ -264,7 +264,7 @@ int main(int argc, char **argv)
 	if (!app_dir)
 	{
 		g_warning("APP_DIR environment variable was unset!\n"
-			"Use the AppRun script to invoke ROX-Filer...\n");
+			"Use the AppRun script to invoke literocks...\n");
 		app_dir = g_get_current_dir();
 	}
 #ifdef HAVE_UNSETENV
@@ -299,7 +299,7 @@ int main(int argc, char **argv)
 		 * compiled OK. Do this test before gtk_init so that
 		 * we don't need an X server to install.
 		 */
-		g_print("ROX-Filer %s\n", VERSION);
+		g_print("literocks %s\n", VERSION);
 		g_print(_(COPYING));
 		show_features();
 		return EXIT_SUCCESS;

@@ -47,7 +47,6 @@
 #include "modechange.h"
 #include "find.h"
 #include "dir.h"
-#include "icon.h"
 #include "mount.h"
 #include "type.h"
 #include "xtypes.h"

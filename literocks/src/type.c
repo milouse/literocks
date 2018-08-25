@@ -56,7 +56,7 @@
 #include "action.h"		/* (for action_chmod) */
 #include "xml.h"
 #include "dropbox.h"
-#include "xdgmime.h"
+//#include "xdgmime.h"
 #include "xtypes.h"
 #include "run.h"
 #include "view_iface.h"
@@ -118,7 +118,7 @@ MIME_type *inode_door;
 
 static GtkIconTheme *icon_theme = NULL;
 
-static GMutex m_xdg;
+//static GMutex m_xdg;
 
 void type_init(void)
 {
@@ -163,7 +163,7 @@ void reread_mime_files(void)
 {
 	gtk_icon_theme_rescan_if_needed(icon_theme);
 
-	xdg_mime_shutdown();
+//	xdg_mime_shutdown();
 
 	filer_update_all();
 }
@@ -197,10 +197,9 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 	mtype->image = NULL;
 	mtype->comment = NULL;
 
-	g_mutex_lock(&m_xdg);
-	mtype->executable = xdg_mime_mime_type_subclass(type_name,
-						"application/x-executable");
-	g_mutex_unlock(&m_xdg);
+//	g_mutex_lock(&m_xdg);
+	mtype->executable = g_content_type_can_be_executable(type_name);
+//;	g_mutex_unlock(&m_xdg);
 
 	g_hash_table_insert(type_hash, g_strdup(type_name), mtype);
 
@@ -304,7 +303,7 @@ MIME_type *type_get_type(const guchar *path)
 MIME_type *type_from_path(const char *path)
 {
 	MIME_type *mime_type = NULL;
-	const char *type_name;
+	char *type_name;
 
 	/* Check for extended attribute first */
 	mime_type = xtype_get(path);
@@ -312,9 +311,33 @@ MIME_type *type_from_path(const char *path)
 		return mime_type;
 
 	/* Try name and contents next */
-	g_mutex_lock(&m_xdg);
-	type_name = xdg_mime_get_mime_type_for_file(path, NULL);
-	g_mutex_unlock(&m_xdg);
+//	g_mutex_lock(&m_xdg);
+//	type_name = xdg_mime_get_mime_type_for_file(path, NULL);
+
+	gboolean uncertain;
+
+	char *base = g_path_get_basename(path);
+	type_name = g_content_type_guess(base, NULL, 0, &uncertain);
+	if (uncertain)
+	{
+
+#define RSIZE 4096
+		char buf[RSIZE];
+		int f = open(path, O_RDONLY);
+		if (f >= 0)
+		{
+			int len = read(f, buf, RSIZE);
+			close(f);
+			if (len >= 0)
+			{
+				g_free(type_name);
+				type_name = g_content_type_guess(base, buf, len, NULL);
+			}
+		}
+	}
+
+	g_free(base);
+//	g_mutex_unlock(&m_xdg);
 
 	if (type_name)
 		return get_mime_type(type_name, TRUE);

@@ -167,7 +167,7 @@ typedef enum
 #define ROX_NS "http://literocks.jun7.github.com/SOAP/literocks"
 
 /* Namespace for configuration */
-#define SITE "literocks.jun7.github.com"
+#define SITE "literocks"
 
 /* Stock icons */
 #define ROX_STOCK_SHOW_DETAILS "rox-show-details"

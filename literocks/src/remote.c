@@ -139,7 +139,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	 * of an already-running copy of this version of the filer, running
 	 * on the same machine and with the same euid.
 	 */
-	unique_id = g_strdup_printf("_ROX_FILER_%d_%s_%s",
+	unique_id = g_strdup_printf("_literocks_%d_%s_%s",
 				(int) euid, VERSION, our_host_name(FALSE));
 	filer_atom = gdk_atom_intern(unique_id, FALSE);
 	g_free(unique_id);
@@ -211,7 +211,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	/* Also have a property without the version number, for programs
 	 * that are happy to talk to any version of the filer.
 	 */
-	unique_id = g_strdup_printf("_ROX_FILER_%d_%s",
+	unique_id = g_strdup_printf("_literocks_%d_%s",
 				(int) euid, our_host_name(FALSE));
 	filer_atom_any = gdk_atom_intern(unique_id, FALSE);
 	g_free(unique_id);
