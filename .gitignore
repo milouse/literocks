@@ -1,0 +1,11 @@
+# Ignore emacs backup files
+*~
+# and the generated manual page
+rox.1
+
+literocks/literocks.dbg
+literocks/literocks
+literocks/build/*
+literocks/src/autom4te.cache
+literocks/src/configure
+
