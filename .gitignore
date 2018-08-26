@@ -1,7 +1,7 @@
 # Ignore emacs backup files
 *~
 # and the generated manual page
-rox.1
+literocks.1
 
 literocks/literocks.dbg
 literocks/literocks
