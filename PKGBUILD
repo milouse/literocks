@@ -5,7 +5,7 @@
 pkgname=literocks
 pkgver=2.11.h
 pkgrel=1
-branch=stable
+branch=master
 pkgdesc="A fork of rox-filer having no desktop features, just a filer"
 arch=('i686' 'x86_64')
 conflicts=('literocks')
@@ -35,8 +35,7 @@ build() {
 
 package() {
   cd "$srcdir/literocks"
-  install -d "$pkgdir/usr/share/Choices/MIME-types"
-  install -m755 Choices/MIME-types/* "$pkgdir/usr/share/Choices/MIME-types/"
+  install -d "$pkgdir/usr/share"
   cp -rp literocks "$pkgdir/usr/share/"
   rm -fr "$pkgdir"/usr/share/literocks/{src,build}
 
@@ -45,6 +44,5 @@ package() {
   ln -sf literocks.1 "$pkgdir/usr/share/man/man1/literocks.1"
 
   install -Dm644 "$srcdir/literocks/literocks.desktop" "$pkgdir/usr/share/applications/literocks.desktop"
-  install -Dm644 "$srcdir/literocks/literocks.svg" "$pkgdir/usr/share/pixmaps/literocks.svg"
-  install -Dm644 "$srcdir/literocks/literocks/.DirIcon" "$pkgdir/usr/share/pixmaps/literocks.png"
+  install -Dm644 "$srcdir/literocks/literocks.png" "$pkgdir/usr/share/pixmaps/literocks.png"
 }
