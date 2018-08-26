@@ -32,6 +32,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -56,8 +57,9 @@
 #include "type.h"
 
 GFSCache *pixmap_cache = NULL;
-GFSCache *thumb_cache = NULL;
 GFSCache *desktop_icon_cache = NULL;
+
+static GHashTable *orders = NULL;
 
 static const char * bad_xpm[] = {
 "12 12 3 1",
@@ -93,8 +95,6 @@ int thumb_size = PIXMAP_THUMB_SIZE;
 gchar *thumb_dir = "normal";
 
 Option o_pixmap_thumb_file_size;
-static Option o_purge_time;
-static Option o_jpeg_thumbs;
 
 typedef struct _ChildThumbnail ChildThumbnail;
 
@@ -132,7 +132,7 @@ static void ordered_update(ChildThumbnail *info);
 static void thumbnail_done(ChildThumbnail *info);
 static void create_thumbnail(const gchar *path, MIME_type *type);
 static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label);
-static gchar *thumbnail_path(const gchar *path);
+static gchar *thumb_path_mk(const gchar *path);
 static gchar *thumbnail_program(MIME_type *type);
 static GdkPixbuf *extract_tiff_thumbnail(const gchar *path);
 static void make_dir_thumb(const gchar *path);
@@ -162,13 +162,7 @@ static void set_thumb_size()
 static void options_changed()
 {
 	if (o_pixmap_thumb_file_size.has_changed)
-	{
 		set_thumb_size();
-		g_fscache_purge(thumb_cache, 0);
-	}
-
-	if (o_purge_time.has_changed)
-		g_fscache_purge(thumb_cache, o_purge_time.int_value);
 }
 
 void pixmaps_init(void)
@@ -177,18 +171,16 @@ void pixmaps_init(void)
 	int i;
 
 	option_add_int(&o_pixmap_thumb_file_size, "thumb_file_size", PIXMAP_THUMB_SIZE);
-//	option_add_int(&o_purge_time, "purge_time", PIXMAP_PURGE_TIME);
-	option_add_int(&o_purge_time, "purge_time", 0);
-	option_add_int(&o_jpeg_thumbs, "jpeg_thumbs", TRUE);
 	option_add_notify(options_changed);
 
 	gtk_widget_push_colormap(gdk_rgb_get_colormap());
 
 	pixmap_cache = g_fscache_new((GFSLoadFunc) image_from_file, NULL, NULL);
-	thumb_cache = g_fscache_new((GFSLoadFunc) image_from_file, NULL, NULL);
+	orders = g_hash_table_new_full(
+			g_str_hash, g_str_equal, g_free, NULL);
+
 	desktop_icon_cache = g_fscache_new((GFSLoadFunc) image_from_desktop_file, NULL, NULL);
 
-	g_timeout_add(6000, purge_thumbs, NULL);
 	g_timeout_add(PIXMAP_PURGE_TIME / 2 * 1000, purge_pixmaps, NULL);
 
 	factory = gtk_icon_factory_new();
@@ -334,15 +326,9 @@ GdkPixbuf *pixmap_load_thumb(const gchar *path)
 
 	found = FALSE;
 
-	if (o_purge_time.int_value > 0)
-		ret = g_fscache_lookup_full(thumb_cache,
-				path, FSCACHE_LOOKUP_ONLY_NEW, &found);
-
-	if (!found) {
+	if (!found)
 		ret = get_thumbnail_for(path, FALSE);
-		if (ret && o_purge_time.int_value > 0)
-			g_fscache_insert(thumb_cache, path, ret, TRUE);
-	}
+
 	return ret;
 }
 
@@ -380,15 +366,8 @@ void pixmap_background_thumb(const gchar *path, gboolean noorder,
 	}
 
 	/* Is it currently being created? */
-	image = g_fscache_lookup_full(thumb_cache, path,
-					FSCACHE_LOOKUP_ONLY_NEW, &found);
-
-	if (found)
-	{
-		/* Thumbnail is known, or being created */
-		if (image)
-			g_object_unref(image);
-
+	if (g_hash_table_lookup(orders, path))
+	{/* Thumbnail is known, or being created */
 		callback(data, NULL);
 		//append to last for sym links what sharing the thumb
 		info = g_new0(ChildThumbnail, 1);
@@ -397,6 +376,7 @@ void pixmap_background_thumb(const gchar *path, gboolean noorder,
 		ordered_update(info);
 		return;
 	}
+	g_hash_table_add(orders, g_strdup(path));
 
 	/* Not in memory, nor in the thumbnails directory.  We need to
 	 * generate it */
@@ -404,11 +384,6 @@ void pixmap_background_thumb(const gchar *path, gboolean noorder,
 	type = type_from_path(path);
 	if (!type)
 		type = text_plain;
-
-	/* Add an entry, set to NULL, so no-one else tries to load this
-	 * image.
-	 */
-	g_fscache_insert(thumb_cache, path, NULL, TRUE);
 
 	thumb_prog = thumbnail_program(type);
 
@@ -450,7 +425,7 @@ void pixmap_background_thumb(const gchar *path, gboolean noorder,
 			diritem_restat(thumb_prog, item, NULL, TRUE);
 
 			execl(thumb_prog, thumb_prog, path,
-					thumbnail_path(path),
+					thumb_path_mk(path),
 					g_strdup_printf("%d", thumb_size),
 					NULL);
 
@@ -468,6 +443,11 @@ void pixmap_background_thumb(const gchar *path, gboolean noorder,
 	on_child_death(child, (CallbackFn) thumbnail_done, info);
 }
 
+
+static const char *thumbdir()
+{
+	return make_path(make_path(g_get_user_cache_dir(), "literocks"), thumb_dir);
+}
 /*
  * Return the thumbnail for a file, only if available.
  */
@@ -476,18 +456,6 @@ GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
 	gboolean  found;
 	GdkPixbuf *image;
 	GdkPixbuf *pixbuf;
-
-	if (o_purge_time.int_value > 0) {
-		image = g_fscache_lookup_full(thumb_cache, path,
-						FSCACHE_LOOKUP_ONLY_NEW, &found);
-
-		if (found)
-		{
-			/* Thumbnail is known, or being created */
-			if (image)
-				return image;
-		}
-	}
 
 	pixbuf = get_thumbnail_for(path, forcheck);
 
@@ -514,8 +482,7 @@ GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
 		}
 		g_free(dir);
 
-		if (mc_stat(make_path(make_path(home_dir, ".cache/thumbnails"), thumb_dir),
-			    &info2) == 0 &&
+		if (mc_stat(thumbdir(), &info2) == 0 &&
 			    info1.st_dev == info2.st_dev &&
 			    info1.st_ino == info2.st_ino)
 		{
@@ -529,15 +496,7 @@ GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
 		}
 	}
 
-	if (pixbuf)
-	{
-		if (o_purge_time.int_value > 0)
-			g_fscache_insert(thumb_cache, path, pixbuf, TRUE);
-
-		return pixbuf;
-	}
-
-	return NULL;
+	return pixbuf;
 }
 
 /****************************************************************
@@ -547,126 +506,46 @@ GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
 /* Create a thumbnail file for this image */
 static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 {
-	struct stat info;
-	gchar *path;
-	int original_width, original_height;
-	GString *to;
-	char *md5, *swidth, *sheight, *ssize, *smtime, *uri;
-	mode_t old_mask;
-	int name_len;
-	GdkPixbuf *thumb;
+	GdkPixbuf *thumb = scale_pixbuf(full, thumb_size, thumb_size);
 
-	if (mc_stat(pathname, &info) != 0)
-		return;
-
-	thumb = scale_pixbuf(full, thumb_size, thumb_size);
-
-	original_width = gdk_pixbuf_get_width(full);
-	original_height = gdk_pixbuf_get_height(full);
-
-	swidth = g_strdup_printf("%d", original_width);
-	sheight = g_strdup_printf("%d", original_height);
-	ssize = g_strdup_printf("%" SIZE_FMT, info.st_size);
-	smtime = g_strdup_printf("%ld", (long) info.st_mtime);
-
-	path = pathdup(pathname);
-	uri = g_filename_to_uri(path, NULL, NULL);
-	if (!uri)
-	        uri = g_strconcat("file://", path, NULL);
-	md5 = md5_hash(uri);
+	gchar *path = pathdup(pathname);
+	char *thumbpath = thumb_path_mk(path);
 	g_free(path);
 
-	to = g_string_new(home_dir);
-	g_string_append(to, "/.cache");
-	mkdir(to->str, 0700);
-	g_string_append(to, "/thumbnails/");
-	mkdir(to->str, 0700);
-
-	g_string_append(to, thumb_dir);
-	g_string_append(to, "/");
-
-	mkdir(to->str, 0700);
-	g_string_append(to, md5);
-	name_len = to->len + 4; /* Truncate to this length when renaming */
-	g_string_append_printf(to, ".png.literocks-%ld", (long) getpid());
-
-	g_free(md5);
-
-	old_mask = umask(0077);
-	if (o_jpeg_thumbs.int_value == 1)
-	{
-		//At least we don't need extensions being '.jpg'
-		gdk_pixbuf_save(thumb, to->str, "jpeg", NULL,
-				"quality", "77",
-				NULL);
-	}
-	else
-	{
-		gdk_pixbuf_save(thumb, to->str, "png", NULL,
-				"tEXt::Thumb::Image::Width", swidth,
-				"tEXt::Thumb::Image::Height", sheight,
-				"tEXt::Thumb::Size", ssize,
-				"tEXt::Thumb::MTime", smtime,
-				"tEXt::Thumb::URI", uri,
-				"tEXt::Software", PROJECT,
-				NULL);
-	}
+	mode_t old_mask = umask(0077);
+	//At least we don't need extensions being '.jpg'
+	gdk_pixbuf_save(thumb, thumbpath, "jpeg", NULL,
+			"quality", "77",
+			NULL);
 	umask(old_mask);
 
-	/* We create the file ###.png.ROX-Filer-PID and rename it to avoid
-	 * a race condition if two programs create the same thumb at
-	 * once.
-	 */
-	{
-		gchar *final;
-
-		final = g_strndup(to->str, name_len);
-		if (rename(to->str, final))
-			g_warning("Failed to rename '%s' to '%s': %s",
-				  to->str, final, g_strerror(errno));
-		g_free(final);
-	}
-
 	g_object_unref(thumb);
-	g_string_free(to, TRUE);
-	g_free(swidth);
-	g_free(sheight);
-	g_free(ssize);
-	g_free(smtime);
-	g_free(uri);
+	g_free(thumbpath);
 }
 
-static gchar *thumbnail_path(const char *path)
+static gchar *_thumb_path(const char *path, bool mkdirif)
 {
 	gchar *uri, *md5;
-	GString *to;
 	gchar *ans;
 
 	uri = g_filename_to_uri(path, NULL, NULL);
 	if(!uri)
 	       uri = g_strconcat("file://", path, NULL);
 	md5 = md5_hash(uri);
-
-	to = g_string_new(home_dir);
-	g_string_append(to, "/.cache");
-	mkdir(to->str, 0700);
-	g_string_append(to, "/thumbnails/");
-	mkdir(to->str, 0700);
-
-	g_string_append(to, thumb_dir);
-	g_string_append(to, "/");
-
-	mkdir(to->str, 0700);
-	g_string_append(to, md5);
-	g_string_append(to, ".png");
-
-	g_free(md5);
 	g_free(uri);
 
-	ans=to->str;
-	g_string_free(to, FALSE);
+	const char *dir = thumbdir();
+	ans = g_strdup_printf("%s/%s.jpg", dir, md5);
+	g_free(md5);
 
-	return ans;
+	if (mkdirif && !g_file_test(dir, G_FILE_TEST_EXISTS))
+		g_mkdir_with_parents(dir, 0700);
+
+	return ans; /* This return is used unlink! Be carefull */
+}
+static gchar *thumb_path_mk(const char *path)
+{
+	return _thumb_path(path, true);
 }
 
 /* Return a program to create thumbnails for files of this type.
@@ -718,20 +597,7 @@ static void create_thumbnail(const gchar *path, MIME_type *type)
 
 char *pixmap_make_thumb_path(const char *path)
 {
-	char *thumb_path, *md5, *uri;
-
-	uri = g_filename_to_uri(path, NULL, NULL);
-	if (!uri)
-	        uri = g_strconcat("file://", path, NULL);
-	md5 = md5_hash(uri);
-	g_free(uri);
-
-	thumb_path = g_strdup_printf(
-			"%s/.cache/thumbnails/%s/%s.png" ,
-			home_dir, thumb_dir, md5);
-	g_free(md5);
-
-	return thumb_path; /* This return is used unlink! Be carefull */
+	return _thumb_path(path, false);
 }
 
 static void make_dir_thumb(const gchar *path)
@@ -800,7 +666,7 @@ static void thumbnail_done(ChildThumbnail *info)
 	if (thumb)
 	{
 		g_object_unref(thumb);
-		g_fscache_remove(thumb_cache, info->path);
+		g_hash_table_remove(orders, info->path);
 	}
 	else
 		g_fscache_insert(pixmap_cache, info->path, NULL, TRUE);
@@ -1028,13 +894,6 @@ static gint purge_pixmaps(gpointer data)
 	g_fscache_purge(pixmap_cache, PIXMAP_PURGE_TIME);
 	return TRUE;
 }
-static gint purge_thumbs(gpointer data)
-{
-	g_fscache_purge(thumb_cache, o_purge_time.int_value);
-
-	g_timeout_add(MIN(60000, o_purge_time.int_value * 300 + 2000), purge_thumbs, NULL);
-	return FALSE;
-}
 
 static gpointer parent_class;
 
@@ -1186,9 +1045,7 @@ static void purge_disk_cache(GtkWidget *button, gpointer data)
 	DIR *dir;
 	struct dirent *ent;
 
-	g_fscache_purge(thumb_cache, 0);
-
-	path = g_strconcat(home_dir, "/.cache/thumbnails/", thumb_dir, "/", NULL);
+	path = g_strconcat(thumbdir(), "/", NULL);
 
 	dir = opendir(path);
 	if (!dir)

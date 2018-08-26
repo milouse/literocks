@@ -3892,7 +3892,6 @@ void filer_refresh_thumbs(FilerWindow *filer_window)
 				make_path(filer_window->real_path, item->leafname));
 
 		g_fscache_remove(pixmap_cache, path);
-		g_fscache_remove(thumb_cache, path);
 
 		thumb_path = pixmap_make_thumb_path(path);
 		unlink(thumb_path); ///////////////////////////
