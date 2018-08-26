@@ -27,7 +27,7 @@ SRCS = abox.c action.c appmenu.c bind.c bookmarks.c		\
 	gtksavebox.c							\
 	gui_support.c i18n.c icon.c infobox.c log.c main.c menu.c minibuffer.c\
 	modechange.c mount.c options.c pixmaps.c	\
-	remote.c run.c sc.c session.c support.c 		\
+	remote.c run.c support.c 		\
 	toolbar.c type.c usericons.c view_collection.c	\
 	view_details.c view_iface.c xml.c xtypes.c \
 
@@ -37,7 +37,7 @@ OBJECTS = abox.o action.o appmenu.o bind.o bookmarks.o	\
 	gtksavebox.o							\
 	gui_support.o i18n.o icon.o infobox.o log.o main.o menu.o minibuffer.o\
 	modechange.o mount.o options.o pixmaps.o	\
-	remote.o run.o sc.o session.o support.o		\
+	remote.o run.o support.o		\
 	toolbar.o type.o usericons.o view_collection.o	\
 	view_details.o view_iface.o xml.o xtypes.o \
 

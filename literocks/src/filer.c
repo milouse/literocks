@@ -610,9 +610,7 @@ static void update_display(Directory *dir,
 			if (!fi)
 				fi = get_globicon(filer_window->real_path);
 			if (!fi)
-				fi = g_fscache_lookup_full(pixmap_cache,
-						make_path(filer_window->real_path, ".DirIcon"),
-						FSCACHE_LOOKUP_ONLY_NEW, NULL);
+				fi = type_to_icon(mime_type_lookup("inode/directory"));
 
 			set_icon(filer_window, fi ? fi->src_pixbuf : NULL);
 
@@ -655,17 +653,6 @@ static void update_display(Directory *dir,
 			view_update_items(view, items);
 
 			if (init) break;
-
-			if (!filer_window->dir_icon)
-			{
-				filer_window->dir_icon = g_fscache_lookup_full(
-						pixmap_cache,
-						make_path(filer_window->real_path, ".DirIcon"),
-						FSCACHE_LOOKUP_ONLY_NEW, NULL);
-
-				if (filer_window->dir_icon)
-					set_icon(filer_window, filer_window->dir_icon->src_pixbuf);
-			}
 
 			if (filer_window->view_type != VIEW_TYPE_COLLECTION)
 				filer_window->may_resize = TRUE;
@@ -1187,13 +1174,7 @@ void filer_openitem(FilerWindow *filer_window, ViewIter *iter, OpenFlags flags)
 		dir_update_item(filer_window->directory, item->leafname);
 
 	if (item->base_type == TYPE_DIRECTORY)
-	{
-		/* Never close a filer window when opening a directory
-		 * (click on a dir or click on an app with shift).
-		 */
-		if (shift)
-			close_window = FALSE;
-	}
+		close_window = FALSE;
 
 	full_path = make_path(filer_window->sym_path, item->leafname);
 	if (shift && (item->flags & ITEM_FLAG_SYMLINK))

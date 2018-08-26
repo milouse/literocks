@@ -68,7 +68,6 @@
 #include "run.h"
 #include "toolbar.h"
 #include "bind.h"
-#include "session.h"
 #include "minibuffer.h"
 #include "xtypes.h"
 #include "bulk_rename.h"
@@ -113,7 +112,6 @@ const char *home_dir, *app_dir;
 #define HELP N_("Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"	\
        "Open each directory or file listed, or the current working\n"	\
        "directory if no arguments are given.\n\n"			\
-       "  -c, --client-id=ID	used for session management\n"		\
        "  -d, --dir=DIR		open DIR as directory (not application)\n"  \
        "  -D, --close=DIR	close DIR and its subdirectories\n"     \
        "  -h, --help		display this help and exit\n"		\
@@ -121,7 +119,6 @@ const char *home_dir, *app_dir;
        "  -n, --new		start new copy; for debugging the filer\n"  \
        "  -R, --RPC		invoke method call read from stdin\n"	\
        "  -s, --show=FILE	open a directory showing FILE\n"	\
-       "  -S, --rox-session	-n\n"\
        "  -u, --user		show user name in each window \n"	\
        "  -U, --url=URL		open file or directory in URI form\n"   \
        "  -v, --version		display the version information and exit\n"   \
@@ -142,11 +139,9 @@ static struct option long_opts[] =
 	{"new", 0, NULL, 'n'},
 	{"RPC", 0, NULL, 'R'},
 	{"show", 1, NULL, 's'},
-	{"rox-session", 0, NULL, 'S'},
 	{"examine", 1, NULL, 'x'},
 	{"close", 1, NULL, 'D'},
 	{"mime-type", 1, NULL, 'm'},
-	{"client-id", 1, NULL, 'c'},
 	{"url", 1, NULL, 'u'},
 	{NULL, 0, NULL, 0},
 };
@@ -228,7 +223,7 @@ int main(int argc, char **argv)
 	int		 i;
 	struct sigaction act;
 	guchar		*tmp, *dir;
-	gchar *client_id = NULL, *base;
+	gchar *base;
 	gboolean	show_user = FALSE;
 	gboolean	rpc_mode = FALSE;
 	xmlDocPtr	rpc, soap_rpc = NULL, reply;
@@ -417,9 +412,6 @@ int main(int argc, char **argv)
 						type->subtype);
 				return EXIT_SUCCESS;
 			}
-			case 'c':
-				client_id = g_strdup(VALUE);
-				break;
 			case 'R':
 				/* Reconnect stdin */
 				if(ofd0>-1) {
@@ -440,11 +432,6 @@ int main(int argc, char **argv)
 				/* Want to print return uninterpreted */
 				rpc_mode=TRUE;
 
-				break;
-
-			case 'S':
-				new_copy = TRUE;
-				session_auto_respawn = TRUE;
 				break;
 
 		        case 'U':
@@ -563,10 +550,6 @@ int main(int argc, char **argv)
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = 0;
 	sigaction(SIGPIPE, &act, NULL);
-
-	/* Set up session managament if available */
-	session_init(client_id);
-	g_free(client_id);
 
 	/* Finally, execute the request */
 	reply = run_soap(rpc);

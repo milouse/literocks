@@ -2285,12 +2285,6 @@ generated.
     </para></listitem>
 
     <listitem><para>
-      <filename>.DirIcon</filename>
-      is the image used to represent the directory (this works even if
-      there is no <filename>AppRun</filename>).
-    </para></listitem>
-
-    <listitem><para>
       <filename>Help</filename>
       is the directory to be opened when you choose <guimenuitem>Help</guimenuitem>
       from the File menu.
@@ -2300,13 +2294,6 @@ generated.
       <filename>AppInfo.xml</filename>
       contains extra information about an application (see below).
     </para></listitem>
-
-    <listitem><para>
-      <filename>AppIcon.xpm</filename>
-      is used if <filename>.DirIcon</filename> is missing (for backwards
-      compatibility; not to be used anymore).
-    </para></listitem>
-
    </itemizedlist>
 
    Have a look at the <filename>ROX-Filer</filename> application directory for a

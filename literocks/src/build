@@ -4,26 +4,26 @@
 # against the GTK 2.4 headers, using the gtk-2.4 compatibility environment.
 
 # This should already exist for releases, but is needed for Git checkouts
-if [ ! -f "$SRCDIR/ROX-Filer/src/configure" ]; then
-  (cd "$SRCDIR/ROX-Filer/src" && autoconf) || exit 1
+if [ ! -f "$SRCDIR/literocks/src/configure" ]; then
+  (cd "$SRCDIR/literocks/src" && autoconf) || exit 1
 fi
 
 # This should already exist for releases, but is needed for Git checkouts
-if [ ! -f "$SRCDIR/rox.1" ]; then
-  (make -C "$SRCDIR/ROX-Filer/src/Docs") || exit 1
+if [ ! -f "$SRCDIR/literocks.1" ]; then
+  (make -C "$SRCDIR/literocks/src/Docs") || exit 1
 fi
 
 if [ ! -f Makefile ]; then
-  "$SRCDIR/ROX-Filer/src/configure" "$@" || exit 1
+  "$SRCDIR/literocks/src/configure" "$@" || exit 1
 fi
 
-[ -d "$DISTDIR/ROX-Filer" ] || mkdir "$DISTDIR/ROX-Filer" || exit 1
+[ -d "$DISTDIR/literocks" ] || mkdir "$DISTDIR/literocks" || exit 1
 
-make "PLATFORM_DIR=$DISTDIR/ROX-Filer"|| exit 1
+make "PLATFORM_DIR=$DISTDIR/literocks"|| exit 1
 
-(cd "$SRCDIR" && cp -r Choices README README-es rox.xml rox.1 "$DISTDIR") || exit 1
-(cd "$SRCDIR/ROX-Filer" && cp -r .DirIcon Help images Messages ROX AppInfo.xml AppRun Options.xml style.css subclasses Templates.ui "$DISTDIR/ROX-Filer") || exit 1
+(cd "$SRCDIR" && cp -r Choices README README-es literocks.xml literocks.1 "$DISTDIR") || exit 1
+(cd "$SRCDIR/literocks" && cp -r Help images Messages AppRun Options.xml style.css Templates.ui "$DISTDIR/literocks") || exit 1
 find "$DISTDIR" -name '.svn' -type d |xargs rm -rf
 
 # Remove debugging symbols, if any
-rm -f "$DISTDIR/ROX-Filer/ROX-Filer.dbg"
+rm -f "$DISTDIR/literocks/literocks.dbg"

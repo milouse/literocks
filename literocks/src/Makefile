@@ -9,7 +9,7 @@ all:
 
 # This ensures we get the header files for GTK 2.4
 with0launch:
-	0launch --source --main=/ROX-Filer/build --wrapper='make -C' ../ROX-Filer-src.xml
+	0launch --source --main=/literocks/build --wrapper='make -C' ../literocks-src.xml
 
 clean:
 	cd ${BUILDDIR} && ${MAKE} clean
