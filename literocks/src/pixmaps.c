@@ -139,6 +139,12 @@ static void make_dir_thumb(const gchar *path);
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
+static char *thumbdirpath;
+static const char *thumbdir()
+{
+	return thumbdirpath ?: (thumbdirpath =
+		g_build_filename(g_get_user_cache_dir(), "literocks", thumb_dir, NULL));
+}
 static void set_thumb_size()
 {
 	switch (thumb_size = o_pixmap_thumb_file_size.int_value) {
@@ -157,6 +163,9 @@ static void set_thumb_size()
 	default:
 		thumb_dir = "fail";
 	}
+
+	g_free(thumbdirpath);
+	thumbdirpath = NULL;
 }
 static void options_changed()
 {
@@ -441,11 +450,6 @@ void pixmap_background_thumb(const gchar *path, gboolean noorder,
 	on_child_death(child, (CallbackFn) thumbnail_done, info);
 }
 
-
-static const char *thumbdir()
-{
-	return make_path(make_path(g_get_user_cache_dir(), "literocks"), thumb_dir);
-}
 /*
  * Return the thumbnail for a file, only if available.
  */
