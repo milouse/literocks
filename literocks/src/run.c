@@ -761,7 +761,14 @@ static gboolean type_open(const char *path, MIME_type *type)
 
 	open = handler_for(type);
 	if (!open)
-		return FALSE;
+	{
+		if (type != text_plain)
+			return FALSE;
+
+		const char *tav[] = {"xterm", "-e", "vi", path, NULL};
+		rox_spawn(home_dir, tav);
+		return TRUE;
+	}
 
 	if (stat(open, &info))
 	{

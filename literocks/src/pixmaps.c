@@ -123,7 +123,6 @@ static const char *stocks[] = {
 
 static void load_default_pixmaps(void);
 static gint purge_pixmaps(gpointer data);
-static gint purge_thumbs(gpointer data);
 static MaskedPixmap *image_from_file(const char *path);
 static MaskedPixmap *image_from_desktop_file(const char *path);
 static MaskedPixmap *get_bad_image(void);
@@ -348,7 +347,6 @@ static int thumb_prog_timeout(ChildThumbnail *info)
 void pixmap_background_thumb(const gchar *path, gboolean noorder,
 		GFunc callback, gpointer data)
 {
-	gboolean	found;
 	GdkPixbuf	*image;
 	pid_t		child;
 	ChildThumbnail	*info;
@@ -453,8 +451,6 @@ static const char *thumbdir()
  */
 GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
 {
-	gboolean  found;
-	GdkPixbuf *image;
 	GdkPixbuf *pixbuf;
 
 	pixbuf = get_thumbnail_for(path, forcheck);
