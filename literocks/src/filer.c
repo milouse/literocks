@@ -2772,10 +2772,21 @@ void filer_target_mode(FilerWindow *filer_window,
 
 static void set_selection_state(FilerWindow *filer_window, gboolean normal)
 {
+	FilerWindow *fw = filer_window;
+
 	GtkStateType old_state = filer_window->selection_state;
 
 	filer_window->selection_state = normal
 			? GTK_STATE_SELECTED : GTK_STATE_ACTIVE;
+
+	if (filer_window->view_type == VIEW_TYPE_DETAILS)
+	{
+		GtkStyle *style = fw->window->style;
+		gtk_widget_modify_base(GTK_WIDGET(fw->view),
+				GTK_STATE_ACTIVE, &style->base[fw->selection_state]);
+		gtk_widget_modify_text(GTK_WIDGET(fw->view),
+				GTK_STATE_ACTIVE, &style->text[fw->selection_state]);
+	}
 
 	if (old_state != filer_window->selection_state
 	    && view_count_selected(filer_window->view))
@@ -3732,9 +3743,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 	 * do the spring-open thing.
 	 */
 	if (item && type == drop_dest_dir)
-	{
 		dnd_spring_load(context, filer_window);
-	}
 	else
 		dnd_spring_abort();
 

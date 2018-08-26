@@ -320,7 +320,6 @@ MIME_type *type_from_path(const char *path)
 	type_name = g_content_type_guess(base, NULL, 0, &uncertain);
 	if (uncertain)
 	{
-
 #define RSIZE 4096
 		char buf[RSIZE];
 		int f = open(path, O_RDONLY);

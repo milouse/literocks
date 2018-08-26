@@ -659,7 +659,7 @@ static void draw_item(GtkWidget *widget,
 
 			view->image = get_globicon(path);
 
-			//.DirIcon
+			//used as an icon of some where
 			if (!view->image && fw->show_thumbs &&
 					item->base_type == TYPE_FILE)
 				view->image = g_fscache_lookup_full(pixmap_cache, path,
