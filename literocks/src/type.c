@@ -339,9 +339,10 @@ MIME_type *type_from_path(const char *path)
 //	g_mutex_unlock(&m_xdg);
 
 	if (type_name)
-		return get_mime_type(type_name, TRUE);
+		mime_type =  get_mime_type(type_name, TRUE);
+	g_free(type_name);
 
-	return NULL;
+	return mime_type;
 }
 
 /* Returns the file/dir in Choices for handling this type.
