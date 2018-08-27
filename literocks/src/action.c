@@ -79,6 +79,7 @@ struct _GUIside
 
 	int 		from_child;	/* File descriptor */
 	FILE		*to_child;
+	gint		synced;
 	gint		sync;
 	int 		input_tag;	/* gdk_input_add() */
 	pid_t		child;		/* Process ID */
@@ -313,13 +314,13 @@ static void show_settype_help(gpointer data)
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(help)->vbox), text, TRUE, TRUE, 0);
 	gtk_label_set_selectable(GTK_LABEL(text), TRUE);
 	gtk_label_set_markup(GTK_LABEL(text), _(
-"Normally literocks determines the type of a regular file\n"
+"Normally ROX-Filer determines the type of a regular file\n"
 "by matching it's name against a pattern. To change the\n"
 "type of the file you must rename it.\n"
 "\n"
 "Newer file systems can support something called 'Extended\n"
 "Attributes' which can be used to store additional data with\n"
-"each file as named parameters. literocks uses the\n"
+"each file as named parameters. ROX-Filer uses the\n"
 "'user.mime_type' attribute to store file types.\n"
 "\n"
 "File types are only supported for regular files, not\n"
@@ -349,8 +350,15 @@ static void process_message(GUIside *gui_side, const gchar *buffer)
 	ABox *abox = gui_side->abox;
 
 	if (*buffer == 'r')
-//		gui_side->sync = g_idle_add((GSourceFunc)syncchild, gui_side);
-		syncchild(gui_side);
+	{
+		if (!gui_side->synced)
+		{//first time is heavy
+			gui_side->synced = TRUE;
+			gui_side->sync = g_idle_add((GSourceFunc)syncchild, gui_side);
+		}
+		else
+			syncchild(gui_side);
+	}
 	else if (*buffer == 'w')
 	{
 		char *dir = g_path_get_dirname(buffer + 1);
@@ -920,6 +928,7 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 	gui_side = g_new(GUIside, 1);
 	gui_side->from_child = filedes[0];
 	gui_side->to_child = fdopen(filedes[3], "wb");
+	gui_side->synced = 0;
 	gui_side->sync = 0;
 	gui_side->child = child;
 	gui_side->errors = 0;
@@ -949,15 +958,16 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 #define SHOWTIME 100 * 1000
 static void syncgui()
 {
-	static gint64 start = 0;
+	static gint64 start;
 	gint64 now = g_get_monotonic_time();
 	if (now - start < SHOWTIME) return;
-	start = now;
 
 	printf_send("r");
 	char c;
 	read(from_parent, &c, 1);
 	if (c != 'r') process_flag(c);
+
+	start = g_get_monotonic_time();
 	//g_usleep(100);
 }
 
@@ -2793,7 +2803,6 @@ void action_init(void)
 
 	option_add_int(&o_action_wink, "action_wink", 1);
 }
-
 
 void set_find_string_colour(GtkWidget *widget, const guchar *string)
 {
