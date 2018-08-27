@@ -1023,11 +1023,8 @@ static void load_default_pixmaps(void)
 	im_appdir = load_pixmap("application");
 
 	winicon = gtk_icon_theme_load_icon(
-		gtk_icon_theme_get_default(), "rox", thumb_size, 0, NULL);
+		gtk_icon_theme_get_default(), "literocks", thumb_size, 0, NULL);
 
-	if (!winicon)
-		winicon = gdk_pixbuf_new_from_file(
-			make_path(app_dir, ".DirIcon"), &error);
 	if (winicon)
 		gtk_window_set_default_icon(winicon);
 	else

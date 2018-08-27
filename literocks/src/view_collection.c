@@ -733,10 +733,10 @@ end_image:
 	if (colitem->selected)
 		select_colour = &widget->style->base[fw->selection_state];
 
-	if (!view->name)
-		view->name = make_layout(fw, item);
+	PangoLayout *name = make_layout(fw, item);
+
 	if (view->name_width == 0)
-		pango_layout_get_pixel_size(view->name,
+		pango_layout_get_pixel_size(name,
 				&view->name_width, &view->name_height);
 
 	PangoLayout *details = NULL;
@@ -787,7 +787,7 @@ end_image:
 	fg = colitem->selected ?
 		&widget->style->text[fw->selection_state] : type_colour;
 
-	draw_string(cr, view->name,
+	draw_string(cr, name,
 			&template.leafname,
 			view->name_width,
 			view->name_height,
@@ -805,6 +805,7 @@ end_image:
 		g_object_unref(details);
 	}
 
+	g_object_unref(name);
 	cairo_destroy(cr);
 }
 
@@ -1307,9 +1308,6 @@ static void display_free_colitem(Collection *collection,
 
 	if (!view)
 		return;
-
-	if (view->name)
-		g_object_unref(view->name);
 
 	if (view->image)
 		g_object_unref(view->image);
