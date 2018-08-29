@@ -101,6 +101,7 @@ typedef struct _ChildThumbnail ChildThumbnail;
 /* There is one of these for each active child process */
 struct _ChildThumbnail {
 	gchar	 *path;
+	struct timespec orgtime;
 	GFunc	 callback;
 	gpointer data;
 	pid_t	 child;
@@ -133,7 +134,6 @@ static void create_thumbnail(const gchar *path, MIME_type *type);
 static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label);
 static gchar *thumb_path_mk(const gchar *path);
 static gchar *thumbnail_program(MIME_type *type);
-static GdkPixbuf *extract_tiff_thumbnail(const gchar *path);
 static void make_dir_thumb(const gchar *path);
 
 /****************************************************************
@@ -353,8 +353,7 @@ static int thumb_prog_timeout(ChildThumbnail *info)
  * If the image is already uptodate, or being created already, calls the
  * callback right away.
  */
-void pixmap_background_thumb(const gchar *path, gboolean noorder,
-		GFunc callback, gpointer data)
+void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 {
 	GdkPixbuf	*image;
 	pid_t		child;
@@ -394,6 +393,7 @@ void pixmap_background_thumb(const gchar *path, gboolean noorder,
 
 	thumb_prog = thumbnail_program(type);
 
+
 	/* Only attempt to load 'images' types ourselves */
 	if (thumb_prog == NULL && strcmp(type->media_type, "image") != 0)
 	{
@@ -401,13 +401,20 @@ void pixmap_background_thumb(const gchar *path, gboolean noorder,
 		return;		/* Don't know how to handle this type */
 	}
 
+	struct stat orginfo;
+	if (mc_stat(path, &orginfo) != 0)
+	{
+		callback(data, NULL);
+		return;
+	}
+
 	info = g_new(ChildThumbnail, 1);
 	info->path = g_strdup(path);
+	info->orgtime = orginfo.st_ctim;
 	info->callback = callback;
 	info->data = data;
 	info->timeout = 0;
 	info->order = ordered_num++;
-	if (noorder) info->order = 0;
 
 	child = fork();
 	if (child == -1)
@@ -466,7 +473,7 @@ GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
 
 		/* Skip zero-byte files. They're either empty, or
 		 * special (may cause us to hang, e.g. /proc/kmsg). */
-		if (mc_stat(path, &info1) == 0 && info1.st_size == 0) {
+		if (mc_stat(path, &info1) != 0 || info1.st_size == 0) {
 			return NULL;
 		}
 
@@ -486,9 +493,8 @@ GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
 			    info1.st_dev == info2.st_dev &&
 			    info1.st_ino == info2.st_ino)
 		{
-			pixbuf = rox_pixbuf_new_from_file_at_scale(path,
-					thumb_size, thumb_size,
-								   TRUE, NULL);
+			pixbuf = gdk_pixbuf_new_from_file_at_scale(path,
+					thumb_size, thumb_size, TRUE, NULL);
 			if (!pixbuf)
 			{
 				return NULL;
@@ -579,13 +585,8 @@ static gchar *thumbnail_program(MIME_type *type)
  */
 static void create_thumbnail(const gchar *path, MIME_type *type)
 {
-	GdkPixbuf *image=NULL;
-
-        if(strcmp(type->subtype, "jpeg")==0)
-            image=extract_tiff_thumbnail(path);
-
-	if(!image)
-            image = rox_pixbuf_new_from_file_at_scale(path,
+	//rox_pixbuf can make image from files being load
+	GdkPixbuf *image = rox_pixbuf_new_from_file_at_scale(path,
 			thumb_size, thumb_size, TRUE, NULL);
 
 	if (image)
@@ -645,7 +646,7 @@ static void ordered_update(ChildThumbnail *info)
 			continue;
 		}
 
-		if (!li->callback)
+		if (!li->data)
 			dir_force_update_path(li->path, TRUE);
 		make_dir_thumb(li->path);
 
@@ -657,23 +658,45 @@ static void ordered_update(ChildThumbnail *info)
 			g_slist_delete_link(done_stack, n);
 	}
 }
+
+
+static void do_nothing() {}
+static gboolean retry_thumb(char *path)
+{
+D(*************retry %s, path)
+	pixmap_background_thumb(path, do_nothing, NULL);
+	g_free(path);
+	return FALSE;
+}
+
+#define SPECCMP(left, cmp, right) (\
+	left.tv_sec == right.tv_sec ? \
+		left.tv_nsec cmp right.tv_nsec : left.tv_sec cmp right.tv_sec)
 static void thumbnail_done(ChildThumbnail *info)
 {
 	if (info->timeout)
 		g_source_remove(info->timeout);
 
-	GdkPixbuf *thumb = get_thumbnail_for(info->path, FALSE);
-	if (thumb)
+	bool ok = false;
+	struct stat tinfo, nowinfo;
+	char *tpath = _thumb_path(info->path, false);
+	if (mc_stat(tpath, &tinfo) == 0 && SPECCMP(tinfo.st_ctim, >=, info->orgtime))
 	{
-		g_object_unref(thumb);
-		g_hash_table_remove(orders, info->path);
+		if (mc_stat(info->path, &nowinfo) == 0
+				&& SPECCMP(nowinfo.st_ctim, !=, info->orgtime))
+		{ //file is changed from start time
+			g_timeout_add(900, (GSourceFunc) retry_thumb, g_strdup(info->path));
+		}
+		ok = true;
 	}
 	else
 		g_fscache_insert(pixmap_cache, info->path, NULL, TRUE);
 
-	info->callback(info->data, thumb ? info->path : NULL);
-
+	g_hash_table_remove(orders, info->path);
+	info->callback(info->data, ok ? info->path : NULL);
 	ordered_update(info);
+
+	g_free(tpath);
 }
 
 
@@ -683,60 +706,26 @@ static void thumbnail_done(ChildThumbnail *info)
 static GdkPixbuf *get_thumbnail_for(const char *pathname, gboolean forcheck)
 {
 	GdkPixbuf *thumb = NULL;
-	char *thumb_path, *path, *pic_path = NULL;
-	const char *pic_uri, *ssize, *smtime;
+	char *thumb_path, *path;
 	struct stat info, thumbinfo;
-	time_t ttime, now;
 
 	path = pathdup(pathname);
-
 	thumb_path = pixmap_make_thumb_path(path);
 
 	thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
 	if (!thumb)
 		goto err;
 
-	/* Note that these don't need freeing... */
-	pic_uri = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::URI");
-	if (pic_uri)
-	{
-		pic_path = g_filename_from_uri(pic_uri, NULL, NULL);
+	if (mc_lstat(thumb_path, &thumbinfo) != 0 ||
+		mc_lstat(path, &info) != 0
+		)
+		goto err;
 
-		if (mc_stat(pic_path, &info) != 0)
-			goto err;
+	if (!forcheck)
+		thumbinfo.st_ctim.tv_sec++; //one sec older file is valid
 
-		smtime = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::MTime");
-		if (!smtime)
-			goto err;
-		ttime=(time_t) atol(smtime);
-		time(&now);
-		if (info.st_mtime != ttime && now>ttime+PIXMAP_THUMB_TOO_OLD_TIME)
-			goto err;
-
-		/* This is optional, so don't flag an error if it is missing */
-		ssize = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::Size");
-		if (ssize && info.st_size < atol(ssize))
-			goto err;
-	}
-	else
-	{ //for jpeg
-		if (mc_lstat(thumb_path, &thumbinfo) != 0 ||
-			mc_lstat(path, &info) != 0
-			)
-			goto err;
-
-		if (forcheck && (
-					   info.st_ctime == thumbinfo.st_ctime
-					|| info.st_ctime == thumbinfo.st_ctime - 1))
-					   //we asume generater doesn't take more than 1 sec
-		{ //maybe thumb is old in a sec.
-			time(&now);
-			if (now > thumbinfo.st_ctime)
-				goto err;
-		}
-		else if (info.st_ctime > thumbinfo.st_ctime)
-			goto err;
-	}
+	if (SPECCMP(info.st_ctim, >, thumbinfo.st_ctim))
+		goto err;
 
 	goto out;
 err:
@@ -746,7 +735,6 @@ err:
 	}
 	thumb = NULL;
 out:
-	g_free(pic_path);
 	g_free(path);
 	g_free(thumb_path);
 	return thumb;
@@ -1086,159 +1074,6 @@ static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label)
 	g_signal_connect(button, "clicked", G_CALLBACK(purge_disk_cache), NULL);
 
 	return g_list_append(NULL, align);
-}
-
-/* Exif reading.
- * Based on Thierry Bousch's public domain exifdump.py.
- */
-
-#define JPEG_FORMAT        0x201
-#define JPEG_FORMAT_LENGTH 0x202
-
-/*
- * Extract n-byte integer in Motorola (big-endian) format
- */
-static inline long long s2n_motorola(const unsigned char *p, int len)
-{
-    long long a=0;
-    int i;
-
-    for(i=0; i<len; i++)
-        a=(a<<8) | (int)(p[i]);
-
-    return a;
-}
-
-/*
- * Extract n-byte integer in Intel (little-endian) format
- */
-static inline long long s2n_intel(const unsigned char *p, int len)
-{
-    long long a=0;
-    int i;
-
-    for(i=0; i<len; i++)
-        a=a | (((int) p[i]) << (i*8));
-
-    return a;
-}
-
-/*
- * Extract n-byte integer from data
- */
-static int s2n(const unsigned char *dat, int off, int len, char format)
-{
-    const unsigned char *p=dat+off;
-
-    switch(format) {
-    case 'I':
-        return s2n_intel(p, len);
-
-    case 'M':
-        return s2n_motorola(p, len);
-    }
-
-    return 0;
-}
-
-/*
- * Load header of JPEG/Exif file and attempt to extract the embedded
- * thumbnail.  Return NULL on failure.
- */
-static GdkPixbuf *extract_tiff_thumbnail(const gchar *path)
-{
-    FILE *in;
-    unsigned char header[256];
-    int i, n;
-    int length;
-    unsigned char *data;
-    char format;
-    int ifd, entries;
-    int thumb=0, tlength=0;
-    GdkPixbuf *buf=NULL;
-
-    in=fopen(path, "rb");
-    if(!in) {
-        return NULL;
-    }
-
-    /* Check for Exif format */
-    n=fread(header, 1, 12, in);
-    if(n!=12 || strncmp((char *) header, "\377\330\377\341", 4)!=0 ||
-       strncmp((char *)header+6, "Exif", 4)!=0) {
-        fclose(in);
-        return NULL;
-    }
-
-    /* Read header */
-    length=header[4]*256+header[5];
-    data=g_new(unsigned char, length);
-    n=fread(data, 1, length, in);
-    fclose(in);   /* File no longer needed */
-    if(n!=length) {
-        g_free(data);
-        return NULL;
-    }
-
-    /* Big or little endian (as 'M' or 'I') */
-    format=data[0];
-
-    /* Skip over main section */
-    ifd=s2n(data, 4, 4, format);
-    entries=s2n(data, ifd, 2, format);
-
-    /* Second section contains data on thumbnail */
-    ifd=s2n(data, ifd+2+12*entries, 4, format);
-    entries=s2n(data, ifd, 2, format);
-
-    /* Loop over the entries */
-    for(i=0; i<entries; i++) {
-        int entry=ifd+2+12*i;
-        int tag=s2n(data, entry, 2, format);
-        int type=s2n(data, entry+2, 2, format);
-        int offset=entry+8;
-
-        if(type==4) {
-            int val=(int) s2n(data, offset, 4, format);
-
-            /* Only interested in two entries, the location of the thumbnail
-               and its size */
-            switch(tag) {
-            case JPEG_FORMAT: thumb=val; break;
-            case JPEG_FORMAT_LENGTH: tlength=val; break;
-            }
-        }
-    }
-
-    if(thumb && tlength) {
-        GError *err=NULL;
-        GdkPixbufLoader *loader;
-
-        /* Don't read outside the header (some files have incorrect data) */
-        if(thumb+tlength>length)
-            tlength=length-thumb;
-
-        loader=gdk_pixbuf_loader_new();
-        gdk_pixbuf_loader_write(loader, data+thumb, tlength, &err);
-        if(err) {
-            g_error_free(err);
-            return NULL;
-        }
-
-        gdk_pixbuf_loader_close(loader, &err);
-        if(err) {
-            g_error_free(err);
-            return NULL;
-        }
-
-        buf=gdk_pixbuf_loader_get_pixbuf(loader);
-        g_object_ref(buf);      /* Ref the image before we unref the loader */
-        g_object_unref(loader);
-    }
-
-    g_free(data);
-
-    return buf;
 }
 
 
