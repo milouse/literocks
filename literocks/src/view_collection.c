@@ -650,9 +650,21 @@ static void draw_item(GtkWidget *widget,
 		g_clear_object(&view->image);
 		g_clear_object(&view->thumb);
 
-		view->image =
-			get_globicon(make_path(fw->sym_path , item->leafname)) ?:
-			get_globicon(make_path(fw->real_path, item->leafname));
+		view->image = get_globicon(
+				make_path(fw->sym_path, item->leafname));
+
+		if (!view->image)
+		{
+			const guchar *path = make_path(fw->real_path, item->leafname);
+
+			view->image = get_globicon(path);
+
+			//used as an icon of some where
+			if (!view->image && fw->show_thumbs &&
+					item->base_type == TYPE_FILE)
+				view->image = g_fscache_lookup_full(pixmap_cache, path,
+						FSCACHE_LOOKUP_ONLY_NEW, NULL);
+		}
 
 		if (!view->image)
 		{
