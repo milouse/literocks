@@ -565,10 +565,10 @@ static gboolean next_thumb(ViewCollection *vc)
 
 			if (!view->thumb)
 			{
-				gchar *path = pathdup(
+				char *rpath = pathdup(
 						make_path(fw->real_path, item->leafname));
-				view->thumb = pixmap_try_thumb(path, FALSE);
-				g_free(path);
+				view->thumb = pixmap_try_thumb(rpath, FALSE);
+				g_free(rpath);
 			}
 
 			if (!view->image || view->thumb)
@@ -650,21 +650,9 @@ static void draw_item(GtkWidget *widget,
 		g_clear_object(&view->image);
 		g_clear_object(&view->thumb);
 
-		view->image = get_globicon(
-				make_path(fw->sym_path, item->leafname));
-
-		if (!view->image)
-		{
-			const guchar *path = make_path(fw->real_path, item->leafname);
-
-			view->image = get_globicon(path);
-
-			//used as an icon of some where
-			if (!view->image && fw->show_thumbs &&
-					item->base_type == TYPE_FILE)
-				view->image = g_fscache_lookup_full(pixmap_cache, path,
-						FSCACHE_LOOKUP_ONLY_NEW, NULL);
-		}
+		view->image =
+			get_globicon(make_path(fw->sym_path , item->leafname)) ?:
+			get_globicon(make_path(fw->real_path, item->leafname));
 
 		if (!view->image)
 		{

@@ -9,7 +9,6 @@
 #include <gtk/gtk.h>
 
 extern GFSCache *pixmap_cache;
-extern GFSCache *thumb_cache;
 extern GFSCache *desktop_icon_cache;
 
 extern MaskedPixmap *im_error;
@@ -38,6 +37,7 @@ extern int small_width; /* SMALL_WIDTH * small_height / SMALL_WIDTH */
 extern int thumb_size;
 
 extern Option o_pixmap_thumb_file_size;
+extern Option o_create_sub_dir_thumbs;
 
 typedef struct _MaskedPixmapClass MaskedPixmapClass;
 

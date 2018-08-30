@@ -200,7 +200,6 @@ Option o_filer_width_limit;
 Option o_fast_font_calc;
 static Option o_right_gap, o_bottom_gap, o_auto_move;
 static Option o_disable_pointer_warp;
-Option o_create_sub_dir_thumbs;
 Option o_window_link;
 Option o_scroll_speed;
 static Option o_hide_root_msg;

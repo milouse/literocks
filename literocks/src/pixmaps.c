@@ -30,16 +30,8 @@
 #define PIXMAP_THUMB_SIZE  256
 #define PIXMAP_THUMB_TOO_OLD_TIME  5
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
-
-#include <gtk/gtk.h>
 
 #include "global.h"
 
@@ -48,7 +40,6 @@
 #include "gui_support.h"
 #include "pixmaps.h"
 #include "main.h"
-#include "filer.h"
 #include "dir.h"
 #include "diritem.h"
 #include "choices.h"
@@ -95,6 +86,8 @@ int thumb_size = PIXMAP_THUMB_SIZE;
 gchar *thumb_dir = "normal";
 
 Option o_pixmap_thumb_file_size;
+Option o_create_sub_dir_thumbs;
+
 
 typedef struct _ChildThumbnail ChildThumbnail;
 
@@ -291,9 +284,9 @@ void pixmap_make_small(MaskedPixmap *mp)
 }
 
 /* -1:not thumb target 0:not created 1:created and loaded */
-gint pixmap_check_thumb(const gchar *path)
+gint pixmap_check_thumb(const gchar *rpath)
 {
-	GdkPixbuf *image = pixmap_try_thumb(path, TRUE);
+	GdkPixbuf *image = pixmap_try_thumb(rpath, TRUE);
 
 	if (image)
 	{
@@ -301,7 +294,7 @@ gint pixmap_check_thumb(const gchar *path)
 		return 1;
 	}
 
-	MIME_type *type = type_from_path(path);
+	MIME_type *type = type_from_path(rpath);
 	if (type)
 	{
 		gchar *thumb_prog = NULL;
@@ -329,7 +322,7 @@ static int thumb_prog_timeout(ChildThumbnail *info)
  * If the image is already uptodate, or being created already, calls the
  * callback right away.
  */
-void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
+void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 {
 	GdkPixbuf	*image;
 	pid_t		child;
@@ -436,11 +429,11 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 /*
  * Return the thumbnail for a file, only if available.
  */
-GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
+GdkPixbuf *pixmap_try_thumb(const gchar *rpath, gboolean forcheck)
 {
 	GdkPixbuf *pixbuf;
 
-	pixbuf = get_thumbnail_for(path, forcheck);
+	pixbuf = get_thumbnail_for(rpath, forcheck);
 
 	if (!pixbuf)
 	{
@@ -449,14 +442,14 @@ GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
 
 		/* Skip zero-byte files. They're either empty, or
 		 * special (may cause us to hang, e.g. /proc/kmsg). */
-		if (mc_stat(path, &info1) != 0 || info1.st_size == 0) {
+		if (mc_stat(rpath, &info1) != 0 || info1.st_size == 0) {
 			return NULL;
 		}
 
 		/* If the image itself is in ~/.cache/thumbnails, load it now
 		 * (ie, don't create thumbnails for thumbnails!).
 		 */
-		dir = g_path_get_dirname(path);
+		dir = g_path_get_dirname(rpath);
 		if (mc_stat(dir, &info1) != 0)
 		{
 			g_free(dir);
@@ -468,7 +461,7 @@ GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
 			    info1.st_dev == info2.st_dev &&
 			    info1.st_ino == info2.st_ino)
 		{
-			pixbuf = gdk_pixbuf_new_from_file_at_scale(path,
+			pixbuf = gdk_pixbuf_new_from_file_at_scale(rpath,
 					thumb_size, thumb_size, TRUE, NULL);
 			if (!pixbuf)
 			{
@@ -677,27 +670,20 @@ static void thumbnail_done(ChildThumbnail *info)
 /* Check if we have an up-to-date thumbnail for this image.
  * If so, return it. Otherwise, returns NULL.
  */
-static GdkPixbuf *get_thumbnail_for(const char *pathname, gboolean forcheck)
+static GdkPixbuf *get_thumbnail_for(const char *rpath, gboolean forcheck)
 {
-	GdkPixbuf *thumb = NULL;
-	char *thumb_path, *path;
-	struct stat info, thumbinfo;
-
-	path = pathdup(pathname);
-	thumb_path = pixmap_make_thumb_path(path);
-
-	thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
+	char *thumb_path = pixmap_make_thumb_path(rpath);
+	GdkPixbuf *thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
 	if (!thumb)
 		goto err;
 
-	if (mc_lstat(thumb_path, &thumbinfo) != 0 ||
-		mc_lstat(path, &info) != 0
-		)
+	struct stat info, thumbinfo;
+	if (mc_lstat(thumb_path, &thumbinfo) != 0
+	||  mc_lstat(rpath     , &info     ) != 0)
 		goto err;
 
 	if (!forcheck)
 		thumbinfo.st_ctim.tv_sec++; //one sec older file is valid
-
 	if (SPECCMP(info.st_ctim, >, thumbinfo.st_ctim))
 		goto err;
 
@@ -709,7 +695,6 @@ err:
 	}
 	thumb = NULL;
 out:
-	g_free(path);
 	g_free(thumb_path);
 	return thumb;
 }
