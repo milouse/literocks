@@ -317,30 +317,6 @@ gint pixmap_check_thumb(const gchar *path)
 }
 
 
-GdkPixbuf *pixmap_load_thumb(const gchar *path)
-{
-	GdkPixbuf *ret = NULL;
-	gboolean found = FALSE;
-	MaskedPixmap *pixmap;
-
-	pixmap = g_fscache_lookup_full(pixmap_cache,
-			path, FSCACHE_LOOKUP_ONLY_NEW, &found);
-
-	if (found && !pixmap)
-		return NULL;
-
-	if (pixmap)
-		g_object_unref(pixmap);
-
-	found = FALSE;
-
-	if (!found)
-		ret = get_thumbnail_for(path, FALSE);
-
-	return ret;
-}
-
-
 static int thumb_prog_timeout(ChildThumbnail *info)
 {
 	info->timeout = 0;
@@ -477,11 +453,10 @@ GdkPixbuf *pixmap_try_thumb(const gchar *path, gboolean forcheck)
 			return NULL;
 		}
 
-		dir = g_path_get_dirname(path);
-
 		/* If the image itself is in ~/.cache/thumbnails, load it now
 		 * (ie, don't create thumbnails for thumbnails!).
 		 */
+		dir = g_path_get_dirname(path);
 		if (mc_stat(dir, &info1) != 0)
 		{
 			g_free(dir);
@@ -663,7 +638,6 @@ static void ordered_update(ChildThumbnail *info)
 static void do_nothing() {}
 static gboolean retry_thumb(char *path)
 {
-D(*************retry %s, path)
 	pixmap_background_thumb(path, do_nothing, NULL);
 	g_free(path);
 	return FALSE;
