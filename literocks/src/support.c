@@ -21,28 +21,18 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
 #include <netdb.h>
 #include <errno.h>
-#include <ctype.h>
 #include <sys/param.h>
 #include <pwd.h>
 #include <grp.h>
 #include <fcntl.h>
 #include <sys/wait.h>
-#include <string.h>
-#include <time.h>
-#include <unistd.h>
-#include <libxml/parser.h>
 #include <math.h>
 #include <sys/mman.h>
 
 #include "global.h"
 
-#include "choices.h"
-#include "main.h"
 #include "options.h"
 #include "support.h"
 #include "fscache.h"
@@ -605,6 +595,18 @@ char *pretty_time(const time_t *time)
 		time_buf[0]= 0;
 
 	return to_utf8(time_buf);
+}
+char *pretty_timespec(struct timespec *ts)
+{
+	struct tm *tms = localtime(&ts->tv_sec);
+	char time_buf[32];
+	if (strftime(time_buf, sizeof(time_buf), TIME_FORMAT, tms) == 0)
+		time_buf[0]= 0;
+
+	char *t = pretty_time(&ts->tv_sec);
+	char *ret = g_strdup_printf("%s .%09ld", time_buf, ts->tv_nsec);
+	g_free(t);
+	return ret;
 }
 
 #ifndef O_NOFOLLOW
@@ -1273,7 +1275,7 @@ gchar *unescape_uri(const EscapedPath *uri)
 }
 
 /* Used as the sort function for sorting GPtrArrays */
-gint strcmp2(gconstpointer a, gconstpointer b)
+static gint strcmp2(gconstpointer a, gconstpointer b)
 {
 	const char *aa = *(char **) a;
 	const char *bb = *(char **) b;

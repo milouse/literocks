@@ -635,11 +635,11 @@ static GtkWidget *make_details(const guchar *path, DirItem *item,
 		}
 	}
 
-	add_row_and_free(store, _("Change time:"), pretty_time(&item->ctime));
-
-	add_row_and_free(store, _("Modify time:"), pretty_time(&item->mtime));
-
-	add_row_and_free(store, _("Access time:"), pretty_time(&item->atime));
+	struct stat info;
+	mc_lstat(path, &info);
+	add_row_and_free(store, _("Change time:"), pretty_timespec(&info.st_ctim));
+	add_row_and_free(store, _("Modify time:"), pretty_timespec(&info.st_mtim));
+	add_row_and_free(store, _("Access time:"), pretty_timespec(&info.st_atim));
 
 	add_row(store, _("Type:"), pretty_type(item, path));
 

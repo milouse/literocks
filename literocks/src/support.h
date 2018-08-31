@@ -7,7 +7,7 @@
 #define _SUPPORT_H
 
 #define PRETTY_SIZE_LIMIT 10000
-#define TIME_FORMAT "%T %d %b %Y"
+#define TIME_FORMAT "%Y-%m-%d %T"
 #define COMPACT_TIME_FORMAT "%T %d%b%y"
 
 #include <glib-object.h>
@@ -32,6 +32,7 @@ char *get_local_path(const EscapedPath *escaped_uri);
 void close_on_exec(int fd, gboolean close);
 void set_blocking(int fd, gboolean blocking);
 char *pretty_time(const time_t *time);
+char *pretty_timespec(struct timespec *ts);
 guchar *shell_escape(const guchar *word);
 gboolean is_sub_dir(const char *sub, const char *parent);
 gboolean in_list(const guchar *item, const guchar *list);
@@ -50,7 +51,6 @@ void null_g_free(gpointer p);
 gboolean file_exists(const char *path);
 GPtrArray *list_dir_all(const guchar *path);
 GPtrArray *list_dir(const guchar *path);
-gint strcmp2(gconstpointer a, gconstpointer b);
 int stat_with_timeout(const char *path, struct stat *info);
 
 EscapedPath *escape_uri_path(const char *path);
