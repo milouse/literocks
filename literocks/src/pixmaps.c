@@ -95,6 +95,7 @@ typedef struct _ChildThumbnail ChildThumbnail;
 /* There is one of these for each active child process */
 struct _ChildThumbnail {
 	gchar	 *path;
+	gchar	 *rpath;
 	struct timespec orgtime;
 	GFunc	 callback;
 	gpointer data;
@@ -102,7 +103,6 @@ struct _ChildThumbnail {
 	guint	 timeout;
 	guint	 order;
 };
-static guint ordered_num = 0;
 static guint next_order = 0;
 
 static const char *stocks[] = {
@@ -327,13 +327,19 @@ static int thumb_prog_timeout(ChildThumbnail *info)
  */
 void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 {
+	static guint ordered_num;
+
 	GdkPixbuf	*image;
 	pid_t		child;
 	ChildThumbnail *info;
 	MIME_type      *type;
 	gchar          *thumb_prog;
 
-	image = pixmap_try_thumb(path, TRUE);
+	static char *rpath;
+	g_free(rpath);
+	rpath = pathdup(path);
+
+	image = pixmap_try_thumb(rpath, TRUE);
 
 	if (image)
 	{
@@ -344,22 +350,23 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 	}
 
 	/* Is it currently being created? */
-	if (g_hash_table_lookup(orders, path))
+	if (g_hash_table_lookup(orders, rpath))
 	{/* Thumbnail is known, or being created */
 		callback(data, NULL);
 		//append to last for sym links what sharing the thumb
 		info = g_new0(ChildThumbnail, 1);
 		info->path = g_strdup(path);
+		info->rpath = g_strdup(rpath);
 		info->order = ordered_num++;
 		ordered_update(info);
 		return;
 	}
-	g_hash_table_add(orders, g_strdup(path));
+	g_hash_table_add(orders, g_strdup(rpath));
 
 	/* Not in memory, nor in the thumbnails directory.  We need to
 	 * generate it */
 
-	type = type_from_path(path);
+	type = type_from_path(rpath);
 	if (!type)
 		type = text_plain;
 
@@ -384,6 +391,7 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 
 	info = g_new(ChildThumbnail, 1);
 	info->path = g_strdup(path);
+	info->rpath = g_strdup(rpath);
 	info->orgtime = orginfo.st_ctim;
 	info->callback = callback;
 	info->data = data;
@@ -405,8 +413,8 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 		   memory, but since we go away very quickly, that's ok.) */
 		if (thumb_prog)
 		{
-			execl(thumb_prog, thumb_prog, path,
-					thumb_path_mk(path),
+			execl(thumb_prog, thumb_prog, rpath,
+					thumb_path_mk(rpath),
 					g_strdup_printf("%d", thumb_size),
 					NULL);
 
@@ -416,15 +424,15 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 		if (!strcmp(type->media_type, "video") && *o_video_thumbnailer.value)
 		{
 			execlp("sh", "sh", "-c", o_video_thumbnailer.value, "sh",
-					path,
-					thumb_path_mk(path),
+					rpath,
+					thumb_path_mk(rpath),
 					g_strdup_printf("%d", thumb_size),
 					NULL);
 
 			_exit(1);
 		}
 		else
-			create_thumbnail(path, type);
+			create_thumbnail(rpath, type);
 		_exit(0);
 	}
 
@@ -628,6 +636,7 @@ static void ordered_update(ChildThumbnail *info)
 		make_dir_thumb(li->path);
 
 		g_free(li->path);
+		g_free(li->rpath);
 		g_free(li);
 
 		next_order++;
@@ -655,20 +664,20 @@ static void thumbnail_done(ChildThumbnail *info)
 
 	bool ok = false;
 	struct stat tinfo, nowinfo;
-	char *tpath = _thumb_path(info->path, false);
+	char *tpath = _thumb_path(info->rpath, false);
 	if (mc_stat(tpath, &tinfo) == 0 && SPECCMP(tinfo.st_ctim, >=, info->orgtime))
 	{
-		if (mc_stat(info->path, &nowinfo) == 0
+		if (mc_stat(info->rpath, &nowinfo) == 0
 				&& SPECCMP(nowinfo.st_ctim, !=, info->orgtime))
 		{ //file is changed from start time
-			g_timeout_add(900, (GSourceFunc) retry_thumb, g_strdup(info->path));
+			g_timeout_add(900, (GSourceFunc) retry_thumb, g_strdup(info->rpath));
 		}
 		ok = true;
 	}
 	else
 		g_fscache_insert(pixmap_cache, info->path, NULL, TRUE);
 
-	g_hash_table_remove(orders, info->path);
+	g_hash_table_remove(orders, info->rpath);
 	info->callback(info->data, ok ? info->path : NULL);
 	ordered_update(info);
 
