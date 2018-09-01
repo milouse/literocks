@@ -21,13 +21,7 @@
 
 #include "config.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <ctype.h>
 #include <netdb.h>
-#include <sys/param.h>
 #include <fnmatch.h>
 #include <regex.h>
 

@@ -23,12 +23,6 @@
 
 #include <gtk/gtk.h>
 #include <errno.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <fnmatch.h>
-#include <libxml/parser.h>
-#include <time.h>
 
 #include "global.h"
 
@@ -40,14 +34,9 @@
 #include "pixmaps.h"
 #include "type.h"
 #include "run.h"
-#include "dnd.h"
 #include "support.h"
 #include "usericons.h"
-#include "main.h"
-#include "menu.h"
 #include "filer.h"
-#include "action.h"
-#include "display.h"
 #include "xml.h"
 #include "dropbox.h"
 #include "icon.h"

@@ -823,9 +823,9 @@ static void make_script_clicked(GtkWidget *button, gpointer udata)
 
 	/* Default to saving in current filer window */
 	if(window_with_focus)
-		filename=make_path(window_with_focus->sym_path, "rox");
+		filename=make_path(window_with_focus->sym_path, "literocks");
 	else
-		filename="rox";
+		filename="literocks";
 	image = type_to_icon(application_x_shellscript);
 
 	/* Create a save box to save the script */
