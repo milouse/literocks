@@ -70,7 +70,7 @@
  */
 
 typedef struct _GUIside GUIside;
-typedef void ActionChild(gpointer data);
+typedef void ActionChild(GList *paths);
 typedef void ForDirCB(const char *path, const char *dest_path);
 
 struct _GUIside
@@ -2036,9 +2036,8 @@ static void do_mount(const guchar *path, gboolean mount)
 /* After forking, the child calls one of these functions */
 
 /* We use a double for total size in order to count beyond 4Gb */
-static void usage_cb(gpointer data)
+static void usage_cb(GList *paths)
 {
-	GList *paths = (GList *) data;
 	double	total_size = 0;
 	int n, i;
 	gchar *base;
@@ -2088,9 +2087,8 @@ static void usage_cb(gpointer data)
 }
 
 #ifdef DO_MOUNT_POINTS
-static void mount_cb(gpointer data)
+static void mount_cb(GList *paths)
 {
-	GList 		*paths = (GList *) data;
 	gboolean	mount_points = FALSE;
 	int n, i;
 
@@ -2137,9 +2135,8 @@ static guchar *dirname(guchar *path)
 	return g_strdup("/");
 }
 
-static void delete_cb(gpointer data)
+static void delete_cb(GList *paths)
 {
-	GList	*paths = (GList *) data;
 	int n, i;
 
 	n=g_list_length(paths);
@@ -2160,14 +2157,10 @@ static void delete_cb(gpointer data)
 	send_done();
 }
 
-static void eject_cb(gpointer data)
+static void eject_cb(GList *paths)
 {
-	GList	*paths = (GList *) data;
-	int n, i;
-
-	n=g_list_length(paths);
-
-	for (i=0; paths; paths = paths->next, i++)
+	int n = g_list_length(paths);
+	for (int i = 0; paths; paths = paths->next, i++)
 	{
 		guchar	*path = (guchar *) paths->data;
 
@@ -2175,13 +2168,11 @@ static void eject_cb(gpointer data)
 		do_eject(path);
 		send_prog(i, n);
 	}
-
 	send_done();
 }
 
-static void find_cb(gpointer data)
+static void find_cb(GList *all_paths)
 {
-	GList *all_paths = (GList *) data;
 	GList *paths;
 
 	while (1)
@@ -2204,9 +2195,8 @@ static void find_cb(gpointer data)
 	send_done();
 }
 
-static void chmod_cb(gpointer data)
+static void chmod_cb(GList *paths)
 {
-	GList *paths = (GList *) data;
 	int n, i;
 	gchar *base;
 
@@ -2235,9 +2225,8 @@ static void chmod_cb(gpointer data)
 	send_done();
 }
 
-static void settype_cb(gpointer data)
+static void settype_cb(GList *paths)
 {
-	GList *paths = (GList *) data;
 	int n, i;
 	gchar *base;
 
@@ -2266,15 +2255,12 @@ static void settype_cb(gpointer data)
 	send_done();
 }
 
-static void list_cb(gpointer data)
+static void list_cb(GList *paths)
 {
-	GList	*paths = (GList *) data;
-	int n, i;
 	char *last = NULL;
 
-	n=g_list_length(paths);
-
-	for (i=0; paths; paths = paths->next, i++)
+	int n = g_list_length(paths);
+	for (int i = 0; paths; paths = paths->next, i++)
 	{
 		send_src((char *) paths->data);
 
@@ -2291,9 +2277,13 @@ static void list_cb(gpointer data)
 	send_check_path(action_dest);
 
 	if (last && o_action_wink.int_value)
-		//autoselect(wink)
-		printf_send("w%s",
+	{
+		char *lbase = g_path_get_dirname(last);
+		if (strcmp(lbase, action_dest))
+			printf_send("w%s",
 				make_dest_path(seqed_path ?: last, action_dest));
+		g_free(lbase);
+	}
 }
 
 /*			EXTERNAL INTERFACE			*/
