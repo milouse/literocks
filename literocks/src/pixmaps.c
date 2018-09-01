@@ -86,6 +86,7 @@ int thumb_size = PIXMAP_THUMB_SIZE;
 gchar *thumb_dir = "normal";
 
 Option o_pixmap_thumb_file_size;
+Option o_video_thumbnailer;
 Option o_create_sub_dir_thumbs;
 
 
@@ -172,6 +173,7 @@ void pixmaps_init(void)
 	int i;
 
 	option_add_int(&o_pixmap_thumb_file_size, "thumb_file_size", PIXMAP_THUMB_SIZE);
+	option_add_string(&o_video_thumbnailer, "video_thumbnailer", "ffmpegthumbnailer -i \"$1\" -o \"$2\" -s $3");
 	option_add_notify(options_changed);
 
 	gtk_widget_push_colormap(gdk_rgb_get_colormap());
@@ -298,8 +300,9 @@ gint pixmap_check_thumb(const gchar *rpath)
 	if (type)
 	{
 		gchar *thumb_prog = NULL;
-		if (strcmp(type->media_type, "image") == 0 ||
-				(thumb_prog = thumbnail_program(type)))
+		if (!strcmp(type->media_type, "image")
+		|| (!strcmp(type->media_type, "video") && *o_video_thumbnailer.value)
+		|| (thumb_prog = thumbnail_program(type)))
 		{
 			g_free(thumb_prog);
 			return 0;
@@ -326,9 +329,9 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 {
 	GdkPixbuf	*image;
 	pid_t		child;
-	ChildThumbnail	*info;
-	MIME_type       *type;
-	gchar		*thumb_prog, *base;
+	ChildThumbnail *info;
+	MIME_type      *type;
+	gchar          *thumb_prog;
 
 	image = pixmap_try_thumb(path, TRUE);
 
@@ -364,8 +367,10 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 
 
 	/* Only attempt to load 'images' types ourselves */
-	if (thumb_prog == NULL && strcmp(type->media_type, "image") != 0)
-	{
+	if (thumb_prog == NULL
+	&&  strcmp(type->media_type, "image")
+	&& (strcmp(type->media_type, "video") || !*o_video_thumbnailer.value)
+	) {
 		callback(data, NULL);
 		return;		/* Don't know how to handle this type */
 	}
@@ -400,13 +405,6 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 		   memory, but since we go away very quickly, that's ok.) */
 		if (thumb_prog)
 		{
-			DirItem *item;
-
-			base = g_path_get_basename(thumb_prog);
-			item = diritem_new(base);
-			g_free(base);
-			diritem_restat(thumb_prog, item, NULL, TRUE);
-
 			execl(thumb_prog, thumb_prog, path,
 					thumb_path_mk(path),
 					g_strdup_printf("%d", thumb_size),
@@ -415,7 +413,18 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 			_exit(1);
 		}
 
-		create_thumbnail(path, type);
+		if (!strcmp(type->media_type, "video") && *o_video_thumbnailer.value)
+		{
+			execlp("sh", "sh", "-c", o_video_thumbnailer.value, "sh",
+					path,
+					thumb_path_mk(path),
+					g_strdup_printf("%d", thumb_size),
+					NULL);
+
+			_exit(1);
+		}
+		else
+			create_thumbnail(path, type);
 		_exit(0);
 	}
 
