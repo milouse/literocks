@@ -47,7 +47,6 @@
 #include "type.h"
 #include "options.h"
 #include "minibuffer.h"
-#include "icon.h"
 #include "toolbar.h"
 #include "bind.h"
 #include "mount.h"
@@ -277,9 +276,8 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h, gboolean not
 	Settings *set = (Settings *) g_hash_table_lookup(
 			settings_table, filer_window->sym_path);
 	GtkWidget *window = filer_window->window;
-	GdkWindow *gdk_window = window->window;
+	GdkWindow *gdk_window = gdkwin(window);
 	if (!gdk_window) return;
-	GtkRequisition *req = &window->requisition;
 	gint dx = 0, dy = 0, px = 0, py = 0;
 
 	if (filer_window->req_width >= 0)
@@ -296,16 +294,24 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h, gboolean not
 	else
 	{
 		if (filer_window->scrollbar)
-			w += filer_window->scrollbar->allocation.width;
+			w += alloc(filer_window->scrollbar).width;
 
 		if (o_toolbar.int_value != TOOLBAR_NONE)
-			h += filer_window->toolbar->allocation.height;
+			h += alloc(filer_window->toolbar).height;
 		if (gtk_widget_get_visible(filer_window->message))
-			h += filer_window->message->allocation.height;
+			h += alloc(filer_window->message).height;
 	}
 
+#if GTK_MAJOR_VERSION >= 3
+	GtkRequisition req;
+	gtk_widget_get_preferred_size(window, &req, NULL);
+	w = MAX(req.width, w);
+	h = MAX(req.height, h);
+#else
+	GtkRequisition *req = &window->requisition;
 	w = MAX(req->width, w);
 	h = MAX(req->height, h);
+#endif
 
 	if (o_auto_move.int_value || filer_window->reqx >= 0)
 	{
@@ -315,9 +321,9 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h, gboolean not
 		gdk_window_get_pointer(NULL, &x, &y, NULL);
 		m = gdk_screen_get_monitor_at_point(gdk_screen_get_default(), x, y);
 
-		gdk_window_get_geometry(gdk_window, NULL, NULL, &bcw, &bch, NULL);
+		geometry(gdk_window, NULL, NULL, &bcw, &bch);
 		gdk_window_get_frame_extents(gdk_window, &frect);
-		gdk_window_get_geometry(gdk_window, NULL, NULL, &currentw, &currenth, NULL);
+		geometry(gdk_window, NULL, NULL, &currentw, &currenth);
 		/* If delay happens between bc and current then get after. */
 		if (bcw != currentw || bch != currenth)
 			gdk_window_get_frame_extents(gdk_window, &frect);
@@ -377,11 +383,19 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h, gboolean not
 			if (gtk_window_is_active(GTK_WINDOW(window)) && !o_disable_pointer_warp.int_value)
 			{
 				gdk_window_get_pointer(gdk_window, &px, &py, NULL);
+
+#if GTK_MAJOR_VERSION >= 3
+				gdk_device_warp(
+						gdk_seat_get_pointer(gdk_display_get_default_seat(gdk_window_get_display(gdk_window))),
+						gdk_display_get_default_screen(gdk_window_get_display(gdk_window)),
+						px + dx, py + dy);
+#else
 				XWarpPointer(gdk_x11_drawable_get_xdisplay(gdk_window),
 						None,
 						gdk_x11_drawable_get_xid(gdk_window),
 						0, 0, 0, 0,
 						px + dx, py + dy);
+#endif
 			}
 
 			/* In start up, there is no GDK_window. Have to use GTK. */
@@ -424,19 +438,26 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h, gboolean not
 						&px, &py, NULL);
 
 			if (filer_window->scrollbar)
-				w -= filer_window->scrollbar->allocation.width;
+				w -= alloc(filer_window->scrollbar).width;
 
 			nx = CLAMP(px, 2, w - 2);
 			ny = CLAMP(py, 2, h - 2);
 
 			if (nx != px || ny != py)
 			{
+#if GTK_MAJOR_VERSION >= 3
+				gdk_device_warp(
+						gdk_seat_get_pointer(gdk_display_get_default_seat(gdk_window_get_display(gdk_window))),
+						gdk_display_get_default_screen(gdk_window_get_display(gdk_window)),
+						px + dx, py + dy);
+#else
 				XWarpPointer(
 						gdk_x11_drawable_get_xdisplay(gdk_window),
 						None,
 						gdk_x11_drawable_get_xid(gdk_window),
 						0, 0, 0, 0,
 						nx + dx, ny + dy);
+#endif
 			}
 
 		 	gdk_event_free(event);
@@ -454,13 +475,13 @@ static gboolean acceptfocuscb(FilerWindow *fw)
 void filer_link(FilerWindow *left, FilerWindow *right)
 {
 	GdkRectangle frect = {0, 0, 0, 0};
-	gdk_window_get_frame_extents(left->window->window, &frect);
+	gdk_window_get_frame_extents(gdkwin(left->window), &frect);
 	gtk_window_move(GTK_WINDOW(right->window),
 			frect.x + frect.width,
 			frect.y);
 
 	gtk_window_set_accept_focus(GTK_WINDOW(right->window), FALSE);
-	gdk_window_raise(right->window->window);
+	gdk_window_raise(gdkwin(right->window));
 	if (right->accept_timeout)
 		g_source_remove(right->accept_timeout);
 	right->accept_timeout =
@@ -493,9 +514,9 @@ static gboolean _set_pointer(void *vp)
 	fw->pointer_idle = 0;
 	if (!g_list_find(all_filer_windows, fw)) return FALSE;//destroyed
 
-	GdkWindow *gwin = gdk_window_get_pointer(fw->window->window, NULL, NULL, NULL);
+	GdkWindow *gwin = gdk_window_get_pointer(gdkwin(fw->window), NULL, NULL, NULL);
 
-	if (GTK_WIDGET(fw->view)->window == gwin)
+	if (gdkwin(fw->view) == gwin)
 	{
 		gdk_window_get_pointer(gwin, &x, &y, NULL);
 
@@ -503,7 +524,7 @@ static gboolean _set_pointer(void *vp)
 		item = iter.peek(&iter);
 	}
 
-	gdk_window_set_cursor(fw->window->window,
+	gdk_window_set_cursor(gdkwin(fw->window),
 			item ? hand_cursor : NULL);
 
 	return FALSE;
@@ -675,7 +696,7 @@ static void update_display(Directory *dir,
 
 static void attach(FilerWindow *filer_window)
 {
-	gdk_window_set_cursor(filer_window->window->window, busy_cursor);
+	gdk_window_set_cursor(gdkwin(filer_window->window), busy_cursor);
 	gdk_flush();
 
 	view_clear(filer_window->view);
@@ -868,7 +889,7 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 	unmount_mem_btn = gtk_check_button_new_with_label(
 			_("Perform the same action in future for this mount point"));
 	gtk_widget_show(unmount_mem_btn);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), unmount_mem_btn,
+	gtk_box_pack_start(VBOX(GTK_DIALOG(dialog)), unmount_mem_btn,
 			FALSE, FALSE, 0);
 	g_object_set_data(G_OBJECT(dialog), "unmount_mem_btn",
 			unmount_mem_btn);
@@ -917,7 +938,7 @@ gboolean filer_window_delete(GtkWidget *window,
 		may_offer_unmount(filer_window, mount);
 
 	/* Without this, the window will flash more */
-	gdk_window_resize(window->window, 4, 4);
+	gdk_window_resize(gdkwin(window), 4, 4);
 
 	return FALSE;
 }
@@ -1537,7 +1558,7 @@ gint filer_key_press_event(GtkWidget	*widget,
 			   FilerWindow	*filer_window)
 {
 	ViewIface *view = filer_window->view;
-	GtkWidget *focus = GTK_WINDOW(widget)->focus_widget;
+	GtkWidget *focus = gtk_window_get_focus(GTK_WINDOW(widget));
 	guint key = event->keyval;
 	GdkModifierType modifiers = gtk_accelerator_get_default_mod_mask();
 	char group[2] = "1";
@@ -1559,7 +1580,7 @@ gint filer_key_press_event(GtkWidget	*widget,
 		gtk_widget_grab_focus(GTK_WIDGET(view));
 
 	if (filer_window->mini_type &&
-		(key == GDK_Tab || key == GDK_ISO_Left_Tab))
+		(key == GDK_KEY_Tab || key == GDK_KEY_ISO_Left_Tab))
 	{
 		gtk_widget_grab_focus(filer_window->minibuffer);
 		return TRUE;
@@ -1567,36 +1588,36 @@ gint filer_key_press_event(GtkWidget	*widget,
 
 	if ((filer_window->right_link || filer_window->left_link) &&
 			(
-			key == GDK_Left  ||
-			key == GDK_Right ||
-			key == GDK_Up    ||
-			key == GDK_Down  )
+			key == GDK_KEY_Left  ||
+			key == GDK_KEY_Right ||
+			key == GDK_KEY_Up    ||
+			key == GDK_KEY_Down  )
 			)
 		link_cursor(filer_window);
 
 	switch (key)
 	{
-		case GDK_Escape:
+		case GDK_KEY_Escape:
 			if ((filer_window->right_link || filer_window->left_link))
 				filer_cut_links(filer_window, 0);
 			filer_target_mode(filer_window, NULL, NULL, NULL);
 			view_cursor_to_iter(view, NULL);
 			view_clear_selection(view);
 			return FALSE;
-		case GDK_Return:
+		case GDK_KEY_Return:
 			return_pressed(filer_window, event);
 			break;
-		case GDK_ISO_Left_Tab:
+		case GDK_KEY_ISO_Left_Tab:
 			filer_next_selected(filer_window, -1);
 			break;
-		case GDK_Tab:
+		case GDK_KEY_Tab:
 			filer_next_selected(filer_window, 1);
 			break;
-		case GDK_BackSpace:
+		case GDK_KEY_BackSpace:
 			change_to_parent(filer_window);
 			break;
-		case GDK_bar:
-		case GDK_backslash:
+		case GDK_KEY_bar:
+		case GDK_KEY_backslash:
 		{
 			ViewIter iter;
 
@@ -1611,18 +1632,18 @@ gint filer_key_press_event(GtkWidget	*widget,
 			filer_window_toggle_cursor_item_selected(filer_window);
 			break;
 		default:
-			if (key >= GDK_0 && key <= GDK_9)
-				group[0] = key - GDK_0 + '0';
-			else if (key >= GDK_KP_0 && key <= GDK_KP_9)
-				group[0] = key - GDK_KP_0 + '0';
+			if (key >= GDK_KEY_0 && key <= GDK_KEY_9)
+				group[0] = key - GDK_KEY_0 + '0';
+			else if (key >= GDK_KEY_KP_0 && key <= GDK_KEY_KP_9)
+				group[0] = key - GDK_KEY_KP_0 + '0';
 			else if (!(event->state & modifiers) &&
-						key >= GDK_a && key <= GDK_z)
+						key >= GDK_KEY_a && key <= GDK_KEY_z)
 			{
 				minibuffer_show(filer_window, MINI_REG_SELECT, key);
 				return TRUE;
 			}
 			else if ((event->state & modifiers) == GDK_SHIFT_MASK &&
-						key >= GDK_A && key <= GDK_Z)
+						key >= GDK_KEY_A && key <= GDK_KEY_Z)
 			{
 				minibuffer_show(filer_window, MINI_TEMP_FILTER, key);
 				return TRUE;
@@ -1753,8 +1774,8 @@ void filer_change_to(FilerWindow *fw,
 	force_resize = check_settings(fw, FALSE);
 
 
-	if (fw->window->window)
-		gdk_window_set_role(fw->window->window,
+	if (gdkwin(fw->window))
+		gdk_window_set_role(gdkwin(fw->window),
 				    fw->sym_path);
 
 	attach(fw);
@@ -1892,8 +1913,8 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->scanning = FALSE;
 	filer_window->auto_select = NULL;
 	filer_window->toolbar_text = NULL;
-	filer_window->toolbar_size_text = NULL;
-	filer_window->toolbar_settings_text = NULL;
+	filer_window->toolbar_size_btn = NULL;
+	filer_window->toolbar_settings_btn = NULL;
 	filer_window->target_cb = NULL;
 	filer_window->mini_type = MINI_NONE;
 	filer_window->selection_state = GTK_STATE_ACTIVE;
@@ -2195,10 +2216,13 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 		small_width = (SMALL_WIDTH * small_height) / SMALL_HEIGHT;
 	}
 
+#if GTK_MAJOR_VERSION >= 3
+#else
 	GdkScreen *screen = gtk_widget_get_screen(filer_window->window);
 	GdkColormap *rgba = gdk_screen_get_rgba_colormap(screen);
 	if (rgba)
 		gtk_widget_set_colormap(filer_window->window, rgba);
+#endif
 
 	/* This property is cleared when the window is destroyed.
 	 * You can thus ref filer_window->window and use this to see
@@ -2255,7 +2279,7 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	gtk_widget_show(filer_window->scrollbar);
 	gtk_widget_realize(filer_window->window);
 
-	gdk_window_set_role(filer_window->window->window,
+	gdk_window_set_role(gdkwin(filer_window->window),
 			    filer_window->sym_path);
 }
 
@@ -2269,10 +2293,7 @@ static gboolean configure_cb(
 	if (fw->resize_drag_width)
 	{
 		gint cw;
-		gdk_window_get_geometry(
-				fw->window->window, NULL, NULL,
-				&cw,
-				NULL, NULL);
+		geometry(gdkwin(fw->window), NULL, NULL, &cw, NULL);
 
 		if (fw->name_scale == 1.0) //just, toolbar doesn't know collection
 			fw->name_scale_itemw =
@@ -2314,9 +2335,9 @@ static gboolean focus_in_cb(GtkWidget *w, GdkEvent *e, FilerWindow *fw)
 
 	GdkRectangle lfrect, rfrect;
 	gdk_window_get_frame_extents(
-			fw->left_link->window->window, &lfrect);
+			gdkwin(fw->left_link->window), &lfrect);
 	gdk_window_get_frame_extents(
-			fw->window->window, &rfrect);
+			gdkwin(fw->window), &rfrect);
 	if (
 			rfrect.x + (fw_font_height / 2) < lfrect.x + lfrect.width ||
 			rfrect.x - (fw_font_height / 2) > lfrect.x + lfrect.width)
@@ -2517,8 +2538,6 @@ void filer_check_mounted(const char *real_path)
 	parent = g_path_get_dirname(real_path);
 	refresh_dirs(parent);
 	g_free(parent);
-
-	icons_may_update(real_path);
 }
 
 /* Close all windows displaying 'path' or subdirectories of 'path' */
@@ -2742,7 +2761,7 @@ void filer_target_mode(FilerWindow *filer_window,
 
 	if (fn != old_fn)
 		gdk_window_set_cursor(
-				GTK_WIDGET(filer_window->view)->window,
+				gdkwin(filer_window->view),
 				fn ? crosshair : NULL);
 
 	filer_window->target_cb = fn;
@@ -2774,7 +2793,7 @@ static void set_selection_state(FilerWindow *filer_window, gboolean normal)
 
 	if (filer_window->view_type == VIEW_TYPE_DETAILS)
 	{
-		GtkStyle *style = fw->window->style;
+		GtkStyle *style = STYLE(fw->window);
 		gtk_widget_modify_base(GTK_WIDGET(fw->view),
 				GTK_STATE_ACTIVE, &style->base[fw->selection_state]);
 		gtk_widget_modify_text(GTK_WIDGET(fw->view),
@@ -3556,7 +3575,7 @@ gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event)
 	{
 		if (motion_state != MOTION_READY_FOR_DND &&
 				!(event->state & (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK)))
-			gdk_window_set_cursor(filer_window->window->window, hand_cursor);
+			gdk_window_set_cursor(gdkwin(filer_window->window), hand_cursor);
 
 		if (item != tip_item)
 		{
@@ -3570,7 +3589,7 @@ gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event)
 	}
 	else
 	{
-		gdk_window_set_cursor(filer_window->window->window, NULL);
+		gdk_window_set_cursor(gdkwin(filer_window->window), NULL);
 
 		tooltip_show(NULL);
 		tip_item = NULL;
@@ -3682,13 +3701,13 @@ static gboolean drag_motion(GtkWidget		*widget,
 	DirItem		*item;
 	ViewIface	*view = filer_window->view;
 	ViewIter	iter;
-	GdkDragAction	action = context->suggested_action;
+	GdkDragAction	action = gdk_drag_context_get_suggested_action(context);
 	const guchar	*new_path = NULL;
 	const char	*type = NULL;
 	gboolean	retval = FALSE;
 	gboolean	same_window;
 
-	if ((context->actions & GDK_ACTION_ASK) && o_dnd_left_menu.int_value)
+	if ((gdk_drag_context_get_actions(context) & GDK_ACTION_ASK) && o_dnd_left_menu.int_value)
 	{
 		guint state;
 		gdk_window_get_pointer(NULL, NULL, NULL, &state);
@@ -3712,7 +3731,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 
 	if (o_dnd_drag_to_icons.int_value)
 	{
-		view_get_iter_at_point(view, &iter, widget->window, x, y);
+		view_get_iter_at_point(view, &iter, gdkwin(widget), x, y);
 		item = iter.peek(&iter);
 	}
 	else
@@ -4412,9 +4431,9 @@ static gboolean check_settings(FilerWindow *filer_window, gboolean onlycheck)
 	}
 	g_free(moved);
 
-	if (filer_window->toolbar_settings_text)
+	if (filer_window->toolbar_settings_btn)
 	{
-		gtk_label_set_text(filer_window->toolbar_settings_text, status);
+		gtk_button_set_label(filer_window->toolbar_settings_btn, status);
 	}
 
 	if (onlycheck)
@@ -4652,7 +4671,7 @@ void filer_save_settings(FilerWindow *fwin, gboolean parent)
 	gtk_window_set_title(GTK_WINDOW(set_win->window),
 			     _("Select display properties to save"));
 
-	vbox=GTK_DIALOG(set_win->window)->vbox;
+	vbox=GTK_WIDGET(VBOX(set_win->window));
 
 	lbl=gtk_label_new(parent ?
 			_("<b>Save display settings for parent directory/*</b>") :

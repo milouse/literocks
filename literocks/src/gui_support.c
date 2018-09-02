@@ -45,7 +45,6 @@ static gint tip_timeout = 0;	/* When primed */
 /* Static prototypes */
 static void run_error_info_dialog(GtkMessageType type, const char *message,
 				  va_list args);
-static GType simple_image_get_type(void);
 
 void gui_store_screen_geometry(GdkScreen *screen)
 {
@@ -471,8 +470,11 @@ void entry_set_error(GtkWidget *entry, gboolean error)
 /* Draw the black border */
 static gint tooltip_draw(GtkWidget *w)
 {
+#if GTK_MAJOR_VERSION >= 3
+#else
 	gdk_draw_rectangle(w->window, w->style->fg_gc[w->state], FALSE, 0, 0,
-			w->allocation.width - 1, w->allocation.height - 1);
+			alloc(w).width - 1, alloc(w).height - 1);
+#endif
 
 	return FALSE;
 }
@@ -524,8 +526,8 @@ void tooltip_show(guchar *text)
 	gtk_widget_show(label);
 	gtk_widget_realize(tip_widget);
 
-	w = tip_widget->allocation.width;
-	h = tip_widget->allocation.height;
+	w = alloc(tip_widget).width;
+	h = alloc(tip_widget).height;
 	gdk_window_get_pointer(NULL, &x, &py, NULL);
 
 	m = gdk_screen_get_monitor_at_point(gdk_screen_get_default(), x, py);
@@ -638,7 +640,7 @@ void radios_add(Radios *radios, const gchar *tip, gint value,
 	}
 
 	radio = gtk_radio_button_new_with_label(group, s);
-	gtk_label_set_line_wrap(GTK_LABEL(GTK_BIN(radio)->child), TRUE);
+	gtk_label_set_line_wrap(GTK_LABEL(gtk_bin_get_child(GTK_BIN(radio))), TRUE);
 	gtk_widget_show(radio);
 	if (tip)
 		gtk_widget_set_tooltip_text(radio, tip);
@@ -762,118 +764,6 @@ GList *uri_list_to_glist(const char *uri_list)
 
 	return gq.head;
 }
-
-typedef struct _SimpleImageClass SimpleImageClass;
-typedef struct _SimpleImage SimpleImage;
-
-struct _SimpleImageClass {
-	GtkWidgetClass parent;
-};
-
-struct _SimpleImage {
-	GtkWidget widget;
-
-	GdkPixbuf *pixbuf;
-	int	  width, height;
-};
-
-#define SIMPLE_IMAGE(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), \
-				simple_image_get_type(), SimpleImage))
-
-static void simple_image_finialize(GObject *object)
-{
-	SimpleImage *image = SIMPLE_IMAGE(object);
-
-	g_object_unref(G_OBJECT(image->pixbuf));
-	image->pixbuf = NULL;
-}
-
-static void simple_image_size_request(GtkWidget      *widget,
-				      GtkRequisition *requisition)
-{
-	SimpleImage *image = (SimpleImage *) widget;
-
-	requisition->width = image->width;
-	requisition->height = image->height;
-}
-
-/* Render a pixbuf without messing up the clipping */
-static void render_pixbuf(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
-		   int x, int y, int width, int height)
-{
-	gdk_draw_pixbuf(target, gc, pixbuf, 0, 0, x, y, width, height,
-		        GDK_RGB_DITHER_NORMAL, 0, 0);
-
-}
-
-static gint simple_image_expose(GtkWidget *widget, GdkEventExpose *event)
-{
-	SimpleImage *image = (SimpleImage *) widget;
-	int x;
-
-	gdk_gc_set_clip_region(widget->style->black_gc, event->region);
-
-	x = widget->allocation.x +
-		(widget->allocation.width - image->width) / 2;
-
-	render_pixbuf(image->pixbuf, widget->window, widget->style->black_gc,
-			x, widget->allocation.y,
-			image->width, image->height);
-
-	gdk_gc_set_clip_region(widget->style->black_gc, NULL);
-	return FALSE;
-}
-
-static void simple_image_class_init(gpointer gclass, gpointer data)
-{
-	GObjectClass *object = (GObjectClass *) gclass;
-	GtkWidgetClass *widget = (GtkWidgetClass *) gclass;
-
-	object->finalize = simple_image_finialize;
-	widget->size_request = simple_image_size_request;
-	widget->expose_event = simple_image_expose;
-}
-
-static void simple_image_init(GTypeInstance *object, gpointer gclass)
-{
-	gtk_widget_set_has_window(GTK_WIDGET(object), FALSE);
-}
-
-static GType simple_image_get_type(void)
-{
-	static GType type = 0;
-
-	if (!type)
-	{
-		static const GTypeInfo info =
-		{
-			sizeof (SimpleImageClass),
-			NULL,			/* base_init */
-			NULL,			/* base_finalise */
-			simple_image_class_init,
-			NULL,			/* class_finalise */
-			NULL,			/* class_data */
-			sizeof(SimpleImage),
-			0,			/* n_preallocs */
-			simple_image_init,
-		};
-
-		type = g_type_register_static(gtk_widget_get_type(),
-						"SimpleImage", &info, 0);
-	}
-
-	return type;
-}
-
-
-/* Whether a line l1 long starting from n1 overlaps a line l2 from n2 */
-inline static gboolean gui_ranges_overlap(int n1, int l1, int n2, int l2)
-{
-	return (n1 > n2 && n1 < n2 + l2) ||
-		(n1 + l1 > n2 && n1 + l1 < n2 + l2) ||
-		(n1 <= n2 && n1 + l1 >= n2 + l2);
-}
-
 
 
 static void
@@ -1245,8 +1135,8 @@ gchar get_mnemonic(gchar *text, gchar *assigned)
 
 	if (assigned &&
 		ret != '\0' &&
-		ret >= GDK_a &&
-		ret <= GDK_z)
+		ret >= GDK_KEY_a &&
+		ret <= GDK_KEY_z)
 	{
 		for (; ; assigned+=1)
 		{
@@ -1302,8 +1192,8 @@ gchar *add_mnemonic(gchar *text, gchar *assigned)
 					}
 
 			if (!found &&
-				lc >= GDK_a &&
-				lc <= GDK_z)
+				lc >= GDK_KEY_a &&
+				lc <= GDK_KEY_z)
 			{
 				if (k ==0)
 					assigned[alen] = lc;
@@ -1321,4 +1211,11 @@ gchar *add_mnemonic(gchar *text, gchar *assigned)
 	}
 
 	return ret;
+}
+
+GtkAllocation alloc(void *widget)
+{
+	GtkAllocation allocation;
+	gtk_widget_get_allocation(widget, &allocation);
+	return allocation;
 }

@@ -227,13 +227,13 @@ GType view_collection_get_type(void)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-static void view_collection_destroy(GtkObject *view_collection)
+static void view_collection_destroy(OWObject *view_collection)
 {
 	VIEW_COLLECTION(view_collection)->filer_window = NULL;
 
 	clear_thumb_func(VIEW_COLLECTION(view_collection));
 
-	(*GTK_OBJECT_CLASS(parent_class)->destroy)(view_collection);
+	(*OW_CLASS(parent_class)->destroy)(view_collection);
 }
 
 static void view_collection_finialize(GObject *object)
@@ -259,7 +259,7 @@ static void view_collection_class_init(gpointer gclass, gpointer data)
 	widget->grab_focus = view_collection_grab_focus;
 
 	object->finalize = view_collection_finialize;
-	GTK_OBJECT_CLASS(object)->destroy = view_collection_destroy;
+	OW_CLASS(object)->destroy = view_collection_destroy;
 }
 
 static gboolean set_bg_src(cairo_t *cr, GtkWidget *widget)
@@ -288,7 +288,7 @@ static gboolean set_bg_src(cairo_t *cr, GtkWidget *widget)
 		return TRUE;
 	}
 
-	GdkColor base = widget->style->base[GTK_STATE_NORMAL];
+	GdkColor base = STYLE(widget)->base[GTK_STATE_NORMAL];
 	cairo_set_source_rgba(cr,
 			base.red / p,
 			base.green / p,
@@ -301,7 +301,7 @@ static gboolean transparent_expose(GtkWidget *widget,
 			GdkEventExpose *event,
 			ViewCollection *view)
 {
-	cairo_t *cr = gdk_cairo_create(widget->window);
+	cairo_t *cr = gdk_cairo_create(gdkwin(widget));
 	GdkColor *fg = view->filer_window->dir_colour;
 	GdkRectangle *rects;
 	int i, n_rects;
@@ -514,7 +514,7 @@ static void draw_dir_mark(cairo_t *cr,
 static void draw_cursor(GtkWidget *widget,
 		GdkRectangle *rect, Collection *col, GdkColor *colour)
 {
-	cairo_t *cr = gdk_cairo_create(widget->window);
+	cairo_t *cr = gdk_cairo_create(gdkwin(widget));
 
 	cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
 	cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
@@ -629,7 +629,7 @@ static void draw_item(GtkWidget *widget,
 	DirItem        *item = (DirItem *) colitem->data;
 	ViewData       *view = (ViewData *) colitem->view_data;
 	GdkColor       *select_colour = NULL, *type_colour;
-	GdkColor       *fg = &widget->style->fg[GTK_STATE_NORMAL];
+	GdkColor       *fg = &STYLE(widget)->fg[GTK_STATE_NORMAL];
 	Template       template;
 
 	cairo_t *cr;
@@ -639,7 +639,7 @@ static void draw_item(GtkWidget *widget,
 
 	if (view->iconstatus == 0) {
 		if (fw->display_style == HUGE_ICONS &&
-				vc->collection->vadj->value == 0) return;
+				vadjv(vc->collection) == 0) return;
 		goto end_image;
 	}
 
@@ -679,7 +679,7 @@ static void draw_item(GtkWidget *widget,
 				if (!re && (
 						fw->display_style != HUGE_ICONS ||
 						fw->scanning ||
-						vc->collection->vadj->value == 0
+						vadjv(vc->collection) == 0
 				))
 					view->iconstatus = 4;
 				else
@@ -728,11 +728,11 @@ static void draw_item(GtkWidget *widget,
 
 end_image:
 
-	cr = gdk_cairo_create(widget->window);
+	cr = gdk_cairo_create(gdkwin(widget));
 	type_colour = type_get_colour(item, fg);
 
 	if (colitem->selected)
-		select_colour = &widget->style->base[fw->selection_state];
+		select_colour = &STYLE(widget)->base[fw->selection_state];
 
 	PangoLayout *name = make_layout(fw, item);
 
@@ -768,7 +768,7 @@ end_image:
 			sendi = view->image->src_pixbuf;
 	}
 
-	draw_huge_icon(widget->window, widget->style, &template.icon, item,
+	draw_huge_icon(gdkwin(widget), STYLE(widget), &template.icon, item,
 			sendi, colitem->selected, select_colour);
 
 	//	g_clear_object(&(view->thumb));
@@ -786,7 +786,7 @@ end_image:
 
 
 	fg = colitem->selected ?
-		&widget->style->text[fw->selection_state] : type_colour;
+		&STYLE(widget)->text[fw->selection_state] : type_colour;
 
 	draw_string(cr, name,
 			&template.leafname,
@@ -1202,7 +1202,7 @@ static void view_collection_extend_tip(ViewIface *view, ViewIter *iter,
 	area.height = collection->item_height;
 
 	if (filer_window->display_style == SMALL_ICONS && col == collection->columns - 1)
-		area.width = GTK_WIDGET(collection)->allocation.width - area.x;
+		area.width = alloc(collection).width - area.x;
 	else
 		area.width = collection->item_width;
 
@@ -1230,8 +1230,8 @@ static void size_allocate(GtkWidget *w, GtkAllocation *a, gpointer data)
 {
 	Collection *col = ((ViewCollection *) data)->collection;
 
-	col->vadj->step_increment = col->item_height;
-	col->vadj->page_increment = col->vadj->page_size;
+	gtk_adjustment_set_step_increment(col->vadj, col->item_height);
+	gtk_adjustment_set_page_increment(col->vadj, vadjpage(col));
 }
 
 static gint coll_button_release(GtkWidget *widget,
@@ -2011,10 +2011,10 @@ static void view_collection_get_iter_at_point(ViewIface *view, ViewIter *iter,
 	Collection *collection = view_collection->collection;
 	int i;
 
-	if (src == ((GtkWidget *) view)->window)
+	if (src == gdkwin(view))
 	{
 		/* The event is on the Viewport, not the collection... */
-		y += collection->vadj->value;
+		y += vadjv(collection);
 	}
 
 	i = collection_get_item(collection, x, y);
@@ -2137,9 +2137,9 @@ static void view_collection_autosize(ViewIface *view, gboolean turn)
 	 * if visible.
 	 */
 	if (o_toolbar.int_value != TOOLBAR_NONE)
-		t = filer_window->toolbar->allocation.height;
+		t = alloc(filer_window->toolbar).height;
 	if (gtk_widget_get_visible(filer_window->message))
-		t += filer_window->message->allocation.height;
+		t += alloc(filer_window->message).height;
 
 	n = collection->number_of_items;
 	if (n == 0)
@@ -2159,7 +2159,7 @@ static void view_collection_autosize(ViewIface *view, gboolean turn)
 			min_x = 200;
 
 		if (filer_window->scrollbar)
-			min_x -= filer_window->scrollbar->allocation.width;
+			min_x -= alloc(filer_window->scrollbar).width;
 	}
 
 	/* Leave some room for extra icons, but only in Small Icons mode
@@ -2255,8 +2255,8 @@ static void view_collection_autosize(ViewIface *view, gboolean turn)
 	gboolean notauto = FALSE;
 
 	if (turn && (vw != max_x || vh != max_y) &&
-		GTK_WIDGET(view_collection)->allocation.width  == vw &&
-		GTK_WIDGET(view_collection)->allocation.height == vh)
+		alloc(view_collection).width  == vw &&
+		alloc(view_collection).height == vh)
 	{
 		vw = max_x;
 		vh = max_y - (inbar ? exh : 0);
@@ -2295,14 +2295,14 @@ static void view_collection_start_lasso_box(ViewIface *view,
 /* Change the adjustment by this amount. Bounded. */
 static void diff_vpos(Collection *collection, int diff)
 {
-	int	old = collection->vadj->value;
+	int	old = vadjv(collection);
 	int	value = old + diff;
 
 	value = CLAMP(value, 0,
-			collection->vadj->upper - collection->vadj->page_size);
+			vadjupper(collection) - vadjpage(collection));
 	gtk_adjustment_set_value(collection->vadj, value);
 
-	if (collection->vadj->value != old)
+	if (vadjv(collection) != old)
 		dnd_spring_abort();
 }
 
@@ -2310,7 +2310,7 @@ static gboolean view_collection_auto_scroll_callback(ViewIface *view)
 {
 	ViewCollection	*view_collection = (ViewCollection *) view;
 	Collection	*collection = view_collection->collection;
-	GdkWindow	*window = ((GtkWidget *) collection)->window;
+	GdkWindow	*window = gdkwin(collection);
 	gint		x, y, w, h;
 	GdkModifierType	mask;
 	int		diff = 0;
@@ -2318,8 +2318,8 @@ static gboolean view_collection_auto_scroll_callback(ViewIface *view)
 	gdk_window_get_pointer(window, &x, &y, &mask);
 	w = gdk_window_get_width(window);
 
-	h = collection->vadj->page_size;
-	y -= collection->vadj->value;
+	h = vadjpage(collection);
+	y -= vadjv(collection);
 
 	if ((x < 0 || x > w || y < 0 || y > h) && !collection->lasso_box)
 		return FALSE;		/* Out of window - stop */

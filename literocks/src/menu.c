@@ -226,7 +226,7 @@ GtkWidget *menu_add_item(gchar *label, MenuCB cb, guint action)
 {
 	current = gtk_menu_item_new_with_label(_(label));
 	item_common(label, cb, action);
-	return GTK_BIN(current)->child;
+	return BINC(current);
 }
 #define ads menu_add_stock
 GtkWidget *menu_add_stock(
@@ -235,7 +235,7 @@ GtkWidget *menu_add_stock(
 	current = gtk_image_menu_item_new_from_stock(stock_id, NULL);
 	gtk_menu_item_set_label(GTK_MENU_ITEM(current), _(label));
 	item_common(label, cb, action);
-	return GTK_BIN(current)->child;
+	return BINC(current);
 }
 static void adt(gchar *label, MenuCB cb, guint action, GtkWidget **w)
 {
@@ -383,7 +383,11 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 
 	while (item >= 0 && next)
 	{
+#if GTK_MAJOR_VERSION >= 3
+		gtk_widget_get_preferred_height((GtkWidget *) next->data, NULL, &h/*natural_height*/);
+#else
 		h = ((GtkWidget *) next->data)->requisition.height;
+#endif
 
 		if (item > 0)
 			y_shift += h;
@@ -665,7 +669,7 @@ gboolean ensure_filer_menu(void)
 
 
 	filer_file_menu = start_menu("File", filer_menu);
-	filer_file_item = GTK_BIN(current)->child;
+	filer_file_item = BINC(current);
 
 	ads(N_("Copy..."  ), file_op, FILE_COPY_ITEM, GTK_STOCK_COPY);
 		sta(GDK_KEY_c, GDK_CONTROL_MASK);
@@ -1326,7 +1330,7 @@ static void savebox_show(const gchar *action, const gchar *path,
 			"If off, the path from the root directory is stored - "
 			"use this if the symlink may move but the target will "
 			"stay put."));
-		gtk_box_pack_start(GTK_BOX(GTK_DIALOG(savebox)->vbox),
+		gtk_box_pack_start(VBOX(savebox),
 				check_relative, FALSE, TRUE, 0);
 		gtk_widget_show(check_relative);
 
@@ -1339,7 +1343,7 @@ static void savebox_show(const gchar *action, const gchar *path,
 		gtk_widget_set_can_focus(check_sympath, FALSE);
 		gtk_widget_set_tooltip_text(check_sympath,
 			_("If on, the symlink will use target path as Sym path."));
-		gtk_box_pack_start(GTK_BOX(GTK_DIALOG(savebox)->vbox),
+		gtk_box_pack_start(VBOX(savebox),
 				check_sympath, FALSE, TRUE, 0);
 		gtk_widget_show(check_sympath);
 	}
@@ -2197,7 +2201,7 @@ void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n)
 	item = g_list_nth(items, from);
 	while (item && n--)
 	{
-		gtk_widget_set_sensitive(GTK_BIN(item->data)->child, !shaded);
+		gtk_widget_set_sensitive(gtk_bin_get_child(GTK_BIN(item->data)), !shaded);
 		item = item->next;
 	}
 	g_list_free(items);

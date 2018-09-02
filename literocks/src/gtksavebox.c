@@ -34,19 +34,13 @@
 
 #include "gtksavebox.h"
 #include "gtk/gtkwidget.h"
-#include "gtk/gtkalignment.h"
 #include "gtk/gtkdnd.h"
 #include "gtk/gtkbutton.h"
-#include "gtk/gtksignal.h"
-#include "gtk/gtkhbox.h"
 #include "gtk/gtkeventbox.h"
 #include "gtk/gtkentry.h"
 #include "gtk/gtkmessagedialog.h"
-#include "gtk/gtkhseparator.h"
-#include "gtk/gtkvbox.h"
 #include "gtk/gtkdialog.h"
 #include "gtk/gtklabel.h"
-#include "gtk/gtkstock.h"
 
 #include "global.h"
 #include "support.h"
@@ -251,7 +245,7 @@ gtk_savebox_init (GtkSavebox *savebox)
   gtk_window_set_wmclass (GTK_WINDOW (savebox), "savebox", "Savebox");
 
   alignment = gtk_alignment_new (0.5, 0.5, 0, 0);
-  gtk_box_pack_start (GTK_BOX (dialog->vbox), alignment, TRUE, TRUE, 0);
+  gtk_box_pack_start (VBOX(dialog), alignment, TRUE, TRUE, 0);
 
   savebox->drag_box = gtk_event_box_new ();
   gtk_container_set_border_width (GTK_CONTAINER (savebox->drag_box), 4);
@@ -267,9 +261,9 @@ gtk_savebox_init (GtkSavebox *savebox)
   savebox->entry = gtk_entry_new ();
   g_signal_connect_swapped (savebox->entry, "activate",
 			     G_CALLBACK (do_save), savebox);
-  gtk_box_pack_start (GTK_BOX (dialog->vbox), savebox->entry, FALSE, TRUE, 4);
+  gtk_box_pack_start (VBOX(dialog), savebox->entry, FALSE, TRUE, 4);
 
-  gtk_widget_show_all (dialog->vbox);
+  gtk_widget_show_all(GTK_WIDGET(VBOX(dialog)));
   gtk_widget_grab_focus (savebox->entry);
 
   savebox->discard_area = gtk_hbutton_box_new();
@@ -280,9 +274,9 @@ gtk_savebox_init (GtkSavebox *savebox)
   gtk_widget_set_can_focus(button, FALSE);
   gtk_widget_set_can_default(button, TRUE);
 
-  gtk_box_pack_end (GTK_BOX (dialog->vbox), savebox->discard_area,
+  gtk_box_pack_end (VBOX(dialog), savebox->discard_area,
 		      FALSE, TRUE, 0);
-  gtk_box_reorder_child (GTK_BOX (dialog->vbox), savebox->discard_area, 0);
+  gtk_box_reorder_child (VBOX(dialog), savebox->discard_area, 0);
 
   savebox->dnd_action = GDK_ACTION_COPY;
 }
@@ -314,7 +308,7 @@ gtk_savebox_new (const gchar *action)
 
   gtk_dialog_set_default_response (dialog, GTK_RESPONSE_OK);
 
-  list = gtk_container_get_children (GTK_CONTAINER (dialog->action_area));
+  list = gtk_container_get_children (GTK_CONTAINER (gtk_dialog_get_action_area(dialog)));
   for (next = list; next; next = next->next)
     gtk_widget_set_can_focus(GTK_WIDGET(next->data), FALSE);
   g_list_free(list);
@@ -493,7 +487,7 @@ read_xds_property (GdkDragContext *context, gboolean delete)
 
   g_return_val_if_fail (context != NULL, NULL);
 
-  if (gdk_property_get (context->source_window, XdndDirectSave, text_plain,
+  if (gdk_property_get (gdk_drag_context_get_source_window(context), XdndDirectSave, text_plain,
 		       0, XDS_MAXURILEN, delete,
 		       NULL, NULL, &length, &prop_text)
 	    && prop_text)
@@ -517,12 +511,12 @@ write_xds_property (GdkDragContext *context, const guchar *value)
 
   if (value)
     {
-      gdk_property_change (context->source_window, XdndDirectSave,
+      gdk_property_change (gdk_drag_context_get_source_window(context), XdndDirectSave,
 			   text_plain, 8, GDK_PROP_MODE_REPLACE,
 			   value, strlen (value));
     }
   else
-    gdk_property_delete (context->source_window, XdndDirectSave);
+    gdk_property_delete (gdk_drag_context_get_source_window(context), XdndDirectSave);
 }
 
 static void drag_end (GtkWidget *widget, GdkDragContext *context)

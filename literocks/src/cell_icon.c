@@ -36,6 +36,7 @@
 #include "diritem.h"
 #include "pixmaps.h"
 #include "type.h"
+#include "gui_support.h"
 #include "support.h"
 #include "fscache.h"
 
@@ -337,7 +338,7 @@ static void cell_icon_render(GtkCellRenderer    *cell,
 	if (!image && !sendi)
 		return;
 
-	color = &widget->style->base[fw->selection_state];
+	color = &STYLE(widget)->base[fw->selection_state];
 
 	/* Draw the icon */
 	GdkRectangle area = *cell_area;
@@ -372,6 +373,6 @@ static void cell_icon_render(GtkCellRenderer    *cell,
 		}
 	}
 
-	draw_huge_icon(window, widget->style, &area, item,
+	draw_huge_icon(window, STYLE(widget), &area, item,
 			sendi, selected, color);
 }

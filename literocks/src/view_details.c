@@ -45,6 +45,11 @@
 #include "cell_icon.h"
 #include "choices.h"
 
+
+#define AVAL(a) gtk_adjustment_get_value(a)
+#define AUPPER(a) gtk_adjustment_get_upper(a)
+#define APAGE(a) gtk_adjustment_get_page_size(a)
+
 static gpointer parent_class = NULL;
 
 struct _ViewDetailsClass {
@@ -119,7 +124,7 @@ static void setcolour(ViewDetails *view_details)
 {
 	FilerWindow *fw = view_details->filer_window;
 
-	GtkStyle *style = fw->window->style;
+	GtkStyle *style = STYLE(fw->window);
 	gtk_widget_modify_base(GTK_WIDGET(view_details),
 			GTK_STATE_ACTIVE, &style->base[fw->selection_state]);
 	gtk_widget_modify_text(GTK_WIDGET(view_details),
@@ -144,7 +149,7 @@ static void setcolour(ViewDetails *view_details)
 		gtk_widget_modify_text(GTK_WIDGET(view_details),
 				GTK_STATE_NORMAL, &type_colours[TYPE_FILE]);
 	} else {
-		GtkStyle *style = view_details->filer_window->window->style;
+		GtkStyle *style = STYLE(view_details->filer_window->window);
 		gtk_widget_modify_base(GTK_WIDGET(view_details),
 				GTK_STATE_NORMAL, &style->base[GTK_STATE_NORMAL]);
 		gtk_widget_modify_text(GTK_WIDGET(view_details),
@@ -659,9 +664,9 @@ out:
 
 static gint view_details_key_press(GtkWidget *widget, GdkEventKey *event)
 {
-	if (event->keyval == GDK_Up || event->keyval == GDK_Down ||
-	    event->keyval == GDK_Prior || event->keyval == GDK_Next ||
-	    event->keyval == GDK_Home || event->keyval == GDK_End) {
+	if (event->keyval == GDK_KEY_Up || event->keyval == GDK_KEY_Down ||
+	    event->keyval == GDK_KEY_Prior || event->keyval == GDK_KEY_Next ||
+	    event->keyval == GDK_KEY_Home || event->keyval == GDK_KEY_End) {
 		/* Work around a strange GTK bug that prevents you from moving the cursor
 		 * if nothing is selected.
 		 */
@@ -770,7 +775,7 @@ static void select_lasso(ViewDetails *view_details, GdkFunction fn)
 
 	range[0] = view_details->lasso_start_index;
 	range[1] = get_lasso_index(view_details,
-			      view_details->drag_box_y[1] - adj->value);
+			      view_details->drag_box_y[1] - AVAL(adj));
 	range[2] = fn;
 
 	if (range[0] == range[1])
@@ -826,7 +831,7 @@ static gint view_details_motion_notify(GtkWidget *widget, GdkEventMotion *event)
 	{
 		GtkAdjustment	*adj;
 		adj = gtk_tree_view_get_vadjustment(tree);
-		set_lasso(view_details, event->x, event->y + adj->value);
+		set_lasso(view_details, event->x, event->y + AVAL(adj));
 		return TRUE;
 	}
 
@@ -877,12 +882,15 @@ static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
 				view_details->drag_box_x[0]);
 		height = abs(view_details->drag_box_y[1] -
 				view_details->drag_box_y[0]);
-		y -= adj->value;
+		y -= AVAL(adj);
 
+#if GTK_MAJOR_VERSION >= 3
+#else
 		if (width && height)
 			gdk_draw_rectangle(event->window,
-				widget->style->text_gc[GTK_STATE_NORMAL],
+				STYLE(widget)->text_gc[GTK_STATE_NORMAL],
 				FALSE, x, y, width - 1, height - 1);
+#endif
 	}
 
 	if (view_details->wink_item != -1 && view_details->wink_step & 1)
@@ -899,14 +907,23 @@ static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
 		if (wink_area.height)
 		{
 			/* (visible) */
-			wink_area.width = widget->allocation.width;
+			wink_area.width = alloc(widget).width;
+#if GTK_MAJOR_VERSION >= 3
+//gtk_render_focus (GtkStyleContext *context,
+//                  cairo_t *cr,
+//                  gdouble x,
+//                  gdouble y,
+//                  gdouble width,
+//                  gdouble height);
+#else
 			gdk_draw_rectangle(event->window,
-				widget->style->fg_gc[GTK_STATE_NORMAL],
+				STYLE(widget)->fg_gc[GTK_STATE_NORMAL],
 					FALSE,
 					wink_area.x + 1,
 					wink_area.y + 1,
 					wink_area.width - 3,
 					wink_area.height - 3);
+#endif
 		}
 	}
 
@@ -919,8 +936,16 @@ static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
 	if (!focus_rectangle.height)
 		return FALSE;	/* Off screen */
 
-	focus_rectangle.width = widget->allocation.width;
+	focus_rectangle.width = alloc(widget).width;
 
+#if GTK_MAJOR_VERSION >= 3
+//gtk_render_focus (GtkStyleContext *context,
+//                  cairo_t *cr,
+//                  gdouble x,
+//                  gdouble y,
+//                  gdouble width,
+//                  gdouble height);
+#else
 	gtk_paint_focus(widget->style,
 			event->window,
 			GTK_STATE_NORMAL,
@@ -931,12 +956,15 @@ static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
 			focus_rectangle.y,
 			focus_rectangle.width,
 			focus_rectangle.height);
-
+#endif
 	return FALSE;
 }
 
-static void view_details_size_request(GtkWidget *widget,
-				      GtkRequisition *requisition)
+#if GTK_MAJOR_VERSION >= 3
+static void view_details_preferred_wh(GtkWidget *widget, int *min, int *n)
+{ *min = *n = 50; }
+#else
+static void view_details_size_request(GtkWidget *widget, GtkRequisition *requisition)
 {
 	ViewDetails *view_details = (ViewDetails *) widget;
 
@@ -947,6 +975,7 @@ static void view_details_size_request(GtkWidget *widget,
 	requisition->height = 50;
 	requisition->width = 50;
 }
+#endif
 
 static void view_details_drag_data_received(GtkWidget *widget,
 		GdkDragContext *drag_context,
@@ -955,14 +984,14 @@ static void view_details_drag_data_received(GtkWidget *widget,
 	/* Just here to override annoying default handler */
 }
 
-static void view_details_destroy(GtkObject *obj)
+static void view_details_destroy(OWObject *obj)
 {
 	ViewDetails *view_details = VIEW_DETAILS(obj);
 
 	view_details->filer_window = NULL;
 	cancel_wink(view_details);
 
-	(*GTK_OBJECT_CLASS(parent_class)->destroy)(obj);
+	(*OW_CLASS(parent_class)->destroy)(obj);
 }
 
 static void view_details_finialize(GObject *object)
@@ -987,7 +1016,7 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	parent_class = g_type_class_peek_parent(gclass);
 
 	object->finalize = view_details_finialize;
-	GTK_OBJECT_CLASS(object)->destroy = view_details_destroy;
+	OW_CLASS(object)->destroy = view_details_destroy;
 
 	widget->scroll_event = view_details_scroll;
 	widget->key_press_event = view_details_key_press;
@@ -995,7 +1024,14 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	widget->button_release_event = view_details_button_release;
 	widget->motion_notify_event = view_details_motion_notify;
 	widget->expose_event = view_details_expose;
+
+#if GTK_MAJOR_VERSION >= 3
+	widget->get_preferred_width = view_details_preferred_wh;
+	widget->get_preferred_height = view_details_preferred_wh;
+#else
 	widget->size_request = view_details_size_request;
+#endif
+
 	widget->drag_data_received = view_details_drag_data_received;
 
 	/*
@@ -1168,11 +1204,14 @@ static void defcols(ViewDetails *view_details)
 					    "weight", COL_WEIGHT, 	\
 					    NULL);			\
 	gtk_tree_view_append_column(treeview, column);			\
-	g_signal_connect(column->button, "grab-focus",			\
+	g_signal_connect(column->button, "grab-focus", \
 			G_CALLBACK(block_focus), view_details); \
 	view_details->cols[model_column] = column; \
 	gtk_tree_view_column_set_reorderable(column, TRUE); \
 	gtk_tree_view_column_set_resizable(column, TRUE);
+
+//g_signal_connect(gtk_tree_view_column_get_button(column), "grab-focus",
+
 
 #define ADD_TEXT_COLUMN(name, model_column) \
 	ADD_TEXT_COLUMN_NS(name, model_column) \
@@ -1796,7 +1835,7 @@ static void redraw_wink_area(ViewDetails *view_details)
 		window = gtk_tree_view_get_bin_window(tree);
 		if (!window) return;
 
-		wink_area.width = GTK_WIDGET(tree)->allocation.width;
+		wink_area.width = alloc(tree).width;
 		gdk_window_invalidate_rect(window, &wink_area, FALSE);
 	}
 }
@@ -1871,8 +1910,8 @@ static void view_details_autosize(ViewIface *view, gboolean turn)
 	gboolean notauto = FALSE;
 
 	if (turn && (vw != max_width || vh != max_height) &&
-		GTK_WIDGET(view_details)->allocation.width  == vw &&
-		GTK_WIDGET(view_details)->allocation.height == vh)
+		alloc(view_details).width  == vw &&
+		alloc(view_details).height == vh)
 	{
 		vw = max_width;
 		vh = max_height;
@@ -1939,7 +1978,7 @@ static void set_lasso(ViewDetails *view_details, int x, int y)
 
 		adj = gtk_tree_view_get_vadjustment((GtkTreeView *)
 							view_details);
-		area.y -= adj->value;
+		area.y -= AVAL(adj);
 		gdk_window_invalidate_rect(window, &area, FALSE);
 	}
 }
@@ -1958,7 +1997,7 @@ static void view_details_start_lasso_box(ViewIface *view, GdkEventButton *event)
 
 	view_details->drag_box_x[0] = view_details->drag_box_x[1] = event->x;
 	view_details->drag_box_y[0] = view_details->drag_box_y[1] = event->y +
-								adj->value;
+								AVAL(adj);
 	view_details->lasso_box = TRUE;
 }
 
@@ -2186,7 +2225,7 @@ static gboolean view_details_auto_scroll_callback(ViewIface *view)
 	w = gdk_window_get_width(window);
 
 	adj = gtk_range_get_adjustment(scrollbar);
-	h = adj->page_size;
+	h = APAGE(adj);
 
 	if ((x < 0 || x > w || y < 0 || y > h) && !view_details->lasso_box)
 		return FALSE;		/* Out of window - stop */
@@ -2198,13 +2237,13 @@ static gboolean view_details_auto_scroll_callback(ViewIface *view)
 
 	if (diff)
 	{
-		int	old = adj->value;
+		int	old = AVAL(adj);
 		int	value = old + diff * AUTOSCROLL_SPEED;
 
-		value = CLAMP(value, 0, adj->upper - adj->page_size);
+		value = CLAMP(value, 0, AUPPER(adj) - APAGE(adj));
 		gtk_adjustment_set_value(adj, value);
 
-		if (adj->value != old)
+		if (AVAL(adj) != old)
 			dnd_spring_abort();
 	}
 

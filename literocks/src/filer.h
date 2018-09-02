@@ -95,8 +95,8 @@ struct _FilerWindow
 	GtkWidget	*toolbar;
 	GtkWidget	*toolbar_text;
 	GtkWidget	*scrollbar;
-	GtkLabel	*toolbar_size_text;
-	GtkLabel	*toolbar_settings_text;
+	GtkButton	*toolbar_size_btn;
+	GtkButton	*toolbar_settings_btn;
 
 	GtkStateType	selection_state;	/* for drawing selection */
 

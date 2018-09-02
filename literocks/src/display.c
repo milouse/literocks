@@ -661,7 +661,7 @@ void display_set_layout(FilerWindow *fw,
 			DetailsType  details,
 			gboolean     force_resize)
 {
-	gdk_window_set_cursor(fw->window->window, busy_cursor);
+	gdk_window_set_cursor(gdkwin(fw->window), busy_cursor);
 	gdk_flush();
 
 	gboolean details_changed = fw->details_type != details;
@@ -691,7 +691,7 @@ void display_set_layout(FilerWindow *fw,
 			)
 		view_autosize(fw->view, FALSE);
 
-	if (fw->toolbar_size_text)
+	if (fw->toolbar_size_btn)
 	{
 		gchar *size_label = g_strdup_printf("%s%s", _("Size"),
 			want == LARGE_ICONS ? _("┤") :
@@ -700,12 +700,12 @@ void display_set_layout(FilerWindow *fw,
 			want == AUTO_SIZE_ICONS ?
 				fw->display_style == LARGE_ICONS ? _("├") : _("┌")
 			: _("┼"));
-		gtk_label_set_text(fw->toolbar_size_text, size_label);
+		gtk_button_set_label(fw->toolbar_size_btn, size_label);
 
 		g_free(size_label);
 	}
 
-	gdk_window_set_cursor(fw->window->window, NULL);
+	gdk_window_set_cursor(gdkwin(fw->window), NULL);
 }
 
 /* Set the 'Show Thumbnails' flag for this window */

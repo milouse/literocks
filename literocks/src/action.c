@@ -201,7 +201,7 @@ void show_condition_help(gpointer data)
 
 	text = gtk_label_new(NULL);
 	gtk_misc_set_padding(GTK_MISC(text), 2, 2);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(help)->vbox), text, TRUE, TRUE, 0);
+	gtk_box_pack_start(VBOX(help), text, TRUE, TRUE, 0);
 	gtk_label_set_selectable(GTK_LABEL(text), TRUE);
 	gtk_label_set_markup(GTK_LABEL(text), _(
 "<u>Quick Start</u>\n"
@@ -259,7 +259,7 @@ static void show_chmod_help(gpointer data)
 
 	text = gtk_label_new(NULL);
 	gtk_misc_set_padding(GTK_MISC(text), 2, 2);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(help)->vbox), text, TRUE, TRUE, 0);
+	gtk_box_pack_start(VBOX(help), text, TRUE, TRUE, 0);
 	gtk_label_set_selectable(GTK_LABEL(text), TRUE);
 	gtk_label_set_markup(GTK_LABEL(text), _(
 "Normally, you can just select a command from the menu (click \n"
@@ -311,7 +311,7 @@ static void show_settype_help(gpointer data)
 
 	text = gtk_label_new(NULL);
 	gtk_misc_set_padding(GTK_MISC(text), 2, 2);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(help)->vbox), text, TRUE, TRUE, 0);
+	gtk_box_pack_start(VBOX(help), text, TRUE, TRUE, 0);
 	gtk_label_set_selectable(GTK_LABEL(text), TRUE);
 	gtk_label_set_markup(GTK_LABEL(text), _(
 "Normally ROX-Filer determines the type of a regular file\n"
@@ -329,7 +329,7 @@ static void show_settype_help(gpointer data)
 
 	text = gtk_label_new(_(ATTR_MAN_PAGE));
 	gtk_misc_set_padding(GTK_MISC(text), 2, 2);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(help)->vbox), text, TRUE, TRUE, 0);
+	gtk_box_pack_start(VBOX(help), text, TRUE, TRUE, 0);
 
 	g_signal_connect(help, "response",
 			G_CALLBACK(gtk_widget_destroy), NULL);
@@ -427,9 +427,9 @@ static void process_message(GUIside *gui_side, const gchar *buffer)
 }
 
 /* Called when the child sends us a message */
-static void message_from_child(gpointer 	  data,
-			        gint     	  source,
-			        GdkInputCondition condition)
+static void message_from_child(gpointer          data,
+                               gint              source,
+                               GdkInputCondition condition)
 {
 	char buf[5];
 	GUIside	*gui_side = (GUIside *) data;
@@ -446,6 +446,7 @@ static void message_from_child(gpointer 	  data,
 		buf[4] = '\0';
 		message_len = strtol(buf, NULL, 16);
 		buffer = g_malloc(message_len + 1);
+
 		if (message_len > 0 && read_exact(source, buffer, message_len))
 		{
 			buffer[message_len] = '\0';
@@ -947,10 +948,8 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 	g_signal_connect(abox, "abort_operation",
 			 G_CALLBACK(abort_operation), gui_side);
 
-	gui_side->input_tag = gdk_input_add_full(gui_side->from_child,
-						GDK_INPUT_READ,
-						message_from_child,
-						gui_side, NULL);
+	gui_side->input_tag = gdk_input_add_full(
+			gui_side->from_child, GDK_INPUT_READ, message_from_child, gui_side, NULL);
 
 	return gui_side;
 }

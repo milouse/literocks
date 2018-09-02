@@ -252,7 +252,7 @@ void bookmarks_edit(void)
 			GTK_SHADOW_IN);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(swin),
 			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(bookmarks_window)->vbox),
+	gtk_box_pack_start(VBOX(bookmarks_window),
 			swin, TRUE, TRUE, 0);
 
 	model = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
@@ -314,7 +314,7 @@ void bookmarks_edit(void)
 	gtk_container_add(GTK_CONTAINER(swin), list);
 
 	hbox = gtk_hbutton_box_new();
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(bookmarks_window)->vbox),
+	gtk_box_pack_start(VBOX(bookmarks_window),
 			hbox, FALSE, TRUE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
 
@@ -495,7 +495,7 @@ static void bposition_menu(GtkMenu *menu, gint *x, gint *y,
 {
 	FilerWindow *filer_window = (FilerWindow *) data;
 
-	gdk_window_get_origin(GTK_WIDGET(filer_window->view)->window, x, y);
+	gdk_window_get_origin(gdkwin(filer_window->view), x, y);
 }
 
 static void position_menu_widget(GtkMenu *menu, gint *x, gint *y,
@@ -504,10 +504,10 @@ static void position_menu_widget(GtkMenu *menu, gint *x, gint *y,
 	GtkWidget *widget = (GtkWidget *) data;
 
 	gdk_window_get_origin(gtk_widget_get_parent_window(widget), x, y);
-	*x = *x + widget->allocation.x;
+	*x = *x + alloc(widget).x;
 
 	widget = gtk_widget_get_parent(widget);
-	*y = *y + widget->allocation.y + widget->allocation.height;
+	*y = *y + alloc(widget).y + alloc(widget).height;
 }
 
 /* Makes sure that 'bookmarks' is up-to-date, reloading from file if it has
@@ -642,7 +642,7 @@ static void bookmarks_activate(GtkMenuShell *item, FilerWindow *filer_window)
 
 	mark=g_object_get_data(G_OBJECT(item), "bookmark-path");
 	if(!mark) {
-		label = GTK_LABEL(GTK_BIN(item)->child);
+		label = GTK_LABEL(gtk_bin_get_child(GTK_BIN(item)));
 		mark = gtk_label_get_text(label);
 	}
 
@@ -791,7 +791,7 @@ static gboolean dir_dropped(GtkWidget *window, GdkDragContext *context,
 	GtkListStore *model;
 	GList *uris, *next;
 
-	if (!selection_data->data)
+	if (!gtk_selection_data_get_data(selection_data))
 	{
 		/* Timeout? */
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
@@ -800,7 +800,7 @@ static gboolean dir_dropped(GtkWidget *window, GdkDragContext *context,
 
 	model = GTK_LIST_STORE(gtk_tree_view_get_model(view));
 
-	uris = uri_list_to_glist(selection_data->data);
+	uris = uri_list_to_glist(gtk_selection_data_get_data(selection_data));
 
 	for (next = uris; next; next = next->next)
 	{
@@ -947,7 +947,7 @@ static GtkWidget *build_history_menu(FilerWindow *filer_window)
 
 		gtk_widget_modify_fg(label,
 				GTK_STATE_NORMAL,
-				&label->style->text[GTK_STATE_INSENSITIVE]);
+				&STYLE(label)->text[GTK_STATE_INSENSITIVE]);
 
 		layout = gtk_label_get_layout(GTK_LABEL(label));
 		pango_layout_get_pixel_size(layout, &width, &height);
@@ -1082,7 +1082,7 @@ static GtkWidget *bookmarks_build_menu(FilerWindow *filer_window)
 
 		gtk_widget_modify_fg (label,
 				GTK_STATE_NORMAL,
-				&label->style->text[GTK_STATE_INSENSITIVE]);
+				&STYLE(label)->text[GTK_STATE_INSENSITIVE]);
 
 		gtk_label_set_max_width_chars(GTK_LABEL(label), 30);
 		gtk_label_set_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_MIDDLE);

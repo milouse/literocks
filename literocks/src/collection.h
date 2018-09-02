@@ -13,6 +13,7 @@
 
 #include <gdk/gdk.h>
 #include <gtk/gtkwidget.h>
+#include "gui_support.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -82,7 +83,10 @@ struct _Collection
 	gboolean	lasso_box;	/* Is the box drawn? */
 	int		drag_box_x[2];	/* Index 0 is the fixed corner */
 	int		drag_box_y[2];
+#if GTK_MAJOR_VERSION >= 3
+#else
 	GdkGC		*xor_gc;
+#endif
 
 	CollectionItem	*items;
 	gint		cursor_item;		/* -1 if not shown */

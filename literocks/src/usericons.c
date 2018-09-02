@@ -39,7 +39,6 @@
 #include "filer.h"
 #include "xml.h"
 #include "dropbox.h"
-#include "icon.h"
 
 #define SET_MEDIA 2
 #define SET_TYPE 1
@@ -225,10 +224,7 @@ static void clear_icon(DropBox *drop_box, GObject *dialog)
 				delayed_error(_("Can't delete '%s':\n%s"),
 						path, g_strerror(errno));
 			else
-			{
 				dir_check_this(pathname);
-				icons_may_update(pathname);
-			}
 		}
 		g_free(tmp);
 	}
@@ -289,8 +285,8 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	g_object_set_data(G_OBJECT(dialog), "rox-dropbox", frame);
 
 	/* Make sure rox-dropbox is set before packing (calls changed) */
-	radios_pack(radios, GTK_BOX(dialog->vbox));
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), frame, TRUE, TRUE, 4);
+	radios_pack(radios, VBOX(dialog));
+	gtk_box_pack_start(VBOX(dialog), frame, TRUE, TRUE, 4);
 
 	g_signal_connect(frame, "path_dropped",
 			G_CALLBACK(drag_icon_dropped), dialog);

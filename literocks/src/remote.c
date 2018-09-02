@@ -68,9 +68,14 @@ static GHashTable *rpc_calls = NULL; /* MethodName -> Function */
 static GdkWindow *get_existing_ipc_window(void);
 static gboolean get_ipc_property(GdkWindow *window, Window *r_xid);
 static void soap_send(GtkWidget *from, GdkAtom prop, GdkWindow *dest);
+
+#if GTK_MAJOR_VERSION >= 3
+#else
 static gboolean client_event(GtkWidget *window,
 				 GdkEventClient *event,
 				 gpointer data);
+#endif
+
 static void soap_done(GtkWidget *widget,
 		      GdkEventProperty *event,
 		      gpointer data);
@@ -155,7 +160,10 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	ipc_window = gtk_invisible_new();
 	gtk_widget_realize(ipc_window);
 
+#if GTK_MAJOR_VERSION >= 3
+#else
 	XGrabServer(GDK_DISPLAY());
+#endif
 
 	existing_ipc_window = new_copy ? NULL : get_existing_ipc_window();
 	if (existing_ipc_window)
@@ -163,7 +171,10 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 		xmlChar *mem;
 		int	size;
 
+#if GTK_MAJOR_VERSION >= 3
+#else
 		XUngrabServer(GDK_DISPLAY());
+#endif
 
 		xmlDocDumpMemory(rpc, &mem, &size);
 		g_return_val_if_fail(size > 0, FALSE);
@@ -175,7 +186,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 		g_signal_connect(ipc_window, "property-notify-event",
 				G_CALLBACK(soap_done), GINT_TO_POINTER(xsoap));
 
-		gdk_property_change(ipc_window->window, xsoap,
+		gdk_property_change(gdkwin(ipc_window), xsoap,
 				gdk_x11_xatom_to_atom(XA_STRING), 8,
 				GDK_PROP_MODE_REPLACE, mem, size);
 		g_free(mem);
@@ -185,20 +196,26 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 		return TRUE;
 	}
 
-	xwindow = GDK_WINDOW_XWINDOW(ipc_window->window);
+#if GTK_MAJOR_VERSION >= 3
+#else
+	xwindow = GDK_WINDOW_XWINDOW(gdkwin(ipc_window));
+#endif
 
 	/* Make the IPC window contain a property pointing to
 	 * itself - this can then be used to check that it really
 	 * is an IPC window.
 	 */
-	gdk_property_change(ipc_window->window, filer_atom,
+	gdk_property_change(gdkwin(ipc_window), filer_atom,
 			gdk_x11_xatom_to_atom(XA_WINDOW), 32,
 			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);
 
 	/* Get notified when we get a message */
+#if GTK_MAJOR_VERSION >= 3
+#else
 	g_signal_connect(ipc_window, "client-event",
 			G_CALLBACK(client_event), NULL);
+#endif
 
 	/* Make the root window contain a pointer to the IPC window */
 	gdk_property_change(gdk_get_default_root_window(), filer_atom,
@@ -206,7 +223,10 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);
 
+#if GTK_MAJOR_VERSION >= 3
+#else
 	XUngrabServer(GDK_DISPLAY());
+#endif
 
 	/* Also have a property without the version number, for programs
 	 * that are happy to talk to any version of the filer.
@@ -216,7 +236,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	filer_atom_any = gdk_atom_intern(unique_id, FALSE);
 	g_free(unique_id);
 	/* On the IPC window... */
-	gdk_property_change(ipc_window->window, filer_atom_any,
+	gdk_property_change(gdkwin(ipc_window), filer_atom_any,
 			gdk_x11_xatom_to_atom(XA_WINDOW), 32,
 			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);
@@ -386,12 +406,15 @@ static GdkWindow *get_existing_ipc_window(void)
 	if (!get_ipc_property(gdk_get_default_root_window(), &xid))
 		return NULL;
 
+#if GTK_MAJOR_VERSION >= 3
+#else
 	if (gdk_window_lookup(xid))
 		return NULL;	/* Stale handle which we now own */
 
 	window = gdk_window_foreign_new(xid);
 	if (!window)
 		return NULL;
+#endif
 
 	if (!get_ipc_property(window, &xid_confirm) || xid_confirm != xid)
 		return NULL;
@@ -467,6 +490,9 @@ out:
 	return NULL;
 }
 
+
+#if GTK_MAJOR_VERSION >= 3
+#else
 static gboolean client_event(GtkWidget *window,
 				 GdkEventClient *event,
 				 gpointer user_data)
@@ -532,6 +558,7 @@ static gboolean client_event(GtkWidget *window,
 
 	return TRUE;
 }
+#endif
 
 /* Some handy functions for processing SOAP RPC arguments... */
 
@@ -986,6 +1013,8 @@ static gboolean too_slow(gpointer data)
 /* Send the SOAP message in property 'prop' on 'from' to 'dest' */
 static void soap_send(GtkWidget *from, GdkAtom prop, GdkWindow *dest)
 {
+#if GTK_MAJOR_VERSION >= 3
+#else
 	GdkEventClient event;
 
 	event.data.l[0] = GDK_WINDOW_XWINDOW(from->window);
@@ -995,6 +1024,7 @@ static void soap_send(GtkWidget *from, GdkAtom prop, GdkWindow *dest)
 
 	gdk_event_send_client_message((GdkEvent *) &event,
 				      GDK_WINDOW_XWINDOW(dest));
+#endif
 
 	g_timeout_add(10000, too_slow, NULL);
 

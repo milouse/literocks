@@ -38,7 +38,6 @@
 #include "dir.h"
 #include "diritem.h"
 #include "action.h"
-#include "icon.h"
 #include "choices.h"
 
 /* Static prototypes */
@@ -138,7 +137,7 @@ void run_with_files(const char *path, GList *uri_list)
 /* Run the program as '<path> -', piping the data to it via stdin.
  * You can g_free() the data as soon as this returns.
  */
-void run_with_data(const char *path, gpointer data, gulong length)
+void run_with_data(const char *path, const void *data, gulong length)
 {
 	const char	*argv[] = {NULL, "-", NULL};
 	struct stat 	info;
@@ -287,7 +286,7 @@ static FilerWindow *open_or_change(
 		//this emits configure event
 		//gtk_window_present(GTK_WINDOW(fw->window));
 
-		gdk_window_focus(fw->window->window, 0);
+		gdk_window_focus(gdkwin(fw->window), 0);
 	}
 
 	return ret;
@@ -514,9 +513,6 @@ void examine(const guchar *path)
 		/* If this is itself a directory then rescan its contents... */
 		if (S_ISDIR(info.st_mode))
 			refresh_dirs(path);
-
-		/* If it's on the pinboard or a panel, update the icon... */
-		icons_may_update(path);
 	}
 }
 

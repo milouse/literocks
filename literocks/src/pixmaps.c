@@ -176,7 +176,10 @@ void pixmaps_init(void)
 	option_add_string(&o_video_thumbnailer, "video_thumbnailer", "ffmpegthumbnailer -i \"$1\" -o \"$2\" -s $3");
 	option_add_notify(options_changed);
 
+#if GTK_MAJOR_VERSION >= 3
+#else
 	gtk_widget_push_colormap(gdk_rgb_get_colormap());
+#endif
 
 	pixmap_cache = g_fscache_new((GFSLoadFunc) image_from_file, NULL, NULL);
 	orders = g_hash_table_new_full(

@@ -60,4 +60,39 @@ GtkBuilder *get_gtk_builder(gchar **ids);
 void add_stock_to_menu_item(GtkWidget *item, const char *stock);
 gchar get_mnemonic(gchar *text, gchar *assigned);
 gchar *add_mnemonic(gchar *text, gchar *assigned);
+
+
+//for migration
+GtkAllocation alloc(void *widget);
+
+#define VBOX(d) GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(d)))
+#define STYLE(w) gtk_widget_get_style(w)
+#define gdkwin(w) gtk_widget_get_window(GTK_WIDGET(w))
+#define BINC(b) gtk_bin_get_child(GTK_BIN(b))
+
+#define vadjv(c) gtk_adjustment_get_value(c->vadj)
+#define vadjh(c) gtk_adjustment_get_height(c->vadj)
+#define vadjpage(c) gtk_adjustment_get_page_size(c->vadj)
+#define vadjupper(c) gtk_adjustment_get_upper(c->vadj)
+
+#if GTK_MAJOR_VERSION >= 3
+#define OW_CLASS(c) GTK_WIDGET_CLASS(c)
+#define OWObject GObject
+#define geometry(win, x, y, w, h) gdk_window_get_geometry(win, x, y, w, h);
+
+
+typedef enum
+{
+GDK_SET,
+GDK_INVERT,
+
+} GdkFunction;
+#else
+#define OW_CLASS(c) GTK_OBJECT_CLASS(c)
+#define OWObject GtkObject
+#define geometry(win, x, y, w, h) gdk_window_get_geometry(win, x, y, w, h, NULL);
+#endif
+
+
+
 #endif /* _GUI_SUPPORT_H */

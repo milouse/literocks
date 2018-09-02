@@ -161,7 +161,7 @@ void dnd_init(void)
 /* Set the XdndDirectSave0 property on the source window for this context */
 static void set_xds_prop(GdkDragContext *context, const char *text)
 {
-	gdk_property_change(context->source_window,
+	gdk_property_change(gdk_drag_context_get_source_window(context),
 			XdndDirectSave0,
 			xa_text_plain, 8,
 			GDK_PROP_MODE_REPLACE,
@@ -174,7 +174,7 @@ static char *get_xds_prop(GdkDragContext *context)
 	guchar	*prop_text;
 	gint	length;
 
-	if (gdk_property_get(context->source_window,
+	if (gdk_property_get(gdk_drag_context_get_source_window(context),
 			XdndDirectSave0,
 			xa_text_plain,
 			0, MAXURILEN,
@@ -195,7 +195,7 @@ static char *get_xds_prop(GdkDragContext *context)
 /* Is the sender willing to supply this target type? */
 gboolean provides(GdkDragContext *context, GdkAtom target)
 {
-	GList	    *targets = context->targets;
+	GList	    *targets = gdk_drag_context_list_targets(context);
 
 	while (targets && ((GdkAtom) targets->data != target))
 		targets = targets->next;
@@ -377,7 +377,7 @@ void drag_data_get(GtkWidget          		*widget,
 	GdkAtom		type;
 	guchar		*path;
 
-	type = selection_data->target;
+	type = gtk_selection_data_get_target(selection_data);
 
 	switch (info)
 	{
@@ -612,8 +612,8 @@ static void got_moz_uri(GtkWidget 		*widget,
 {
 	gchar *utf8, *uri_list, *eol;
 
-	utf8 = g_utf16_to_utf8((gunichar2 *) selection_data->data,
-			(glong) selection_data->length,
+	utf8 = g_utf16_to_utf8((gunichar2 *) gtk_selection_data_get_data(selection_data),
+			(glong) gtk_selection_data_get_length(selection_data),
 			NULL, NULL, NULL);
 
 	eol = utf8 ? strchr(utf8, '\n') : NULL;
@@ -646,7 +646,7 @@ static void drag_data_received(GtkWidget      	*widget,
 			       guint32          time,
 			       gpointer		user_data)
 {
-	if (!selection_data->data)
+	if (!gtk_selection_data_get_data(selection_data))
 	{
 		/* Timeout? */
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
@@ -663,7 +663,7 @@ static void drag_data_received(GtkWidget      	*widget,
 			got_data_raw(widget, context, selection_data, time);
 			break;
 		case TARGET_URI_LIST:
-			got_uri_list(widget, context, selection_data->data,
+			got_uri_list(widget, context, gtk_selection_data_get_data(selection_data),
 					time);
 			break;
 		case TARGET_MOZ_URL:
@@ -683,13 +683,13 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 				guint32             	time)
 {
 	gboolean	mark_unsafe = TRUE;
-	char		response = *selection_data->data;
+	char		response = *gtk_selection_data_get_data(selection_data);
 	const char	*error = NULL;
 	char		*dest_path;
 
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 
-	if (selection_data->length != 1)
+	if (gtk_selection_data_get_length(selection_data) != 1)
 		response = '?';
 
 	if (response == 'F')
@@ -744,11 +744,11 @@ static void got_data_raw(GtkWidget 		*widget,
 	const char	*error = NULL;
 	const char	*dest_path;
 
-	g_return_if_fail(selection_data->data != NULL);
+	g_return_if_fail(gtk_selection_data_get_data(selection_data) != NULL);
 
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 
-	if (context->action == GDK_ACTION_ASK)
+	if (gdk_drag_context_get_selected_action(context) == GDK_ACTION_ASK)
 	{
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
 		delayed_error(_("Sorry, can't display a menu of actions "
@@ -760,7 +760,8 @@ static void got_data_raw(GtkWidget 		*widget,
 	{
 		/* The data needs to be sent to an application */
 		run_with_data(dest_path,
-				selection_data->data, selection_data->length);
+				gtk_selection_data_get_data(selection_data),
+				gtk_selection_data_get_length(selection_data));
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
 		return;
 	}
@@ -779,8 +780,8 @@ static void got_data_raw(GtkWidget 		*widget,
 	else
 	{
 		if (write(fd,
-			selection_data->data,
-			selection_data->length) == -1)
+			gtk_selection_data_get_data(selection_data),
+			gtk_selection_data_get_length(selection_data)) == -1)
 				error = g_strerror(errno);
 
 		if (close(fd) == -1 && !error)
@@ -868,7 +869,8 @@ static void got_uri_list(GtkWidget 		*widget,
 
 	if (!uri_list)
 		error = _("No URIs in the text/uri-list (nothing to do!)");
-	else if (context->action != GDK_ACTION_ASK && type == drop_dest_prog)
+	else if (gdk_drag_context_get_selected_action(context) != GDK_ACTION_ASK
+			&& type == drop_dest_prog)
 		run_with_files(dest_path, uri_list);
 	else if ((!uri_list->next) && !uri_is_local(uri_list->data))
 	{
@@ -928,22 +930,24 @@ static void got_uri_list(GtkWidget 		*widget,
 
 		GList *local_paths = lq.head;
 
+		GdkDragAction action = gdk_drag_context_get_selected_action(context);
+
 		if (!local_paths)
 		{
 			error = _("None of these files are on the local "
 				"machine - I can't operate on multiple "
 				"remote files - sorry.");
 		}
-		else if (context->action == GDK_ACTION_ASK)
+		else if (action == GDK_ACTION_ASK)
 		{
 			prompt_action(local_paths, dest_path);
 			goto skipdestroy;
 		}
-		else if (context->action == GDK_ACTION_MOVE)
+		else if (action == GDK_ACTION_MOVE)
 			action_move(local_paths, dest_path, NULL, -1);
-		else if (context->action == GDK_ACTION_COPY)
+		else if (action == GDK_ACTION_COPY)
 			action_copy(local_paths, dest_path, NULL, -1);
-		else if (context->action == GDK_ACTION_LINK)
+		else if (action == GDK_ACTION_LINK)
 			action_link(local_paths, dest_path, NULL, TRUE);
 		else
 			error = _("Unknown action requested");
@@ -1152,7 +1156,7 @@ static gboolean spring_now(gpointer data)
 			g_timeout_add(500, spring_check_idle, NULL);
 			g_signal_connect(spring_window->window, "destroy",
 					G_CALLBACK(spring_win_destroyed), NULL);
-			centre_window(spring_window->window->window, x, y);
+			centre_window(gdkwin(spring_window->window), x, y);
 		}
 	}
 	spring_in_progress--;
@@ -1334,7 +1338,7 @@ void dnd_motion_grab_pointer(void)
 {
 	g_return_if_fail(motion_widget != NULL);
 
-	gdk_pointer_grab(motion_widget->window, FALSE,
+	gdk_pointer_grab(gdkwin(motion_widget), FALSE,
 			GDK_POINTER_MOTION_MASK |
 			GDK_BUTTON_RELEASE_MASK,
 			FALSE, NULL, GDK_CURRENT_TIME);

@@ -487,7 +487,7 @@ static void complete(FilerWindow *filer_window)
 		 */
 		tmp_pos = leaf - text; /* index of start of leaf */
 		gtk_editable_delete_text(GTK_EDITABLE(entry),
-					 tmp_pos, entry->text_length);
+					 tmp_pos, gtk_entry_get_text_length(entry));
 		gtk_editable_insert_text(GTK_EDITABLE(entry),
 					 item->leafname, shortest_stem,
 					 &tmp_pos);
@@ -1101,7 +1101,7 @@ static gint key_press_event(GtkWidget	*widget,
 {
 	ViewIter cursor;
 
-	if (event->keyval == GDK_Escape)
+	if (event->keyval == GDK_KEY_Escape)
 	{
 		if (filer_window->mini_type == MINI_SHELL)
 		{
@@ -1136,18 +1136,18 @@ static gint key_press_event(GtkWidget	*widget,
 		case MINI_PATH:
 			switch (event->keyval)
 			{
-				case GDK_Up:
+				case GDK_KEY_Up:
 					search_in_dir(filer_window, -1);
 					break;
-				case GDK_Down:
+				case GDK_KEY_Down:
 					search_in_dir(filer_window, 1);
 					break;
-				case GDK_Return:
-				case GDK_KP_Enter:
+				case GDK_KEY_Return:
+				case GDK_KEY_KP_Enter:
 					path_return_pressed(filer_window,
 								event);
 					break;
-				case GDK_Tab:
+				case GDK_KEY_Tab:
 					complete(filer_window);
 					break;
 				default:
@@ -1158,17 +1158,17 @@ static gint key_press_event(GtkWidget	*widget,
 		case MINI_SHELL:
 			switch (event->keyval)
 			{
-				case GDK_Up:
+				case GDK_KEY_Up:
 					shell_recall(filer_window, 1);
 					break;
-				case GDK_Down:
+				case GDK_KEY_Down:
 					shell_recall(filer_window, -1);
 					break;
-				case GDK_Tab:
+				case GDK_KEY_Tab:
 					shell_tab(filer_window);
 					break;
-				case GDK_Return:
-				case GDK_KP_Enter:
+				case GDK_KEY_Return:
+				case GDK_KEY_KP_Enter:
 					shell_return_pressed(filer_window);
 					break;
 				default:
@@ -1178,16 +1178,16 @@ static gint key_press_event(GtkWidget	*widget,
 		case MINI_SELECT_IF:
 			switch (event->keyval)
 			{
-				case GDK_Up:
+				case GDK_KEY_Up:
 					shell_recall(filer_window, 1);
 					break;
-				case GDK_Down:
+				case GDK_KEY_Down:
 					shell_recall(filer_window, -1);
 					break;
-				case GDK_Tab:
+				case GDK_KEY_Tab:
 					break;
-				case GDK_Return:
-				case GDK_KP_Enter:
+				case GDK_KEY_Return:
+				case GDK_KEY_KP_Enter:
 					select_return_pressed(filer_window,
 								event->time);
 					break;
@@ -1198,8 +1198,8 @@ static gint key_press_event(GtkWidget	*widget,
 		case MINI_REG_SELECT:
 			switch (event->keyval)
 			{
-			case GDK_Page_Up:
-			case GDK_Page_Down:
+			case GDK_KEY_Page_Up:
+			case GDK_KEY_Page_Down:
 				if (filer_window->view_type == VIEW_TYPE_COLLECTION)
 					gtk_widget_event(GTK_WIDGET(
 						VIEW_COLLECTION(filer_window->view)->collection),
@@ -1210,16 +1210,16 @@ static gint key_press_event(GtkWidget	*widget,
 					gtk_widget_grab_focus(filer_window->minibuffer);
 				}
 				return TRUE;
-			case GDK_ISO_Left_Tab:
-			case GDK_Up:
+			case GDK_KEY_ISO_Left_Tab:
+			case GDK_KEY_Up:
 				filer_next_selected(filer_window, -1);
 				break;
-			case GDK_Tab:
-			case GDK_Down:
+			case GDK_KEY_Tab:
+			case GDK_KEY_Down:
 				filer_next_selected(filer_window, 1);
 				break;
-			case GDK_Return:
-			case GDK_KP_Enter:
+			case GDK_KEY_Return:
+			case GDK_KEY_KP_Enter:
 				if ((event->state & GDK_SHIFT_MASK) != 0)
 					temp_filter_return_pressed(filer_window,
 							event->time);
@@ -1233,16 +1233,16 @@ static gint key_press_event(GtkWidget	*widget,
 		case MINI_SELECT_BY_NAME:
 			switch (event->keyval)
 			{
-				case GDK_ISO_Left_Tab:
-				case GDK_Up:
+				case GDK_KEY_ISO_Left_Tab:
+				case GDK_KEY_Up:
 					filer_next_selected(filer_window, -1);
 					break;
-				case GDK_Tab:
-				case GDK_Down:
+				case GDK_KEY_Tab:
+				case GDK_KEY_Down:
 					filer_next_selected(filer_window, 1);
 					break;
-				case GDK_Return:
-				case GDK_KP_Enter:
+				case GDK_KEY_Return:
+				case GDK_KEY_KP_Enter:
 					minibuffer_hide(filer_window);
 					break;
 				default:
@@ -1252,8 +1252,8 @@ static gint key_press_event(GtkWidget	*widget,
 		case MINI_FILTER:
 			switch (event->keyval)
 			{
-				case GDK_Return:
-				case GDK_KP_Enter:
+				case GDK_KEY_Return:
+				case GDK_KEY_KP_Enter:
 					filter_return_pressed(filer_window,
 								event->time);
 					break;
@@ -1264,13 +1264,13 @@ static gint key_press_event(GtkWidget	*widget,
 		case MINI_TEMP_FILTER:
 			switch (event->keyval)
 			{
-			case GDK_Tab:
+			case GDK_KEY_Tab:
 				gtk_widget_grab_focus(GTK_WIDGET(filer_window->view));
 				break;
-			case GDK_Up:
-			case GDK_Down:
+			case GDK_KEY_Up:
+			case GDK_KEY_Down:
 			{
-				gint back = event->keyval == GDK_Up ? VIEW_ITER_BACKWARDS : 0;
+				gint back = event->keyval == GDK_KEY_Up ? VIEW_ITER_BACKWARDS : 0;
 				view_get_iter(filer_window->view, &cursor,
 						back | VIEW_ITER_FROM_CURSOR);
 
@@ -1281,8 +1281,8 @@ static gint key_press_event(GtkWidget	*widget,
 					view_cursor_to_iter(filer_window->view, &cursor);
 				break;
 			}
-			case GDK_Page_Up:
-			case GDK_Page_Down:
+			case GDK_KEY_Page_Up:
+			case GDK_KEY_Page_Down:
 				if (filer_window->view_type == VIEW_TYPE_COLLECTION)
 					gtk_widget_event(GTK_WIDGET(
 						VIEW_COLLECTION(filer_window->view)->collection),
@@ -1293,8 +1293,8 @@ static gint key_press_event(GtkWidget	*widget,
 					gtk_widget_grab_focus(filer_window->minibuffer);
 				}
 				return TRUE;
-			case GDK_Return:
-			case GDK_KP_Enter:
+			case GDK_KEY_Return:
+			case GDK_KEY_KP_Enter:
 				temp_filter_return_pressed(filer_window,
 							event->time);
 				break;

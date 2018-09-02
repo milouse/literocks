@@ -372,7 +372,7 @@ GList *build_numentry_base(Option *option, xmlNode *node,
 		add_to_size_group(node, label_wid);
 	}
 
-	spin = gtk_spin_button_new(adj, adj->step_increment, 0);
+	spin = gtk_spin_button_new(adj, gtk_adjustment_get_step_increment(adj), 0);
 	gtk_entry_set_width_chars(GTK_ENTRY(spin),
 			width > 1 ? width + 1 : 2);
 	gtk_box_pack_start(GTK_BOX(hbox), spin, FALSE, TRUE, 0);
@@ -446,7 +446,7 @@ static void get_new_colour(GtkWidget *ok, Option *option)
 
 	g_return_if_fail(current_csel_box != NULL);
 
-	csel = current_csel_box->colorsel;
+	csel = gtk_color_selection_dialog_get_color_selection(current_csel_box);
 
 	gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(csel), &c);
 
@@ -472,17 +472,22 @@ static void open_coloursel(GtkWidget *button, Option *option)
 
 	g_signal_connect(dialog, "destroy",
 			G_CALLBACK(gtk_widget_destroyed), &current_csel_box);
-	gtk_widget_hide(csel->help_button);
-	g_signal_connect_swapped(csel->cancel_button, "clicked",
+
+	GtkWidget *ok, *cancel, *help;
+	g_object_get(csel, "ok-button", &ok,
+			"cancel-button", &cancel, "help-button", &help, NULL);
+
+	gtk_widget_hide(help);
+	g_signal_connect_swapped(cancel, "clicked",
 			G_CALLBACK(gtk_widget_destroy), dialog);
-	g_signal_connect(csel->ok_button, "clicked",
+	g_signal_connect(ok, "clicked",
 			G_CALLBACK(get_new_colour), option);
 
-	patch = GTK_BIN(button)->child;
+	patch = BINC(button);
 
 	gtk_color_selection_set_current_color(
-			GTK_COLOR_SELECTION(csel->colorsel),
-			&patch->style->bg[GTK_STATE_NORMAL]);
+			GTK_COLOR_SELECTION(gtk_color_selection_dialog_get_color_selection(csel)),
+			&STYLE(patch)->bg[GTK_STATE_NORMAL]);
 
 	gtk_widget_show(dialog);
 }
@@ -515,12 +520,12 @@ static void toggle_active_font(GtkToggleButton *toggle, Option *option)
 
 	if (gtk_toggle_button_get_active(toggle))
 	{
-		gtk_widget_set_sensitive(option->widget->parent, TRUE);
+		gtk_widget_set_sensitive(gtk_widget_get_parent(option->widget), TRUE);
 		gtk_label_set_text(GTK_LABEL(option->widget), "Sans 12");
 	}
 	else
 	{
-		gtk_widget_set_sensitive(option->widget->parent, FALSE);
+		gtk_widget_set_sensitive(gtk_widget_get_parent(option->widget), FALSE);
 		gtk_label_set_text(GTK_LABEL(option->widget),
 				   _("(use default)"));
 	}
@@ -1207,7 +1212,7 @@ static void update_font(Option *option)
 	if (active)
 	{
 		gtk_toggle_button_set_active(active, have_font);
-		gtk_widget_set_sensitive(option->widget->parent, have_font);
+		gtk_widget_set_sensitive(gtk_widget_get_parent(option->widget), have_font);
 	}
 
 	gtk_label_set_text(GTK_LABEL(option->widget),
@@ -1248,7 +1253,7 @@ static guchar *read_numentry(Option *option)
 static guchar *read_slider(Option *option)
 {
 	return g_strdup_printf("%d", (int)
-		gtk_range_get_adjustment(GTK_RANGE(option->widget))->value);
+		gtk_adjustment_get_value(gtk_range_get_adjustment(GTK_RANGE(option->widget))));
 }
 
 static guchar *read_radio_group(Option *option)
@@ -1269,7 +1274,7 @@ static guchar *read_font(Option *option)
 
 static guchar *read_colour(Option *option)
 {
-	GtkStyle *style = GTK_BIN(option->widget)->child->style;
+	GtkStyle *style = STYLE(BINC(option->widget));
 
 	return g_strdup_printf("#%04x%04x%04x",
 			style->bg[GTK_STATE_NORMAL].red,
@@ -1438,7 +1443,7 @@ static GList *build_slider(Option *option, xmlNode *node, guchar *label)
 	slide = gtk_hscale_new(adj);
 
 	if (fixed)
-		gtk_widget_set_size_request(slide, adj->upper, 24);
+		gtk_widget_set_size_request(slide, gtk_adjustment_get_upper(adj), 24);
 	if (showvalue)
 	{
 		gtk_scale_set_draw_value(GTK_SCALE(slide), TRUE);
@@ -1499,7 +1504,7 @@ static GList *build_entry(Option *option, xmlNode *node, guchar *label)
 
 static GList *build_numentry(Option *option, xmlNode *node, guchar *label)
 {
-	GtkObject *adj;
+	GtkAdjustment *adj;
 	int	min, max, step;
 
 	g_return_val_if_fail(option != NULL, NULL);
@@ -1508,7 +1513,7 @@ static GList *build_numentry(Option *option, xmlNode *node, guchar *label)
 	max = get_int(node, "max");
 	step = MAX(1, get_int(node, "step"));
 
-	adj = gtk_adjustment_new(min, min, max, step, step * 10, 0);
+	adj = (void *)gtk_adjustment_new(min, min, max, step, step * 10, 0);
 
 	return build_numentry_base(option, node, label, GTK_ADJUSTMENT(adj));
 }
@@ -1703,7 +1708,7 @@ static GList *build_font(Option *option, xmlNode *node, guchar *label)
 
 	option->update_widget = update_font;
 	option->read_widget = read_font;
-	option->widget = GTK_BIN(button)->child;
+	option->widget = BINC(button);
 	may_add_tip(button, node);
 
 	g_object_set_data(G_OBJECT(option->widget), "rox_override", active);
@@ -1718,9 +1723,9 @@ static void button_patch_set_colour(GtkWidget *button, GdkColor *colour)
 	GtkStyle   	*style;
 	GtkWidget	*patch;
 
-	patch = GTK_BIN(button)->child;
+	patch = BINC(button);
 
-	style = gtk_style_copy(GTK_WIDGET(patch)->style);
+	style = gtk_style_copy(STYLE(patch));
 	style->bg[GTK_STATE_NORMAL].red = colour->red;
 	style->bg[GTK_STATE_NORMAL].green = colour->green;
 	style->bg[GTK_STATE_NORMAL].blue = colour->blue;
@@ -1728,7 +1733,7 @@ static void button_patch_set_colour(GtkWidget *button, GdkColor *colour)
 	g_object_unref(G_OBJECT(style));
 
 	if (gtk_widget_get_realized(patch))
-		gdk_window_clear(patch->window);
+		gdk_window_clear(gdkwin(patch));
 }
 
 static void load_options(xmlDoc *doc)

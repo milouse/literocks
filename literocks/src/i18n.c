@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <locale.h>
 #include <string.h>
 #ifdef HAVE_LIBINTL_H
 #include <libintl.h>
