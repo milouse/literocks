@@ -838,7 +838,9 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 
 	bar = gtk_toolbar_new();
 
-	toolbar_min_width = 0;
+	if (filer_window)
+		toolbar_min_width = 0;
+
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
 	{
 		Tool	*tool = &all_tools[i];
