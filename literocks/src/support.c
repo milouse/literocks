@@ -603,9 +603,7 @@ char *pretty_timespec(struct timespec *ts)
 	if (strftime(time_buf, sizeof(time_buf), TIME_FORMAT, tms) == 0)
 		time_buf[0]= 0;
 
-	char *t = pretty_time(&ts->tv_sec);
 	char *ret = g_strdup_printf("%s .%09ld", time_buf, ts->tv_nsec);
-	g_free(t);
 	return ret;
 }
 
