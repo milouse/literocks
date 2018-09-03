@@ -160,10 +160,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	ipc_window = gtk_invisible_new();
 	gtk_widget_realize(ipc_window);
 
-#if GTK_MAJOR_VERSION >= 3
-#else
-	XGrabServer(GDK_DISPLAY());
-#endif
+	gdk_x11_grab_server();
 
 	existing_ipc_window = new_copy ? NULL : get_existing_ipc_window();
 	if (existing_ipc_window)
@@ -171,10 +168,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 		xmlChar *mem;
 		int	size;
 
-#if GTK_MAJOR_VERSION >= 3
-#else
-		XUngrabServer(GDK_DISPLAY());
-#endif
+		gdk_x11_ungrab_server();
 
 		xmlDocDumpMemory(rpc, &mem, &size);
 		g_return_val_if_fail(size > 0, FALSE);
@@ -223,10 +217,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);
 
-#if GTK_MAJOR_VERSION >= 3
-#else
-	XUngrabServer(GDK_DISPLAY());
-#endif
+	gdk_x11_ungrab_server();
 
 	/* Also have a property without the version number, for programs
 	 * that are happy to talk to any version of the filer.
