@@ -30,6 +30,7 @@
 #include <sys/wait.h>
 #include <math.h>
 #include <sys/mman.h>
+#include <string.h>
 
 #include "global.h"
 
