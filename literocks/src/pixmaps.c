@@ -992,7 +992,7 @@ static void load_default_pixmaps(void)
 	im_appdir = load_pixmap("application");
 
 	winicon = gtk_icon_theme_load_icon(
-		gtk_icon_theme_get_default(), "literocks", thumb_size, 0, NULL);
+		gtk_icon_theme_get_default(), "literocks", thumb_size, 0, &error);
 
 	if (winicon)
 		gtk_window_set_default_icon(winicon);
