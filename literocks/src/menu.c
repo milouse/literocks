@@ -1983,8 +1983,8 @@ MIME_type *menu_selection_type(FilerWindow *fw)
 			if(type!=item->mime_type)
 			{
 				same=FALSE;
-				if(strcmp(type->media_type,
-					  item->mime_type->media_type)!=0)
+				if(!item->mime_type ||
+						strcmp(type->media_type, item->mime_type->media_type))
 				{
 					same_media=FALSE;
 					break;
