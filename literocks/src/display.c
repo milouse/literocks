@@ -691,7 +691,7 @@ void display_set_layout(FilerWindow *fw,
 			)
 		view_autosize(fw->view, FALSE);
 
-	if (fw->toolbar_size_btn)
+	if (fw->toolbar_size_text)
 	{
 		gchar *size_label = g_strdup_printf("%s%s", _("Size"),
 			want == LARGE_ICONS ? _("┤") :
@@ -700,7 +700,7 @@ void display_set_layout(FilerWindow *fw,
 			want == AUTO_SIZE_ICONS ?
 				fw->display_style == LARGE_ICONS ? _("├") : _("┌")
 			: _("┼"));
-		gtk_button_set_label(fw->toolbar_size_btn, size_label);
+		gtk_label_set_text(fw->toolbar_size_text, size_label);
 
 		g_free(size_label);
 	}

@@ -296,6 +296,24 @@ void toolbar_update_info(FilerWindow *filer_window)
 	g_free(label);
 }
 
+static int in_idle_update = 0;
+static gboolean idle_update_cb(gpointer p)
+{
+	o_toolbar.has_changed = TRUE;
+	option_notify();
+	o_toolbar.has_changed = FALSE;
+
+	in_idle_update = 0;
+	return FALSE;
+}
+static void idle_update()
+{
+	if (in_idle_update) return;
+	in_idle_update = 1;
+
+	g_idle_add(idle_update_cb, NULL);
+}
+
 /* Create, destroy or recreate toolbar for this window so that it
  * matches the option setting.
  */
@@ -308,8 +326,8 @@ void toolbar_update_toolbar(FilerWindow *filer_window)
 		gtk_widget_destroy(filer_window->toolbar);
 		filer_window->toolbar = NULL;
 		filer_window->toolbar_text = NULL;
-		filer_window->toolbar_size_btn = NULL;
-		filer_window->toolbar_settings_btn = NULL;
+		filer_window->toolbar_size_text = NULL;
+		filer_window->toolbar_settings_text = NULL;
 	}
 
 	if (o_toolbar.int_value != TOOLBAR_NONE)
@@ -321,9 +339,8 @@ void toolbar_update_toolbar(FilerWindow *filer_window)
 				filer_window->toolbar, 0);
 		gtk_widget_show_all(filer_window->toolbar);
 
-		//todo: not works
-//		g_signal_connect_swapped(filer_window->toolbar, "style-changed",
-//				G_CALLBACK(toolbar_update_toolbar), filer_window);
+		g_signal_connect_swapped(filer_window->toolbar, "style-changed",
+				G_CALLBACK(idle_update), NULL);
 	}
 
 	filer_target_mode(filer_window, NULL, NULL, NULL);
@@ -1007,26 +1024,36 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 	g_object_get(gtk_widget_get_settings(bar),
 			"gtk-toolbar-icon-size", &size, NULL);
 
-	GtkWidget *icon_widget =
+	GtkWidget *lbl =
+		o_toolbar.int_value == TOOLBAR_NORMAL && !filer_window ? NULL :
+		gtk_label_new(_(tool->label));
+	GtkWidget *img =
+		o_toolbar.int_value == TOOLBAR_TEXT   &&  filer_window  ? NULL :
 		gtk_image_new_from_stock(tool->name, size);
 	GtkWidget *button = (void *)(filer_window ?
 			gtk_button_new() : gtk_toggle_button_new());
 
 	gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
 
+	GtkWidget *box = o_toolbar.int_value == TOOLBAR_LARGE ?
+		gtk_vbox_new(FALSE, 0) :
+		gtk_hbox_new(FALSE, 0) ;
+
+	GtkWidget *align = gtk_alignment_new(0.5, 0.5, 0.0, 0.0);
+	gtk_container_add(GTK_CONTAINER(button), align);
+	gtk_container_add(GTK_CONTAINER(align), box);
+
 	if (o_toolbar.int_value == TOOLBAR_NORMAL || !filer_window)
-		gtk_button_set_image(GTK_BUTTON(button), icon_widget);
+		gtk_box_pack_start(GTK_BOX(box), img, FALSE, FALSE, 0);
 	else if (o_toolbar.int_value == TOOLBAR_TEXT)
-		gtk_button_set_label(GTK_BUTTON(button), _(tool->label));
+		gtk_box_pack_start(GTK_BOX(box), lbl, FALSE, FALSE, 0);
 	else
 	{
-		gtk_button_set_image(GTK_BUTTON(button), icon_widget);
-		gtk_button_set_label(GTK_BUTTON(button), _(tool->label));
-
-		if (o_toolbar.int_value == TOOLBAR_LARGE)
-			gtk_button_set_image_position(GTK_BUTTON(button), GTK_POS_TOP);
+		gtk_box_pack_start(GTK_BOX(box), img, FALSE, FALSE, 2);
+		gtk_box_pack_end(GTK_BOX(box), lbl, FALSE, FALSE, 0);
 	}
 
+	gtk_widget_show_all(button);
 
 	GtkRequisition req;
 	gtk_widget_size_request(button, &req);
@@ -1043,13 +1070,6 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 			gtk_toolbar_get_n_items(GTK_TOOLBAR(bar)));
 
 	gtk_widget_set_can_focus(button, FALSE);
-
-	//todo: this changes all widget
-	//gtk_button_set_always_show_image
-	GtkSettings *set = gtk_widget_get_settings(button);
-	g_object_set(set, "gtk-button-images", 1, NULL);
-
-	gtk_widget_show(icon_widget);
 
 	g_object_set_data(G_OBJECT(button), "rox-tool", tool);
 
@@ -1074,12 +1094,12 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 
 		if (o_toolbar.int_value == TOOLBAR_HORIZONTAL ||
 			o_toolbar.int_value == TOOLBAR_TEXT)
-			gtk_button_set_alignment(GTK_BUTTON(button), 0.3, 0.5);
+			gtk_alignment_set(GTK_ALIGNMENT(align), 0.3, 0.5, 0.0, 0.0);
 
 		if (tool->clicked == toolbar_size_clicked)
 		{
 			if (o_toolbar.int_value != TOOLBAR_NORMAL)
-				filer_window->toolbar_size_btn = GTK_BUTTON(button);
+				filer_window->toolbar_size_text = GTK_LABEL(lbl);
 
 			g_signal_connect(button, "scroll_event",
 				G_CALLBACK(toolbar_button_scroll), filer_window);
@@ -1092,7 +1112,7 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 
 		if (tool->clicked == toolbar_settings_clicked)
 			if (o_toolbar.int_value != TOOLBAR_NORMAL)
-				filer_window->toolbar_settings_btn = GTK_BUTTON(button);
+				filer_window->toolbar_settings_text = GTK_LABEL(lbl);
 
 	}
 	else

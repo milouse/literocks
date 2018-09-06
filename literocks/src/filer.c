@@ -1914,8 +1914,8 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->scanning = FALSE;
 	filer_window->auto_select = NULL;
 	filer_window->toolbar_text = NULL;
-	filer_window->toolbar_size_btn = NULL;
-	filer_window->toolbar_settings_btn = NULL;
+	filer_window->toolbar_size_text = NULL;
+	filer_window->toolbar_settings_text = NULL;
 	filer_window->target_cb = NULL;
 	filer_window->mini_type = MINI_NONE;
 	filer_window->selection_state = GTK_STATE_ACTIVE;
@@ -4432,9 +4432,9 @@ static gboolean check_settings(FilerWindow *filer_window, gboolean onlycheck)
 	}
 	g_free(moved);
 
-	if (filer_window->toolbar_settings_btn)
+	if (filer_window->toolbar_settings_text)
 	{
-		gtk_button_set_label(filer_window->toolbar_settings_btn, status);
+		gtk_label_set_text(filer_window->toolbar_settings_text, status);
 	}
 
 	if (onlycheck)
