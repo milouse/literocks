@@ -247,9 +247,12 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 	g_free(rpath);
 	if(thumb)
 	{
+		GdkPixbuf *tmp = scale_pixbuf(thumb, 96, 96);
 		gtk_box_pack_start(GTK_BOX(hbox),
-				   gtk_image_new_from_pixbuf(thumb),
+				   gtk_image_new_from_pixbuf(tmp),
 				   FALSE, FALSE, 4);
+
+		g_object_unref(tmp);
 		g_object_unref(thumb);
 	}
 
