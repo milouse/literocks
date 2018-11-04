@@ -2793,7 +2793,7 @@ void action_init(void)
 	option_add_string(&o_action_eject_command,
 			  "action_eject_command", "eject");
 
-	option_add_int(&o_action_wink, "action_wink", 1);
+	option_add_int(&o_action_wink, "action_wink", 0);
 }
 
 void set_find_string_colour(GtkWidget *widget, const guchar *string)
