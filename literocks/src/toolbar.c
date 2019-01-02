@@ -304,23 +304,23 @@ void toolbar_update_info(FilerWindow *filer_window)
 	g_free(label);
 }
 
-static int in_idle_update = 0;
-static gboolean idle_update_cb(gpointer p)
-{
-	o_toolbar.has_changed = TRUE;
-	option_notify();
-	o_toolbar.has_changed = FALSE;
-
-	in_idle_update = 0;
-	return FALSE;
-}
-static void idle_update()
-{
-	if (in_idle_update) return;
-	in_idle_update = 1;
-
-	g_idle_add(idle_update_cb, NULL);
-}
+//static int in_idle_update = 0;
+//static gboolean idle_update_cb(gpointer p)
+//{
+//	o_toolbar.has_changed = TRUE;
+//	option_notify();
+//	o_toolbar.has_changed = FALSE;
+//
+//	in_idle_update = 0;
+//	return FALSE;
+//}
+//static void idle_update()
+//{
+//	if (in_idle_update) return;
+//	in_idle_update = 1;
+//
+//	g_idle_add(idle_update_cb, NULL);
+//}
 
 /* Create, destroy or recreate toolbar for this window so that it
  * matches the option setting.
@@ -347,8 +347,8 @@ void toolbar_update_toolbar(FilerWindow *filer_window)
 				filer_window->toolbar, 0);
 		gtk_widget_show_all(filer_window->toolbar);
 
-		g_signal_connect_swapped(filer_window->toolbar, "style-changed",
-				G_CALLBACK(idle_update), NULL);
+//		g_signal_connect_swapped(filer_window->toolbar, "style-changed",
+//				G_CALLBACK(idle_update), NULL);
 	}
 
 	filer_target_mode(filer_window, NULL, NULL, NULL);
