@@ -2233,12 +2233,6 @@ static void view_collection_autosize(ViewIface *view, gboolean turn)
 	rows = MAX((n + cols - 1) / cols, 1);
 
 	GtkRequisition req;
-	if (gtk_widget_get_visible(filer_window->thumb_bar))
-	{
-		gtk_widget_size_request(filer_window->thumb_bar, &req);
-		exh += req.height;
-	}
-
 	if (gtk_widget_get_visible(filer_window->minibuffer_area))
 	{
 		gtk_widget_size_request(filer_window->minibuffer_area, &req);

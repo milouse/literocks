@@ -109,7 +109,6 @@ struct _FilerWindow
 
 	gboolean	show_thumbs;
 	GQueue		*thumb_queue;		/* paths to thumbnail */
-	GtkWidget	*thumb_bar;
 	int		max_thumbs;		/* total for this batch */
 	int		trying_thumbs;
 

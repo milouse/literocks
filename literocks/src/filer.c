@@ -2266,16 +2266,6 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	gtk_box_pack_end(GTK_BOX(vbox), filer_window->minibuffer_area,
 				FALSE, TRUE, 0);
 
-	/* And the thumbnail progress bar (also hidden) */
-	{
-		filer_window->thumb_bar = gtk_progress_bar_new();
-		gtk_widget_set_size_request(filer_window->thumb_bar,
-				-1, small_height * (1./3.));
-
-		gtk_box_pack_end(GTK_BOX(vbox), filer_window->thumb_bar,
-				FALSE, TRUE, 0);
-	}
-
 	gtk_widget_show(vbox);
 	gtk_widget_show(filer_window->scrollbar);
 	gtk_widget_realize(filer_window->window);
@@ -2907,12 +2897,6 @@ done:
 
 void filer_cancel_thumbnails(FilerWindow *filer_window)
 {
-	if (gtk_widget_get_visible(filer_window->thumb_bar))
-	{
-		gtk_widget_hide(filer_window->thumb_bar);
-		filer_autosize(filer_window);
-	}
-
 	g_queue_free_full(filer_window->thumb_queue, g_free);
 	filer_window->thumb_queue = g_queue_new();
 
@@ -3004,20 +2988,6 @@ static gboolean filer_next_thumb_real(GObject *window)
 	}
 
 	pixmap_background_thumb(path, (GFunc) filer_next_thumb, window);
-
-	if (!gtk_widget_get_visible(filer_window->thumb_bar))
-	{
-		gtk_widget_show_all(filer_window->thumb_bar);
-		filer_autosize(filer_window);
-	}
-
-	int done, total;
-	total = filer_window->max_thumbs;
-	done = total - g_queue_get_length(filer_window->thumb_queue);
-
-	gtk_progress_bar_set_fraction(
-			GTK_PROGRESS_BAR(filer_window->thumb_bar),
-			done / (float) total);
 
 out:
 	g_free(path);
