@@ -678,8 +678,6 @@ static void thumbnail_done(ChildThumbnail *info)
 		}
 		ok = true;
 	}
-	else
-		g_fscache_insert(pixmap_cache, info->path, NULL, TRUE);
 
 	g_hash_table_remove(orders, info->rpath);
 	info->callback(info->data, ok ? info->path : NULL);
