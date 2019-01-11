@@ -46,10 +46,10 @@ OBJECTS = abox.o action.o appmenu.o bind.o bookmarks.o	\
 ${PROG}: ${OBJECTS}
 	${CC} -o "${PROG}" ${OBJECTS} ${LDFLAGS}
 	mv "${PROG}" "${PLATFORM_DIR}"
-#	-(cd "${PLATFORM_DIR}" && \
-#	 objcopy --only-keep-debug literocks literocks.dbg && \
-#	 strip literocks && \
-#	 objcopy --add-gnu-debuglink=literocks.dbg literocks)
+	-(cd "${PLATFORM_DIR}" && \
+	 objcopy --only-keep-debug literocks literocks.dbg && \
+	 strip literocks && \
+	 objcopy --add-gnu-debuglink=literocks.dbg literocks)
 
 clean:
 	rm -f *.o Makefile.bak
