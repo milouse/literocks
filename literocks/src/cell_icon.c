@@ -207,7 +207,7 @@ static DisplayStyle get_style(GtkCellRenderer *cell)
 			if (!view_item->thumb) {
 				gchar *path = pathdup(
 						make_path(filer_window->real_path, item->leafname));
-				view_item->thumb = pixmap_try_thumb(path, FALSE);
+				view_item->thumb = pixmap_try_thumb(path);
 				g_free(path);
 			}
 		}

@@ -243,7 +243,7 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 	make_heading(name, PANGO_SCALE_X_LARGE);
 
 	char *rpath = pathdup(path);
-	thumb=pixmap_try_thumb(rpath, FALSE);
+	thumb=pixmap_try_thumb(rpath);
 	g_free(rpath);
 	if(thumb)
 	{

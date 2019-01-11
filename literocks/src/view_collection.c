@@ -568,7 +568,7 @@ static gboolean next_thumb(ViewCollection *vc)
 			{
 				char *rpath = pathdup(
 						make_path(fw->real_path, item->leafname));
-				view->thumb = pixmap_try_thumb(rpath, FALSE);
+				view->thumb = pixmap_try_thumb(rpath);
 				g_free(rpath);
 			}
 
@@ -714,7 +714,7 @@ static void draw_item(GtkWidget *widget,
 			view->iconstatus = 2;
 			g_clear_object(&view->thumb);
 			gchar *path = pathdup(make_path(fw->real_path, item->leafname));
-			view->thumb = pixmap_try_thumb(path, FALSE);
+			view->thumb = pixmap_try_thumb(path);
 			g_free(path);
 		}
 

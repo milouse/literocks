@@ -122,7 +122,7 @@ static gint purge_pixmaps(gpointer data);
 static MaskedPixmap *image_from_file(const char *path);
 static MaskedPixmap *image_from_desktop_file(const char *path);
 static MaskedPixmap *get_bad_image(void);
-static GdkPixbuf *get_thumbnail_for(const char *path, gboolean forcheck);
+static GdkPixbuf *get_thumbnail_for(const char *path, gboolean *forcheck);
 static void ordered_update(ChildThumbnail *info);
 static void thumbnail_done(ChildThumbnail *info);
 static void create_thumbnail(const gchar *path, MIME_type *type);
@@ -292,13 +292,11 @@ void pixmap_make_small(MaskedPixmap *mp)
 /* -1:not thumb target 0:not created 1:created and loaded */
 gint pixmap_check_thumb(const gchar *rpath)
 {
-	GdkPixbuf *image = pixmap_try_thumb(rpath, TRUE);
+	gboolean check = TRUE;
+	get_thumbnail_for(rpath, &check);
 
-	if (image)
-	{
-		g_object_unref(image);
+	if (check)
 		return 1;
-	}
 
 	MIME_type *type = type_from_path(rpath);
 	if (type)
@@ -333,7 +331,6 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 {
 	static guint ordered_num;
 
-	GdkPixbuf	*image;
 	pid_t		child;
 	ChildThumbnail *info;
 	MIME_type      *type;
@@ -343,12 +340,11 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 	g_free(rpath);
 	rpath = pathdup(path);
 
-	image = pixmap_try_thumb(rpath, TRUE);
+	gboolean check = TRUE;
+	get_thumbnail_for(rpath, &check);
 
-	if (image)
+	if (check)
 	{
-		g_object_unref(image);
-		/* Thumbnail loaded */
 		callback(data, (gpointer)path);
 		return;
 	}
@@ -450,48 +446,10 @@ void pixmap_background_thumb(const char *path, GFunc callback, gpointer data)
 /*
  * Return the thumbnail for a file, only if available.
  */
-GdkPixbuf *pixmap_try_thumb(const gchar *rpath, gboolean forcheck)
+GdkPixbuf *pixmap_try_thumb(const gchar *rpath)
 {
-	GdkPixbuf *pixbuf;
-
-	pixbuf = get_thumbnail_for(rpath, forcheck);
-
-	if (!pixbuf)
-	{
-		struct stat info1, info2;
-		char *dir;
-
-		/* Skip zero-byte files. They're either empty, or
-		 * special (may cause us to hang, e.g. /proc/kmsg). */
-		if (mc_stat(rpath, &info1) != 0 || info1.st_size == 0) {
-			return NULL;
-		}
-
-		/* If the image itself is in ~/.cache/thumbnails, load it now
-		 * (ie, don't create thumbnails for thumbnails!).
-		 */
-		dir = g_path_get_dirname(rpath);
-		if (mc_stat(dir, &info1) != 0)
-		{
-			g_free(dir);
-			return NULL;
-		}
-		g_free(dir);
-
-		if (mc_stat(thumbdir(), &info2) == 0 &&
-			    info1.st_dev == info2.st_dev &&
-			    info1.st_ino == info2.st_ino)
-		{
-			pixbuf = gdk_pixbuf_new_from_file_at_scale(rpath,
-					thumb_size, thumb_size, TRUE, NULL);
-			if (!pixbuf)
-			{
-				return NULL;
-			}
-		}
-	}
-
-	return pixbuf;
+	gboolean b = FALSE;
+	return get_thumbnail_for(rpath, &b);
 }
 
 /****************************************************************
@@ -678,6 +636,8 @@ static void thumbnail_done(ChildThumbnail *info)
 		}
 		ok = true;
 	}
+	else
+		symlink("/dev/null", tpath);
 
 	g_hash_table_remove(orders, info->rpath);
 	info->callback(info->data, ok ? info->path : NULL);
@@ -690,32 +650,53 @@ static void thumbnail_done(ChildThumbnail *info)
 /* Check if we have an up-to-date thumbnail for this image.
  * If so, return it. Otherwise, returns NULL.
  */
-static GdkPixbuf *get_thumbnail_for(const char *rpath, gboolean forcheck)
+static GdkPixbuf *get_thumbnail_for(const char *rpath, gboolean *forcheck)
 {
 	char *thumb_path = pixmap_make_thumb_path(rpath);
-	GdkPixbuf *thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
-	if (!thumb)
-		goto err;
+	char *dir = NULL;
+	GdkPixbuf *thumb = NULL;
 
 	struct stat info, thumbinfo;
-	if (mc_lstat(thumb_path, &thumbinfo) != 0
-	||  mc_lstat(rpath     , &info     ) != 0)
-		goto err;
+	if (mc_lstat(rpath     , &info     ) != 0)
+		goto out;
 
-	if (!forcheck)
+	if (mc_lstat(thumb_path, &thumbinfo) != 0)
+	{
+		if (*forcheck)
+		{
+			struct stat info1;
+			if (mc_stat(rpath, &info1) != 0 || info1.st_size == 0)
+				goto out;
+		}
+
+		dir = g_path_get_dirname(rpath);
+		if (strcmp(dir, thumbdir()))
+			goto err;
+		else if (!*forcheck)
+			thumb = gdk_pixbuf_new_from_file_at_scale(rpath,
+					thumb_size, thumb_size, TRUE, NULL);
+
+		goto out;
+	}
+
+	if (!*forcheck)
 		thumbinfo.st_ctim.tv_sec++; //one sec older file is valid
 	if (SPECCMP(info.st_ctim, >, thumbinfo.st_ctim))
-		goto err;
-
-	goto out;
-err:
-	if (thumb) {
-		g_object_unref(thumb);
+	{
 		unlink(thumb_path);
+		goto err;
 	}
-	thumb = NULL;
+
+	if (!*forcheck)
+		thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
+	goto out;
+
+err:
+	*forcheck = FALSE;
+
 out:
 	g_free(thumb_path);
+	g_free(dir);
 	return thumb;
 }
 
