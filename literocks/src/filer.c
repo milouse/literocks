@@ -2848,24 +2848,14 @@ static gboolean make_dir_thumb_link()
 
 		if (stage > 0)
 		{
-			gboolean found;
-			GdkPixbuf *pixmap = g_fscache_lookup_full(pixmap_cache, subpath,
-					FSCACHE_LOOKUP_ONLY_NEW, &found);
-
-			if (pixmap)
-				g_object_unref(pixmap);
-
-			if (!found)
+			gchar *sp = g_strdup(subpath);
+			if (pixmap_check_thumb(sp) == 0)
 			{
-				gchar *sp = g_strdup(subpath);
-				if (pixmap_check_thumb(sp) == 0)
-				{
-					sdinfo.fw->max_thumbs++;
-					g_queue_push_tail(sdinfo.fw->thumb_queue, sp/*eaten*/);
-					goto done;
-				}
-				g_free(sp);
+				sdinfo.fw->max_thumbs++;
+				g_queue_push_tail(sdinfo.fw->thumb_queue, sp/*eaten*/);
+				goto done;
 			}
+			g_free(sp);
 
 			continue;
 		}
@@ -3849,14 +3839,14 @@ void filer_refresh_thumbs(FilerWindow *filer_window)
 		guchar *path = g_strdup(
 				make_path(filer_window->real_path, item->leafname));
 
-		g_fscache_remove(pixmap_cache, path);
-
 		thumb_path = pixmap_make_thumb_path(path);
 		unlink(thumb_path); ///////////////////////////
 
 		dir_force_update_path(path, TRUE);
 
-		if (item->base_type == TYPE_DIRECTORY)
+		if (!filer_window->show_thumbs)
+			; //do nothing
+		else if (item->base_type == TYPE_DIRECTORY)
 		{
 			free_subdir_info();
 			sdinfo.fw = filer_window;
