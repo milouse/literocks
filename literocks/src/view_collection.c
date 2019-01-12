@@ -638,7 +638,7 @@ static void draw_item(GtkWidget *widget,
 	g_return_if_fail(view != NULL);
 
 	if (view->iconstatus == 0) {
-		if (fw->display_style == HUGE_ICONS &&
+		if (fw->display_style == HUGE_ICONS && fw->sort_type == SORT_NAME &&
 				vadjv(vc->collection) == 0) return;
 		goto end_image;
 	}
