@@ -273,13 +273,6 @@ xterm -e wget $1</entry>
       <menu-set-keys/>
     </frame>
   </section>
-  <section title='Types'>
-    <frame label='MIME types'>
-      <label help='1'>The filer uses a set of rules to work out the correct MIME type for each regular file, and then chooses a suitable icon for that type.</label>
-
-	<launch uri="http://rox.sourceforge.net/2005/interfaces/MIME-Editor" label="Edit MIME rules" appname="MIME-Editor"/>
-     </frame>
-  </section>
 	<section title='Colours'>
       <frame label='File type colours'>
         <toggle name='display_colour_types' label='Colour files based on their types'>Filenames (and details) are coloured according to the file's type.</toggle>

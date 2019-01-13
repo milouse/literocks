@@ -167,7 +167,6 @@ static void child_died(int signum);
 static void child_died_callback(void);
 static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition);
 static void xrandr_size_change(GdkScreen *screen, gpointer user_data);
-static GList *build_launch(Option *option, xmlNode *node, guchar *label);
 static GList *build_make_script(Option *option, xmlNode *node, guchar *label);
 
 /****************************************************************
@@ -300,7 +299,6 @@ int main(int argc, char **argv)
 		return EXIT_SUCCESS;
 	}
 
-	option_register_widget("launch", build_launch);
 	option_register_widget("make-script", build_make_script);
 
 #ifdef UNIT_TESTS
@@ -724,68 +722,6 @@ static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition)
 static void xrandr_size_change(GdkScreen *screen, gpointer user_data)
 {
 	gui_store_screen_geometry(screen);
-}
-
-static GtkWidget *launch_button_new(const char *label, const char *uri,
-				    const char *appname)
-{
-	GtkWidget *button;
-	GClosure *closure;
-	const gchar *slash;
-	gchar *tip;
-
-	button = button_new_mixed(GTK_STOCK_PREFERENCES, label);
-	closure = g_cclosure_new(G_CALLBACK(launch_uri),
-					g_strdup(uri),
-					(GClosureNotify) g_free);
-	g_signal_connect_closure(button, "clicked", closure, FALSE);
-	if(appname) {
-		g_object_set_data_full(G_OBJECT(button), "appname",
-				       g_strdup(appname),
-				       (GDestroyNotify) g_free);
-	}
-
-	allow_right_click(button);
-
-	slash = strrchr(uri, '/');
-	if (!slash)
-		slash = uri - 1;
-	tip = g_strdup_printf(
-			_("Left-click to run %s.\n"
-			  "Right-click for a list of versions."),
-			slash + 1);
-
-	gtk_widget_set_tooltip_text(button, tip);
-
-	g_free(tip);
-
-	return button;
-}
-
-static GList *build_launch(Option *option, xmlNode *node, guchar *label)
-{
-	GtkWidget *align;
-	char *uri;
-	char *appname;
-
-	g_return_val_if_fail(option == NULL, NULL);
-	g_return_val_if_fail(label != NULL, NULL);
-
-	uri = xmlGetProp(node, "uri");
-	appname = xmlGetProp(node, "appname");
-
-	g_return_val_if_fail(uri != NULL, NULL);
-
-	align = gtk_alignment_new(0, 0.5, 0, 0);
-
-	gtk_container_add(GTK_CONTAINER(align),
-			  launch_button_new(_(label), uri, appname));
-
-	g_free(uri);
-	if(appname)
-	  g_free(appname);
-
-	return g_list_append(NULL, align);
 }
 
 /* Call back from save box to create a rox script */

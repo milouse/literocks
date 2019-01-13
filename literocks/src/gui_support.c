@@ -930,60 +930,6 @@ void make_heading(GtkWidget *label, double scale_factor)
 	pango_attr_list_unref(list);
 }
 
-/* Return mouse button used in the current event, or -1 if none (no event,
- * or not a click).
- */
-static gint current_event_button(void)
-{
-	GdkEventButton *bev;
-	gint button = -1;
-
-	bev = (GdkEventButton *) gtk_get_current_event();
-
-	if (bev &&
-	    (bev->type == GDK_BUTTON_PRESS || bev->type == GDK_BUTTON_RELEASE))
-		button = bev->button;
-
-	gdk_event_free((GdkEvent *) bev);
-
-	return button;
-}
-
-/* Launch a program using 0launch.
- * If button-3 is used, open the GUI with -g.
- */
-void launch_uri(GObject *button, const char *uri)
-{
-	const char *argv[] = {"0launch", NULL, NULL, NULL};
-	const char *uri_0launch = "/uri/0install/zero-install.sourceforge.net"
-				  "/bin/0launch";
-
-	if (!available_in_path(argv[0]))
-	{
-		if (access(uri_0launch, X_OK) == 0)
-			argv[0] = uri_0launch;
-		else
-		{
-			delayed_error(_("This program (%s) cannot be run, "
-				"as the 0launch command is not available. "
-				"It can be downloaded from here:\n\n"
-				"http://0install.net/injector.html"),
-				uri);
-			return;
-		}
-	}
-
-	if (current_event_button() == 3)
-	{
-		argv[1] = "-g";
-		argv[2] = uri;
-	}
-	else
-		argv[1] = uri;
-
-	rox_spawn(NULL, argv);
-}
-
 static gint button3_button_pressed(GtkButton *button,
 				GdkEventButton *event,
 				gpointer date)
