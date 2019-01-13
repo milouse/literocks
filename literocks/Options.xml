@@ -326,8 +326,6 @@ xterm -e wget $1</entry>
     </frame>
 
 	<frame label='etc'>
-		<toggle name='xattr_ignore' label="Don't use extended attributes">This disables the use of extended attributes available in newer operating systems and file systems.  With this option set the 'Set Type' menu entry is disabled, the MIME type of the file is only derived from the file name and the properties window does not report extended attributes.</toggle>
-
 		<toggle name='fast_font_calc' label='Fast width calculating'>
 			If this is on, string width calculations will be faster but less accurate in Small Icons mode.
 		</toggle>

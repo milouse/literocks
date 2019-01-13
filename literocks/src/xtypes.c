@@ -45,10 +45,6 @@
 #include "gui_support.h"
 #include "run.h"
 
-Option o_xattr_ignore;
-
-#define RETURN_IF_IGNORED(val) if(o_xattr_ignore.int_value) return (val)
-
 #if defined(HAVE_GETXATTR)
 /* Linux implementation */
 
@@ -81,16 +77,12 @@ void xattr_init(void)
 	dyn_getxattr = (void *) dlsym(libc, "getxattr");
 	dyn_listxattr = (void *) dlsym(libc, "listxattr");
 	dyn_removexattr = (void *) dlsym(libc, "removexattr");
-
-	option_add_int(&o_xattr_ignore, "xattr_ignore", FALSE);
 }
 
 int xattr_supported(const char *path)
 {
 	char buf[1];
 	ssize_t nent;
-
-	RETURN_IF_IGNORED(FALSE);
 
 	if (!dyn_getxattr)
 		return FALSE;
@@ -110,8 +102,6 @@ int xattr_have(const char *path)
 {
 	ssize_t nent;
 
-	RETURN_IF_IGNORED(FALSE);
-
 	if (!dyn_listxattr)
 		return FALSE;
 
@@ -128,8 +118,6 @@ gchar *xattr_get(const char *path, const char *attr, int *len)
 {
 	ssize_t size;
 	gchar *buf;
-
-	RETURN_IF_IGNORED(NULL);
 
 	if (!dyn_getxattr)
 		return NULL;
@@ -163,12 +151,6 @@ gchar *xattr_get(const char *path, const char *attr, int *len)
 int xattr_set(const char *path, const char *attr,
 	      const char *value, int value_len)
 {
-	if(o_xattr_ignore.int_value)
-	{
-		errno = ENOSYS;
-		return 1;
-	}
-
 	if (!dyn_setxattr)
 	{
 		errno = ENOSYS;
@@ -184,12 +166,6 @@ int xattr_set(const char *path, const char *attr,
 /* 0 on success */
 int xattr_rem(const char *path, const char *attr)
 {
-	if(o_xattr_ignore.int_value)
-	{
-		errno = ENOSYS;
-		return 1;
-	}
-
 	if(!dyn_setxattr)
 	{
 		errno = ENOSYS;
@@ -205,12 +181,10 @@ int xattr_rem(const char *path, const char *attr)
 
 void xattr_init(void)
 {
-	option_add_int(&o_xattr_ignore, "xattr_ignore", FALSE);
 }
 
 int xattr_supported(const char *path)
 {
-	RETURN_IF_IGNORED(FALSE);
 #ifdef _PC_XATTR_ENABLED
 	if(!path)
 		return TRUE;
@@ -223,7 +197,6 @@ int xattr_supported(const char *path)
 
 int xattr_have(const char *path)
 {
-	RETURN_IF_IGNORED(FALSE);
 #ifdef _PC_XATTR_EXISTS
 	return pathconf(path, _PC_XATTR_EXISTS)>0;
 #else
@@ -237,8 +210,6 @@ gchar *xattr_get(const char *path, const char *attr, int *len)
 	int fd;
 	char *buf=NULL;
 	int nb;
-
-	RETURN_IF_IGNORED(NULL);
 
 #ifdef _PC_XATTR_EXISTS
 	if(!pathconf(path, _PC_XATTR_EXISTS))
@@ -268,12 +239,6 @@ int xattr_set(const char *path, const char *attr,
 	int fd;
 	int nb;
 
-	if(o_xattr_ignore.int_value)
-	{
-		errno = ENOSYS;
-		return 1;
-	}
-
 	if(value && value_len<0)
 		value_len = strlen(value);
 
@@ -297,12 +262,6 @@ int xattr_rem(const char *path, const char *attr)
 {
 	int fd;
 	int er;
-
-	if(o_xattr_ignore.int_value)
-	{
-		errno = ENOSYS;
-		return 1;
-	}
 
 	fd=attropen(path, ".", O_WRONLY);
 	if(fd>0) {
@@ -377,12 +336,6 @@ int xtype_set(const char *path, const MIME_type *type)
 {
 	int res;
 	gchar *ttext;
-
-	if(o_xattr_ignore.int_value)
-	{
-		errno = ENOSYS;
-		return 1;
-	}
 
 	ttext = g_strdup_printf("%s/%s", type->media_type, type->subtype);
 	res = xattr_set(path, XATTR_MIME_TYPE, ttext, -1);
@@ -486,7 +439,7 @@ GArray* xattr_list(const char *path)
 
 
 void xattr_copy(const char *src_path, const char *dest_path) {
-	if (!dyn_listxattr || o_xattr_ignore.int_value) return;
+	if (!dyn_listxattr) return;
 
 	GArray *arr = xattr_list(src_path);
 

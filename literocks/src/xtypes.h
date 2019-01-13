@@ -13,9 +13,6 @@
 #define XATTR_HIDDEN    "user.hidden"
 #define XATTR_LABEL		"user.label"
 
-/* If set, do not use extended attributes */
-extern Option o_xattr_ignore;    /* Set up in xattr_init() */
-
 /* Prototypes */
 void xattr_init(void);
 

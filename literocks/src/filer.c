@@ -3902,7 +3902,7 @@ static inline gboolean is_hidden(const char *dir, DirItem *item)
 #if 0
 	/* Most files will not have extended attributes, so this should
 	* be quick. */
-	if(!o_xattr_ignore.int_value && (item->flags & ITEM_FLAG_HAS_XATTR)) {
+	if(item->flags & ITEM_FLAG_HAS_XATTR) {
 		gchar *path, *val;
 		int len;
 		gboolean hidden=FALSE;
