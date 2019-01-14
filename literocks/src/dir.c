@@ -704,7 +704,9 @@ static gboolean compare_items(DirItem  *item, DirItem  *old)
 	 && item->uid == old->uid
 	 && item->gid == old->gid
 	 && item->mime_type == old->mime_type
-	 && (old->_image == NULL || _diritem_get_image(item, FALSE) == old->_image)
+	 && (old->_image == NULL
+		 || item->_image == old->_image
+		 || _diritem_get_image(item, FALSE) == old->_image)
 	 && (item->label == NULL || (
 			   item->label->red   == old->label->red
 			&& item->label->green == old->label->green

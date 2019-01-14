@@ -1242,6 +1242,7 @@ const char *mime_type_comment(MIME_type *type)
 GdkPixbuf *theme_load_icon(const gchar *icon_name, gint size,
 		GtkIconLookupFlags flags, GError **perror)
 {
+	gtk_icon_theme_rescan_if_needed(icon_theme);
 	return gtk_icon_theme_load_icon(icon_theme,
 					icon_name,
 					size,
