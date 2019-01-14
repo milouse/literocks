@@ -42,7 +42,6 @@
 #include "global.h"
 
 #include "string.h"
-#include "fscache.h"
 #include "main.h"
 #include "pixmaps.h"
 #include "run.h"
@@ -437,44 +436,23 @@ static GtkIconInfo *mime_type_lookup_icon_info(GtkIconTheme *theme,
  */
 MaskedPixmap *type_to_icon(MIME_type *type)
 {
-	GtkIconInfo *full;
-	char	*type_name, *path;
-	time_t	now;
-
 	if (type == NULL)
-	{
-		g_object_ref(im_unknown);
-		return im_unknown;
-	}
+		return g_object_ref(im_unknown);
 
-	now = time(NULL);
+	time_t now = time(NULL);
+	GtkIconInfo *full;
+
 	/* Already got an image? */
 	if (type->image)
 	{
 		/* Yes - don't recheck too often */
 		if (labs(now - type->image_time) < 9)
-		{
-			g_object_ref(type->image);
-			return type->image;
-		}
-		g_object_unref(type->image);
-		type->image = NULL;
+			return g_object_ref(type->image);
+
+		g_clear_object(&type->image);
 	}
 
 again:
-	type_name = g_strconcat(type->media_type, "_", type->subtype,
-				".png", NULL);
-	path = choices_find_xdg_path_load(type_name, "MIME-icons", SITE);
-	g_free(type_name);
-	if (path)
-	{
-		type->image = g_fscache_lookup(pixmap_cache, path);
-		g_free(path);
-	}
-
-	if (type->image)
-		goto out;
-
 	full = mime_type_lookup_icon_info(icon_theme, type);
 	if (!full && type == inode_mountpoint)
 	{
@@ -484,31 +462,22 @@ again:
 	}
 	if (full)
 	{
-		const char *icon_path;
-		/* Get the actual icon through our cache, not through GTK, because
-		 * GTK doesn't cache icons.
-		 */
-		icon_path = gtk_icon_info_get_filename(full);
-		if (icon_path != NULL)
-			type->image = g_fscache_lookup(pixmap_cache, icon_path);
-		/* else shouldn't happen, because we didn't use
-		 * GTK_ICON_LOOKUP_USE_BUILTIN.
-		 */
+		GdkPixbuf *buf = gtk_icon_info_load_icon(full, NULL);
+		if (buf)
+		{
+			type->image = masked_pixmap_new(buf);
+			g_object_unref(buf);
+		}
 		gtk_icon_info_free(full);
 	}
 
-out:
 	if (!type->image)
-	{
 		/* One ref from the type structure, one returned */
-		type->image = im_unknown;
-		g_object_ref(im_unknown);
-	}
+		type->image = g_object_ref(im_unknown);
 
 	type->image_time = now;
 
-	g_object_ref(type->image);
-	return type->image;
+	return g_object_ref(type->image);
 }
 
 GdkAtom type_to_atom(MIME_type *type)
