@@ -94,7 +94,6 @@ static void options_changed(void);
 static char *get_action_save_path(GtkWidget *dialog);
 static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
 static gboolean remove_handler_with_confirm(const guchar *path);
-static void set_icon_theme(void);
 
 /* Hash of all allocated MIME types, indexed by "media/subtype".
  * MIME_type structs are never freed; this table prevents memory leaks
@@ -123,11 +122,8 @@ static GtkIconTheme *icon_theme = NULL;
 
 void type_init(void)
 {
-	int	    i;
-
-	icon_theme = gtk_icon_theme_new();
-
 	type_hash = g_hash_table_new(g_str_hash, g_str_equal);
+	icon_theme = gtk_icon_theme_get_default();
 
 	text_plain = get_mime_type("text/plain", TRUE);
 	inode_directory = get_mime_type("inode/directory", TRUE);
@@ -146,13 +142,11 @@ void type_init(void)
 
 	option_add_int(&o_display_colour_types, "display_colour_types", TRUE);
 
-	for (i = 0; i < NUM_TYPE_COLOURS; i++)
+	for (int i = 0; i < NUM_TYPE_COLOURS; i++)
 		option_add_string(&o_type_colours[i],
 				  opt_type_colours[i][0],
 				  opt_type_colours[i][1]);
 	alloc_type_colours();
-
-	set_icon_theme();
 
 	option_add_notify(options_changed);
 }
@@ -1271,12 +1265,6 @@ const char *mime_type_comment(MIME_type *type)
 		find_comment(type);
 
 	return type->comment;
-}
-
-static void set_icon_theme(void)
-{
-	icon_theme = gtk_icon_theme_get_default();
-	gtk_icon_theme_rescan_if_needed(icon_theme);
 }
 
 GtkIconInfo *theme_lookup_icon(const gchar *icon_name, gint size,
