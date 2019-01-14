@@ -48,7 +48,7 @@ ${PROG}: ${OBJECTS}
 	mv "${PROG}" "${PLATFORM_DIR}"
 	-(cd "${PLATFORM_DIR}" && \
 	 objcopy --only-keep-debug literocks literocks.dbg && \
-	 strip literocks && \
+#	 strip literocks && \
 	 objcopy --add-gnu-debuglink=literocks.dbg literocks)
 
 clean:
