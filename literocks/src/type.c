@@ -463,7 +463,9 @@ again:
 	}
 	if (full)
 	{
-		GdkPixbuf *buf = gtk_icon_info_load_icon(full, NULL);
+		GdkPixbuf *buf =
+			gdk_pixbuf_new_from_file(gtk_icon_info_get_filename(full), NULL);
+
 		if (buf)
 		{
 			type->image = masked_pixmap_new(buf);
@@ -1235,12 +1237,6 @@ const char *mime_type_comment(MIME_type *type)
 		find_comment(type);
 
 	return type->comment;
-}
-
-GtkIconInfo *theme_lookup_icon(const gchar *icon_name, gint size,
-		GtkIconLookupFlags flags)
-{
-	return gtk_icon_theme_lookup_icon(icon_theme, icon_name, size, flags);
 }
 
 GdkPixbuf *theme_load_icon(const gchar *icon_name, gint size,

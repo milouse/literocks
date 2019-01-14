@@ -58,8 +58,6 @@ extern GdkColor type_colours[];
 extern Option o_display_colour_types;
 
 
-GtkIconInfo *theme_lookup_icon(const gchar *icon_name, gint size,
-		GtkIconLookupFlags flags);
 GdkPixbuf *theme_load_icon(const gchar *icon_name, gint size,
 		GtkIconLookupFlags flags, GError **error);
 
