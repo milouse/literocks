@@ -49,7 +49,6 @@
 #include "type.h"
 
 GFSCache *pixmap_cache = NULL;
-GFSCache *desktop_icon_cache = NULL;
 
 static GHashTable *orders = NULL;
 
@@ -120,7 +119,6 @@ static const char *stocks[] = {
 static void load_default_pixmaps(void);
 static gint purge_pixmaps(gpointer data);
 static MaskedPixmap *image_from_file(const char *path);
-static MaskedPixmap *image_from_desktop_file(const char *path);
 static MaskedPixmap *get_bad_image(void);
 static GdkPixbuf *get_thumbnail_for(const char *path, gboolean *forcheck);
 static void ordered_update(ChildThumbnail *info);
@@ -185,8 +183,6 @@ void pixmaps_init(void)
 	pixmap_cache = g_fscache_new((GFSLoadFunc) image_from_file, NULL, NULL);
 	orders = g_hash_table_new_full(
 			g_str_hash, g_str_equal, g_free, NULL);
-
-	desktop_icon_cache = g_fscache_new((GFSLoadFunc) image_from_desktop_file, NULL, NULL);
 
 	g_timeout_add(PIXMAP_PURGE_TIME / 2 * 1000, purge_pixmaps, NULL);
 
@@ -728,7 +724,7 @@ static MaskedPixmap *image_from_file(const char *path)
 /* Load this icon named by this .desktop file from the current theme.
  * NULL on failure.
  */
-static MaskedPixmap *image_from_desktop_file(const char *path)
+MaskedPixmap *pixmap_from_desktop_file(const char *path)
 {
 	GError *error = NULL;
 	MaskedPixmap *image = NULL;
