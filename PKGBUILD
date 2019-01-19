@@ -3,7 +3,7 @@
 # Contributor: Jochem Kossen <j.kossen@home.nl>
 
 pkgname=literocks
-pkgver=2.11.h
+pkgver=2.11.l
 pkgrel=1
 branch=master
 pkgdesc="A fork of rox-filer having no desktop features, just a filer"
@@ -37,8 +37,8 @@ build() {
 package() {
   cd "$srcdir/literocks"
   install -d "$pkgdir/usr/share"
-  cp -rp images "$pkgdir/usr/share/literocks/"
-  rm -fr "$pkgdir"/usr/share/literocks/{src,build}
+  cp -rp ../literocks "$pkgdir/usr/share/literocks/"
+  rm -fr "$pkgdir"/usr/share/literocks/{src,build,.git}
 
   install -Dm755 literocks.sh "$pkgdir/usr/bin/literocks"
   install -Dm644 literocks.1 "$pkgdir/usr/share/man/man1/literocks.1"
