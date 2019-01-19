@@ -3,9 +3,9 @@
 # and the generated manual page
 literocks.1
 
-literocks/literocks.dbg
-literocks/literocks
-literocks/build/*
-literocks/src/autom4te.cache
-literocks/src/configure
+literocks.dbg
+literocks
+build/*
+src/autom4te.cache
+src/configure
 
