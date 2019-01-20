@@ -3887,8 +3887,6 @@ void filer_refresh_thumbs(FilerWindow *filer_window)
 	}
 
 	set_scanning_display(filer_window, FALSE);
-	if (!g_queue_is_empty(filer_window->thumb_queue))
-		start_thumb_scanning(filer_window);
 }
 
 static inline gboolean is_hidden(const char *dir, DirItem *item)
