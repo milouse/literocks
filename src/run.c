@@ -420,7 +420,7 @@ gboolean run_by_uri(const gchar *uri, gchar **errmsg)
 			*errmsg=g_strdup_printf(_("Non-local URL %s"), uri);
 		}
 
-	} else if((cmd=choices_find_xdg_path_load(scheme, "URI", SITE))) {
+	} else if((cmd=choices_find_xdg_path_load(scheme, "URI"))) {
 		DirItem *item;
 
 		item=diritem_new(scheme);

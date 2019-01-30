@@ -1132,7 +1132,7 @@ static void colchangedcb(GtkTreeView *tree_view, ViewDetails *view_details)
 				break;
 			}
 
-		char *path = choices_find_xdg_path_save("column_order", PROJECT, SITE, FALSE);
+		char *path = choices_find_xdg_path_save("column_order", NULL, FALSE);
 		if (path)
 		{
 			g_file_set_contents(path, colorder, COL_ITEM, NULL);
@@ -1169,7 +1169,7 @@ static void defcols(ViewDetails *view_details)
 	if (!colorder_loaded)
 	{
 		colorder_loaded = TRUE;
-		char *path = choices_find_xdg_path_load("column_order", PROJECT, SITE);
+		char *path = choices_find_xdg_path_load("column_order", NULL);
 		if (path)
 		{
 			gchar *buffer = NULL;

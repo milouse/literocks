@@ -166,9 +166,6 @@ typedef enum
 #define SOAP_RPC_NS "http://www.w3.org/2001/12/soap-rpc"
 #define ROX_NS "http://literocks.jun7.github.com/SOAP/literocks"
 
-/* Namespace for configuration */
-#define SITE "literocks"
-
 /* Stock icons */
 #define ROX_STOCK_SHOW_DETAILS "rox-show-details"
 #define ROX_STOCK_SHOW_HIDDEN  "rox-show-hidden"

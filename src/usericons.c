@@ -74,7 +74,7 @@ void read_globicons()
 	if (!glob_icons)
 		glob_icons = g_hash_table_new(g_str_hash, g_str_equal);
 
-	path = choices_find_xdg_path_load("globicons", PROJECT, SITE);
+	path = choices_find_xdg_path_load("globicons", NULL);
 	if (!path)
 		return;	/* Nothing to load */
 
@@ -333,8 +333,7 @@ static void radios_changed(Radios *radios, gpointer data)
 			char *path, *type;
 
 			type = g_strconcat(mime_type->media_type, ".png", NULL);
-			path = choices_find_xdg_path_load(type, "MIME-icons",
-							  SITE);
+			path = choices_find_xdg_path_load(type, "MIME-icons");
 			g_free(type);
 			drop_box_set_path(drop_box, path);
 			g_free(path);
@@ -346,8 +345,7 @@ static void radios_changed(Radios *radios, gpointer data)
 
 			type = g_strconcat(mime_type->media_type, "_",
 					   mime_type->subtype, ".png", NULL);
-			path = choices_find_xdg_path_load(type, "MIME-icons",
-							  SITE);
+			path = choices_find_xdg_path_load(type, "MIME-icons");
 			g_free(type);
 			drop_box_set_path(drop_box, path);
 			g_free(path);
@@ -390,7 +388,7 @@ static void write_globicons(void)
 	gchar *save = NULL, *save_new = NULL;
 	xmlDocPtr doc = NULL;
 
-	save = choices_find_xdg_path_save("globicons", PROJECT, SITE, TRUE);
+	save = choices_find_xdg_path_save("globicons", NULL, TRUE);
 
 	if (!save)
 		return;		/* Saving is disabled */
@@ -549,7 +547,7 @@ static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 		leaf = g_strconcat(type->media_type, "_", type->subtype,
 								".png", NULL);
 
-	target = choices_find_xdg_path_save(leaf, "MIME-icons", SITE, TRUE);
+	target = choices_find_xdg_path_save(leaf, "MIME-icons", TRUE);
 	g_free(leaf);
 
 	if (!target)
@@ -592,7 +590,7 @@ static gboolean convert_to_png(const gchar *src, const gchar *dest)
 
 	gdk_pixbuf_save(pic->src_pixbuf, dest,
 			"png", &error,
-			"tEXt::Software", PROJECT,
+			"tEXt::Software", APPNAME,
 			NULL);
 	g_object_unref(pic);
 

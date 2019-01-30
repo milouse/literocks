@@ -136,7 +136,7 @@ static char *thumbdirpath;
 static const char *thumbdir()
 {
 	return thumbdirpath ?: (thumbdirpath =
-		g_build_filename(g_get_user_cache_dir(), "literocks", thumb_dir, NULL));
+		g_build_filename(g_get_user_cache_dir(), APPNAME, thumb_dir, NULL));
 }
 static void set_thumb_size()
 {
@@ -510,15 +510,14 @@ static gchar *thumbnail_program(MIME_type *type)
 		return NULL;
 
 	leaf = g_strconcat(type->media_type, "_", type->subtype, NULL);
-	path = choices_find_xdg_path_load(leaf, "MIME-thumb", SITE);
+	path = choices_find_xdg_path_load(leaf, "MIME-thumb");
 	g_free(leaf);
 	if (path)
 	{
 		return path;
 	}
 
-	path = choices_find_xdg_path_load(type->media_type, "MIME-thumb",
-					  SITE);
+	path = choices_find_xdg_path_load(type->media_type, "MIME-thumb");
 
 	return path;
 }
@@ -967,7 +966,7 @@ static void load_default_pixmaps(void)
 	im_appdir = load_pixmap("application");
 
 	winicon = gtk_icon_theme_load_icon(
-		gtk_icon_theme_get_default(), "literocks", thumb_size, 0, &error);
+		gtk_icon_theme_get_default(), APPNAME, thumb_size, 0, &error);
 
 	if (winicon)
 		gtk_window_set_default_icon(winicon);

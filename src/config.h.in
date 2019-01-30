@@ -1,6 +1,6 @@
 /* The configure script will auto-generate config.h from config.h.in */
 
-#define PROJECT "literocks"
+#define APPNAME "literocks"
 #define VERSION "Unknown"
 #define GTK_VERSION "Unknown"
 

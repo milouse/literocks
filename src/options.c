@@ -165,7 +165,7 @@ void options_init(void)
 	option_hash = g_hash_table_new(g_str_hash, g_str_equal);
 	widget_builder = g_hash_table_new(g_str_hash, g_str_equal);
 
-	path = choices_find_xdg_path_load("Options", PROJECT, SITE);
+	path = choices_find_xdg_path_load("Options", NULL);
 	if (path)
 	{
 		/* Load in all the options set in the filer, storing them
@@ -269,7 +269,7 @@ void options_notify(void)
 	{
 		updating_file_format = FALSE;
 		save_options();
-		info_message(_("literocks has converted your Options file "
+		info_message(_(APPNAME" has converted your Options file "
 				"to the new XML format"));
 	}
 
@@ -539,7 +539,7 @@ static void open_fontsel(GtkWidget *button, Option *option)
 		gtk_widget_destroy(GTK_WIDGET(current_fontsel_box));
 
 	current_fontsel_box = GTK_FONT_SELECTION_DIALOG(
-				gtk_font_selection_dialog_new(PROJECT));
+				gtk_font_selection_dialog_new(APPNAME));
 
 	gtk_window_set_position(GTK_WINDOW(current_fontsel_box),
 				GTK_WIN_POS_MOUSE);
@@ -960,7 +960,7 @@ static GtkWidget *build_window_frame(GtkTreeView **tree_view)
 	gtk_widget_grab_default(button);
 	gtk_widget_grab_focus(button);
 
-	save_path = choices_find_xdg_path_save("...", PROJECT, SITE, FALSE);
+	save_path = choices_find_xdg_path_save("...", NULL, FALSE);
 	if (save_path)
 	{
 		string = g_strdup_printf(_("Choices will be saved as:\n%s"),
@@ -1114,7 +1114,7 @@ static void save_options(void)
 	GList	*next;
 	guchar	*save, *save_new;
 
-	save = choices_find_xdg_path_save("Options", PROJECT, SITE, TRUE);
+	save = choices_find_xdg_path_save("Options", NULL, TRUE);
 	if (!save)
 		goto out;
 

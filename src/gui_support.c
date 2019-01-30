@@ -306,7 +306,7 @@ void parse_file(const char *path, ParseFunc *parse_line)
 		_("Error in '%s' file at line %d: "
 		"\n\"%s\"\n"
 		"This may be due to upgrading from a previous version of "
-		"literocks. Open the Options window and try changing something "
+		APPNAME". Open the Options window and try changing something "
 		"and then changing it back (causing the file to be resaved).\n"
 		"Further errors will be ignored."),
 					path,
@@ -580,7 +580,7 @@ void tooltip_prime(GSourceFunc callback, GObject *object)
  */
 gboolean confirm(const gchar *message, const gchar *stock, const gchar *action)
 {
-	return get_choice(PROJECT, message, 2,
+	return get_choice(APPNAME, message, 2,
 			  GTK_STOCK_CANCEL, NULL,
 			  stock, action) == 1;
 }
@@ -1042,7 +1042,7 @@ GtkBuilder *get_gtk_builder(gchar **ids)
 	GtkBuilder *builder = NULL;
 
 	builder = gtk_builder_new();
-	gtk_builder_set_translation_domain(builder, "literocks");
+	gtk_builder_set_translation_domain(builder, APPNAME);
 
 	path = g_build_filename(app_dir, "Templates.ui", NULL);
 	if (!gtk_builder_add_objects_from_file(builder, path, ids, &error))

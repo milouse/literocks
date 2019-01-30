@@ -1383,7 +1383,7 @@ static xmlNode *group_find(char *name)
 	gchar *path;
 
 	/* Update the groups, if possible */
-	path = choices_find_xdg_path_load("Groups.xml", PROJECT, SITE);
+	path = choices_find_xdg_path_load("Groups.xml", NULL);
 	if (path)
 	{
 		XMLwrapper *wrapper;
@@ -1454,8 +1454,7 @@ static void group_save(FilerWindow *filer_window, char *name)
 	while ((item = iter.next(&iter)))
 		xmlNewTextChild(group, NULL, "item", item->leafname);
 
-	save_path = choices_find_xdg_path_save("Groups.xml", PROJECT, SITE,
-					       TRUE);
+	save_path = choices_find_xdg_path_save("Groups.xml", NULL, TRUE);
 	if (save_path)
 	{
 		save_xml_file(groups->doc, save_path);
@@ -2205,11 +2204,11 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	/* Create the top-level window widget */
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	filer_set_title(filer_window);
-	gtk_widget_set_name(filer_window->window, "literocks");
+	gtk_widget_set_name(filer_window->window, APPNAME);
 
 	if (wm_class)
 		gtk_window_set_wmclass(GTK_WINDOW(filer_window->window),
-				       wm_class, PROJECT);
+				       wm_class, APPNAME);
 
 	if (small_height == 0)
 	{
@@ -4126,7 +4125,7 @@ static void load_learnt_mounts(void)
 	unmount_prompt_actions = g_hash_table_new_full(g_str_hash,
 			g_str_equal, g_free, NULL);
 
-	path = choices_find_xdg_path_load("Mounts", PROJECT, SITE);
+	path = choices_find_xdg_path_load("Mounts", NULL);
 	if (!path)
 		return;
 	if (!g_file_get_contents(path, &buffer, &len, NULL))
@@ -4167,8 +4166,7 @@ static void save_mount(char *path, gpointer value, FILE **pfp)
 
 	if (!*pfp)
 	{
-		gchar *spath = choices_find_xdg_path_save("Mounts",
-				PROJECT, SITE, TRUE);
+		gchar *spath = choices_find_xdg_path_save("Mounts", NULL, TRUE);
 
 		if (!spath)
 			return;
@@ -4198,7 +4196,7 @@ static void load_settings(void)
 	gchar *path;
 	XMLwrapper *settings_doc=NULL;
 
-	path=choices_find_xdg_path_load("Settings.xml", PROJECT, SITE);
+	path=choices_find_xdg_path_load("Settings.xml", NULL);
 	if(path) {
 		settings_doc=xml_new(path);
 		g_free(path);
@@ -4314,7 +4312,7 @@ static void save_settings(void)
 {
 	gchar *path;
 
-	path=choices_find_xdg_path_save("Settings.xml", PROJECT, SITE, TRUE);
+	path=choices_find_xdg_path_save("Settings.xml", NULL, TRUE);
 	if(path) {
 		xmlDocPtr doc = xmlNewDoc("1.0");
 		xmlDocSetRootElement(doc, xmlNewDocNode(doc, NULL,

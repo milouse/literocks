@@ -51,7 +51,7 @@ void log_init()
 {
 	log = gtk_tree_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
-	log_info_paths(_("literocks started"), NULL, NULL);
+	log_info_paths(_("App started"), NULL, NULL);
 
 #if 0
 	GList *paths = NULL;

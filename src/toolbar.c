@@ -199,7 +199,7 @@ static Tool all_tools[] = {
 	 toolbar_settings_clicked, DROP_NONE, TRUE,
 	 FALSE},
 
-	{N_("Help"), GTK_STOCK_HELP, N_("Show literocks help"),
+	{N_("Help"), GTK_STOCK_HELP, N_("Show help"),
 	 toolbar_help_clicked, DROP_NONE, TRUE,
 	 FALSE},
 };

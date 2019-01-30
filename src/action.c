@@ -2425,7 +2425,7 @@ void action_mount(GList	*paths, gboolean open_dir, gboolean mount, int quiet)
 	gtk_widget_show(abox);
 #else
 	report_error(
-		_("literocks does not yet support mount points on your "
+		_(APPNAME" does not yet support mount points on your "
 			"system. Sorry."));
 #endif /* DO_MOUNT_POINTS */
 }

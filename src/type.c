@@ -42,6 +42,7 @@
 #include "global.h"
 
 #include "string.h"
+#include "fscache.h"
 #include "main.h"
 #include "pixmaps.h"
 #include "run.h"
@@ -349,16 +350,15 @@ char *handler_for(MIME_type *type)
 	char	*target;
 
 	if (type == NULL)
-		open = choices_find_xdg_path_load("all", "MIME-types", SITE);
+		open = choices_find_xdg_path_load("all", "MIME-types");
 	else
 	{
 		type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
-		open = choices_find_xdg_path_load(type_name, "MIME-types", SITE);
+		open = choices_find_xdg_path_load(type_name, "MIME-types");
 		g_free(type_name);
 
 		if (!open)
-			open = choices_find_xdg_path_load(type->media_type,
-							  "MIME-types", SITE);
+			open = choices_find_xdg_path_load(type->media_type, "MIME-types");
 	}
 
 	if (!open)
@@ -453,7 +453,22 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		g_clear_object(&type->image);
 	}
 
+	char *type_name, *path;
 again:
+
+	type_name = g_strconcat(type->media_type, "_", type->subtype,
+				".png", NULL);
+	path = choices_find_xdg_path_load(type_name, "MIME-icons");
+	g_free(type_name);
+	if (path)
+	{
+		type->image = g_fscache_lookup(pixmap_cache, path);
+		g_free(path);
+	}
+
+	if (type->image)
+		goto out;
+
 	full = mime_type_lookup_icon_info(icon_theme, type);
 	if (!full && type == inode_mountpoint)
 	{
@@ -463,14 +478,15 @@ again:
 	}
 	if (full)
 	{
-		GdkPixbuf *buf =
-			gdk_pixbuf_new_from_file(gtk_icon_info_get_filename(full), NULL);
-
-		if (buf)
-		{
-			type->image = masked_pixmap_new(buf);
-			g_object_unref(buf);
-		}
+		/* Get the actual icon through our cache, not through GTK, because
+		 * GTK doesn't cache icons.
+		 */
+		const char *icon_path = gtk_icon_info_get_filename(full);
+		if (icon_path != NULL)
+			type->image = g_fscache_lookup(pixmap_cache, icon_path);
+		/* else shouldn't happen, because we didn't use
+		 * GTK_ICON_LOOKUP_USE_BUILTIN.
+		 */
 		gtk_icon_info_free(full);
 	}
 
@@ -478,6 +494,7 @@ again:
 		/* One ref from the type structure, one returned */
 		type->image = g_object_ref(im_unknown);
 
+out:
 	type->image_time = now;
 
 	return g_object_ref(type->image);
@@ -590,16 +607,13 @@ static guchar *handler_for_radios(GObject *dialog)
 	switch (radios_get_value(radios))
 	{
 		case SET_MEDIA:
-			return choices_find_xdg_path_load(type->media_type,
-							  "MIME-types", SITE);
+			return choices_find_xdg_path_load(type->media_type, "MIME-types");
 		case SET_TYPE:
 		{
 			gchar *tmp, *handler;
 			tmp = g_strconcat(type->media_type, "_",
 					  type->subtype, NULL);
-			handler = choices_find_xdg_path_load(tmp,
-							     "MIME-types",
-							     SITE);
+			handler = choices_find_xdg_path_load(tmp, "MIME-types");
 			g_free(tmp);
 			return handler;
 		}
@@ -990,7 +1004,7 @@ static char *get_action_save_path(GtkWidget *dialog)
 		type_name = g_strconcat(type->media_type, "_",
 				type->subtype, NULL);
 
-	path = choices_find_xdg_path_save("", PROJECT, SITE, FALSE);
+	path = choices_find_xdg_path_save("", NULL, FALSE);
 	if (!path)
 	{
 		report_error(
@@ -999,7 +1013,7 @@ static char *get_action_save_path(GtkWidget *dialog)
 	}
 	g_free(path);
 
-	path = choices_find_xdg_path_save(type_name, "MIME-types", SITE, TRUE);
+	path = choices_find_xdg_path_save(type_name, "MIME-types", TRUE);
 
 	if (!remove_handler_with_confirm(path))
 		null_g_free(&path);

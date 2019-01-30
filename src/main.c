@@ -258,7 +258,7 @@ int main(int argc, char **argv)
 	if (!app_dir)
 	{
 		g_warning("APP_DIR environment variable was unset!\n"
-			"Use the AppRun script to invoke literocks...\n");
+			"Use the AppRun script to invoke this...\n");
 		app_dir = g_get_current_dir();
 	}
 #ifdef HAVE_UNSETENV
@@ -293,7 +293,7 @@ int main(int argc, char **argv)
 		 * compiled OK. Do this test before gtk_init so that
 		 * we don't need an X server to install.
 		 */
-		g_print("literocks %s\n", VERSION);
+		g_print(APPNAME" %s\n", VERSION);
 		g_print(_(COPYING));
 		show_features();
 		return EXIT_SUCCESS;
@@ -759,9 +759,9 @@ static void make_script_clicked(GtkWidget *button, gpointer udata)
 
 	/* Default to saving in current filer window */
 	if(window_with_focus)
-		filename=make_path(window_with_focus->sym_path, "literocks");
+		filename=make_path(window_with_focus->sym_path, APPNAME);
 	else
-		filename="literocks";
+		filename=APPNAME;
 	image = type_to_icon(application_x_shellscript);
 
 	/* Create a save box to save the script */

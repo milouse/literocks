@@ -311,7 +311,7 @@ GtkWidget *menu_start(gchar *label, GtkWidget *parent)
 
 void menu_init(void)
 {
-	char *menurc = choices_find_xdg_path_load(MENUS_NAME, PROJECT, SITE);
+	char *menurc = choices_find_xdg_path_load(MENUS_NAME, NULL);
 	if (menurc)
 	{
 		gtk_accel_map_load(menurc);
@@ -601,7 +601,7 @@ static void update_new_files_menu()
 		widgets = NULL;
 	}
 
-	templ_dname = choices_find_xdg_path_load("Templates", "", SITE);
+	templ_dname = choices_find_xdg_path_load("Templates", NULL);
 	if (templ_dname)
 	{
 		widgets = menu_from_dir(filer_new_menu, templ_dname,
@@ -785,10 +785,10 @@ gboolean ensure_filer_menu(void)
 
 	start_menu(N_("Help"), filer_menu);
 
-	adi(N_("About literocks..."), menu_rox_help,  HELP_ABOUT);
+	adi(N_("About "APPNAME"..."), menu_rox_help,  HELP_ABOUT);
 	ads(N_("Show Help Files"   ), menu_rox_help,  HELP_DIR, GTK_STOCK_HELP);
 		sta(GDK_KEY_F1, 0);
-	adi(N_("About literocks..."), menu_rox_help,  HELP_MANUAL);
+	adi(N_("About "APPNAME"..."), menu_rox_help,  HELP_MANUAL);
 
 	start_menu(NULL, filer_menu);
 	adi(N_("Customise Dir Menu..."), customise_directory_menu, 0);
@@ -1771,7 +1771,7 @@ static gboolean new_file_type_cb(GObject *savebox,
 	/* We can work out the template path from the initial name */
 	base = g_path_get_basename(initial);
 	oleaf = base;
-	templ_dname = choices_find_xdg_path_load("Templates", "", SITE);
+	templ_dname = choices_find_xdg_path_load("Templates", NULL);
 	if (!templ_dname)
 	{
 		report_error(
@@ -1835,7 +1835,7 @@ static void customise_directory_menu(gpointer data)
 	char *path;
 	char *leaf = g_strconcat(".", inode_directory->media_type, NULL);
 
-	path = choices_find_xdg_path_save(leaf, "SendTo", SITE, TRUE);
+	path = choices_find_xdg_path_save(leaf, "SendTo", TRUE);
 	g_free(leaf);
 
 	mkdir(path, 0755);
@@ -1864,7 +1864,7 @@ static void customise_send_to(gpointer data)
 
 	dirs = g_string_new(NULL);
 
-	path = choices_list_xdg_dirs("", SITE);
+	path = choices_list_xdg_dirs("");
 	for (i = 0; i < path->len; i++)
 	{
 		guchar *old = (guchar *) path->pdata[i];
@@ -1874,7 +1874,7 @@ static void customise_send_to(gpointer data)
 	}
 	choices_free_list(path);
 
-	save = choices_find_xdg_path_save("", "SendTo", SITE, TRUE);
+	save = choices_find_xdg_path_save("", "SendTo", TRUE);
 	if (save)
 		mkdir(save, 0777);
 
@@ -1911,7 +1911,7 @@ static void customise_new(gpointer data)
 
 	dirs = g_string_new(NULL);
 
-	path = choices_list_xdg_dirs("", SITE);
+	path = choices_list_xdg_dirs("");
 	for (i = 0; i < path->len; i++)
 	{
 		guchar *old = (guchar *) path->pdata[i];
@@ -1921,7 +1921,7 @@ static void customise_new(gpointer data)
 	}
 	choices_free_list(path);
 
-	save = choices_find_xdg_path_save("", "Templates", SITE, TRUE);
+	save = choices_find_xdg_path_save("", "Templates", TRUE);
 	if (save)
 		mkdir(save, 0777);
 
@@ -1959,7 +1959,7 @@ static GList *add_sendto_shared(GtkWidget *menu,
 	else
 		searchdir = g_strdup("SendTo");
 
-	paths = choices_list_xdg_dirs(searchdir, SITE);
+	paths = choices_list_xdg_dirs(searchdir);
 	g_free(searchdir);
 
 	for (i = 0; i < paths->len; i++)
@@ -2271,7 +2271,7 @@ void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n)
 
 static void save_menus(void)
 {
-	char *menurc = choices_find_xdg_path_save(MENUS_NAME, PROJECT, SITE, TRUE);
+	char *menurc = choices_find_xdg_path_save(MENUS_NAME, NULL, TRUE);
 	if (menurc)
 	{
 		gtk_accel_map_save(menurc);

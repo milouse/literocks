@@ -156,8 +156,7 @@ static gchar *choices_find_path_load(const char *leaf, const char *dir)
  * The return values may be NULL - use built-in defaults.
  * g_free() the result.
  */
-gchar *choices_find_xdg_path_load(const char *leaf, const char *dir,
-				  const char *site)
+gchar *choices_find_xdg_path_load(const char *leaf, const char *dir)
 {
 	int i;
 
@@ -167,11 +166,11 @@ gchar *choices_find_xdg_path_load(const char *leaf, const char *dir,
 	{
 		gchar	*path;
 
-		if(site)
-			path = g_build_filename(xdg_dir_list[i], site,
+		if(dir)
+			path = g_build_filename(xdg_dir_list[i], APPNAME,
 					   dir, leaf, NULL);
 		else
-			path = g_build_filename(xdg_dir_list[i], dir,
+			path = g_build_filename(xdg_dir_list[i], APPNAME,
 					   leaf, NULL);
 
 		if (exists(path))
@@ -192,7 +191,7 @@ gchar *choices_find_xdg_path_load(const char *leaf, const char *dir,
  * g_free() the result.
  */
 gchar *choices_find_xdg_path_save(const char *leaf, const char *dir,
-				  const char *site, gboolean create)
+				  gboolean create)
 {
 	gchar	*path, *retval, *tmp;
 
@@ -205,19 +204,14 @@ gchar *choices_find_xdg_path_save(const char *leaf, const char *dir,
 					g_strerror(errno));
 	}
 
-	if(site)
+	path = g_build_filename(xdg_dir_list[0], APPNAME, NULL);
+	if (create && !exists(path))
 	{
-		path = g_build_filename(xdg_dir_list[0], site, NULL);
-		if (create && !exists(path))
-		{
-			if (mkdir(path, 0777))
-				g_warning("mkdir(%s): %s\n", path,
-					  g_strerror(errno));
-		}
-		tmp=path;
-	} else {
-		tmp=g_strdup(xdg_dir_list[0]);
+		if (mkdir(path, 0777))
+			g_warning("mkdir(%s): %s\n", path,
+				  g_strerror(errno));
 	}
+	tmp=path;
 
 	path = g_build_filename(tmp, dir, NULL);
 	g_free(tmp);
@@ -242,7 +236,7 @@ gchar *choices_find_xdg_path_save(const char *leaf, const char *dir,
  *
  * Free the list using choices_free_list().
  */
-GPtrArray *choices_list_xdg_dirs(char *dir, char *site)
+GPtrArray *choices_list_xdg_dirs(char *dir)
 {
 	GPtrArray	*list;
 	int              i;
@@ -255,11 +249,10 @@ GPtrArray *choices_list_xdg_dirs(char *dir, char *site)
 	{
 		guchar	*path;
 
-		if(site)
-			path = g_build_filename(xdg_dir_list[i], site,
-					   dir, NULL);
+		if(dir)
+			path = g_build_filename(xdg_dir_list[i], APPNAME, dir, NULL);
 		else
-			path = g_build_filename(xdg_dir_list[i], dir, NULL);
+			path = g_build_filename(xdg_dir_list[i], APPNAME, NULL);
 
 		if (exists(path))
 			g_ptr_array_add(list, path);

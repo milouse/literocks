@@ -296,7 +296,7 @@ static void customise_type(GtkWidget *item, MIME_type *type)
 
 	leaf = g_strconcat(".", type->media_type ?: "all",
 			type->subtype ? "_" : NULL, type->subtype, NULL);
-	path = choices_find_xdg_path_save(leaf, "SendTo", SITE, TRUE);
+	path = choices_find_xdg_path_save(leaf, "SendTo", TRUE);
 	g_free(leaf);
 
 	mkdir(path, 0755);
