@@ -275,6 +275,7 @@ void drag_one_item(GtkWidget		*widget,
 	if (!image)
 		image = di_image(item);
 
+/* workaround for mem leak
 	if (item->base_type == TYPE_FILE)
 	{
 		MIME_type *t = item->mime_type;
@@ -286,6 +287,7 @@ void drag_one_item(GtkWidget		*widget,
 		g_free(target_table[3].target);
 	}
 	else
+*/
 		target_list = gtk_target_list_new(target_table, 2);
 
 	if (event->state & GDK_BUTTON1_MASK)
