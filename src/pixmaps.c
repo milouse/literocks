@@ -87,7 +87,6 @@ gchar *thumb_dir = "normal";
 
 Option o_pixmap_thumb_file_size;
 Option o_video_thumbnailer;
-Option o_create_sub_dir_thumbs;
 Option o_purge_days;
 
 
@@ -547,8 +546,6 @@ char *pixmap_make_thumb_path(const char *path)
 
 static void make_dir_thumb(const gchar *path)
 {
-	if (o_create_sub_dir_thumbs.int_value != 1) return;
-
 	gchar *dir = g_path_get_dirname(path);
 	gchar *dir_thumb_path = pixmap_make_thumb_path(dir);
 	GdkPixbuf *image = gdk_pixbuf_new_from_file(dir_thumb_path, NULL);
@@ -678,6 +675,7 @@ static GdkPixbuf *get_thumbnail_for(const char *rpath, gboolean *forcheck)
 
 	if (!*forcheck)
 		thumbinfo.st_ctim.tv_sec++; //one sec older file is valid
+
 	if (SPECCMP(info.st_ctim, >, thumbinfo.st_ctim))
 	{
 		unlink(thumb_path);
@@ -686,6 +684,11 @@ static GdkPixbuf *get_thumbnail_for(const char *rpath, gboolean *forcheck)
 
 	if (!*forcheck)
 		thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
+	else if (mc_stat(thumb_path, &thumbinfo) != 0)
+	{//broken link
+		unlink(thumb_path);
+		goto err;
+	}
 	goto out;
 
 err:
