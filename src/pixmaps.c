@@ -174,7 +174,7 @@ void pixmaps_init(void)
 
 	option_add_int(&o_pixmap_thumb_file_size, "thumb_file_size", PIXMAP_THUMB_SIZE);
 	option_add_string(&o_video_thumbnailer, "video_thumbnailer", "ffmpegthumbnailer -i \"$1\" -o \"$2\" -s $3");
-	option_add_int(&o_purge_days, "purge_days", 0);
+	option_add_int(&o_purge_days, "purge_days", 90);
 	option_add_notify(options_changed);
 
 #if GTK_MAJOR_VERSION >= 3
