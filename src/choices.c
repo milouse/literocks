@@ -33,9 +33,7 @@
 #include "choices.h"
 
 static gboolean saving_disabled = TRUE;
-static gchar **dir_list = NULL;
-static gchar **xdg_dir_list = NULL;
-static int     xdg_dir_count= 0 ;
+static GSList *dirs;
 
 /* Static prototypes */
 static gboolean exists(char *path);
@@ -52,58 +50,16 @@ static gboolean exists(char *path);
  */
 void choices_init(void)
 {
-	const char *env;
-	char **dirs;
-	int i, n;
-
-	g_return_if_fail(dir_list == NULL);
-
 	saving_disabled = FALSE;
 
-	dir_list = g_new(gchar *, 4);
-	dir_list[0] = g_build_filename(g_get_home_dir(), "Choices",
-					   NULL);
-	dir_list[1] = g_strdup("/usr/local/share/Choices");
-	dir_list[2] = g_strdup("/usr/share/Choices");
-	dir_list[3] = NULL;
+	char *dir = g_build_filename(g_get_user_config_dir(), APPNAME, NULL);
+	if (!g_file_test(dir, G_FILE_TEST_EXISTS))
+		g_mkdir_with_parents(dir, 0700);
 
-	/* Initialize new system */
-	env = getenv("XDG_CONFIG_DIRS");
-	if (!env)
-		env = "/etc/xdg";
-	dirs = g_strsplit(env, ":", 0);
-	g_return_if_fail(dirs != NULL);
-	for (n = 0; dirs[n]; n++)
-		;
-	for (i = n; i > 0; i--)
-		dirs[i] = dirs[i - 1];
-	env = getenv("XDG_CONFIG_HOME");
-	if (env)
-		dirs[0] = g_strdup(env);
-	else
-		dirs[0] = g_build_filename(g_get_home_dir(), ".config", NULL);
+	dirs = g_slist_append(dirs, dir);
 
-	xdg_dir_list = dirs;
-	xdg_dir_count = n + 1;
-
-#if 0
-	{
-		gchar	**cdir = dir_list;
-
-		for(i=0; i<xdg_dir_count; i++)
-			g_print("[ XDG dir '%s' ]\n", xdg_dir_list[i]);
-
-		while (*cdir)
-		{
-			g_print("[ choices dir '%s' ]\n", *cdir);
-			cdir++;
-		}
-
-		g_print("[ saving is %s ]\n", saving_disabled ? "disabled"
-							      : "enabled");
-	}
-#endif
-
+	for (const gchar * const *d = g_get_system_data_dirs(); *d; d++)
+		dirs = g_slist_append(dirs, g_build_filename(*d, APPNAME, NULL));
 }
 
 void choices_free_list(GPtrArray *list)
@@ -118,35 +74,6 @@ void choices_free_list(GPtrArray *list)
 	g_ptr_array_free(list, TRUE);
 }
 
-/* Get the pathname of a choices file to load. Eg:
- *
- * choices_find_path_load("menus", "ROX-Filer")
- *		 		-> "/usr/local/share/Choices/ROX-Filer/menus".
- *
- * The return values may be NULL - use built-in defaults.
- * g_free() the result.
- */
-static gchar *choices_find_path_load(const char *leaf, const char *dir)
-{
-	gchar	**cdir = dir_list;
-
-	g_return_val_if_fail(dir_list != NULL, NULL);
-
-	for (; *cdir; cdir++)
-	{
-		gchar	*path;
-
-		path = g_build_filename(*cdir, dir, leaf, NULL);
-
-		if (exists(path))
-			return path;
-
-		g_free(path);
-	}
-
-	return NULL;
-}
-
 /* Get the pathname of a choices file to load, using the XDG paths. Eg:
  *
  * choices_find_xdg_path_load("menus", "ROX-Filer", "rox.sourceforge.net")
@@ -158,20 +85,14 @@ static gchar *choices_find_path_load(const char *leaf, const char *dir)
  */
 gchar *choices_find_xdg_path_load(const char *leaf, const char *dir)
 {
-	int i;
-
-	g_return_val_if_fail(dir_list != NULL, NULL);
-
-	for (i=0; i<xdg_dir_count; i++)
+	for (GSList *d = dirs; d; d = d->next)
 	{
 		gchar	*path;
 
 		if(dir)
-			path = g_build_filename(xdg_dir_list[i], APPNAME,
-					   dir, leaf, NULL);
+			path = g_build_filename(d->data, dir, leaf, NULL);
 		else
-			path = g_build_filename(xdg_dir_list[i], APPNAME,
-					   leaf, NULL);
+			path = g_build_filename(d->data, leaf, NULL);
 
 		if (exists(path))
 			return path;
@@ -179,7 +100,7 @@ gchar *choices_find_xdg_path_load(const char *leaf, const char *dir)
 		g_free(path);
 	}
 
-	return choices_find_path_load(leaf, dir);
+	return NULL;
 }
 
 
@@ -193,35 +114,16 @@ gchar *choices_find_xdg_path_load(const char *leaf, const char *dir)
 gchar *choices_find_xdg_path_save(const char *leaf, const char *dir,
 				  gboolean create)
 {
-	gchar	*path, *retval, *tmp;
+	if (saving_disabled) return NULL;
 
-	g_return_val_if_fail(xdg_dir_list != NULL, NULL);
-
-	if (create && !exists(xdg_dir_list[0]))
-	{
-		if (mkdir(xdg_dir_list[0], 0777))
-			g_warning("mkdir(%s): %s\n", xdg_dir_list[0],
-					g_strerror(errno));
-	}
-
-	path = g_build_filename(xdg_dir_list[0], APPNAME, NULL);
-	if (create && !exists(path))
-	{
-		if (mkdir(path, 0777))
-			g_warning("mkdir(%s): %s\n", path,
-				  g_strerror(errno));
-	}
-	tmp=path;
-
-	path = g_build_filename(tmp, dir, NULL);
-	g_free(tmp);
+	char *path = g_build_filename(dirs->data, dir, NULL);
 	if (create && !exists(path))
 	{
 		if (mkdir(path, 0777))
 			g_warning("mkdir(%s): %s\n", path, g_strerror(errno));
 	}
 
-	retval = g_build_filename(path, leaf, NULL);
+	char *retval = g_build_filename(path, leaf, NULL);
 	g_free(path);
 
 	return retval;
@@ -238,22 +140,11 @@ gchar *choices_find_xdg_path_save(const char *leaf, const char *dir,
  */
 GPtrArray *choices_list_xdg_dirs(char *dir)
 {
-	GPtrArray	*list;
-	int              i;
+	GPtrArray *list = g_ptr_array_new();
 
-	g_return_val_if_fail(xdg_dir_list != NULL, NULL);
-
-	list = g_ptr_array_new();
-
-	for (i=0; i<xdg_dir_count; i++)
+	for (GSList *d = dirs; d; d = d->next)
 	{
-		guchar	*path;
-
-		if(dir)
-			path = g_build_filename(xdg_dir_list[i], APPNAME, dir, NULL);
-		else
-			path = g_build_filename(xdg_dir_list[i], APPNAME, NULL);
-
+		guchar *path = g_build_filename(d->data, dir, NULL);
 		if (exists(path))
 			g_ptr_array_add(list, path);
 		else
