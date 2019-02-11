@@ -684,7 +684,7 @@ static GdkPixbuf *get_thumbnail_for(const char *rpath, gboolean *forcheck)
 
 	if (!*forcheck)
 		thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
-	else if (mc_stat(thumb_path, &thumbinfo) != 0)
+	else if (S_ISLNK(thumbinfo.st_mode) && mc_stat(thumb_path, &thumbinfo))
 	{//broken link
 		unlink(thumb_path);
 		goto err;
