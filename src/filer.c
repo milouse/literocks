@@ -2854,7 +2854,7 @@ static gboolean make_dir_thumb_link()
 		case 0:
 			sdinfo.fw->max_thumbs++;
 			g_queue_push_tail(sdinfo.fw->thumb_queue, sp/*eaten*/);
-			goto done;
+			break;
 		case 1:
 			{
 			char *sub_thumb_path = pixmap_make_thumb_path(sp);
@@ -2866,10 +2866,14 @@ static gboolean make_dir_thumb_link()
 			//even the symlink fails this loop wills break.
 
 			g_free(rel_path);
-			goto done;
+			break;
 			}
+		default:
+			g_free(sp);
+			continue;
 		}
 		g_free(sp);
+		goto done;
 	}
 
 	if (currentend < end)
