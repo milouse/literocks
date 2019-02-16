@@ -136,7 +136,7 @@ static char *thumbdirpath;
 static const char *thumbdir()
 {
 	return thumbdirpath ?: (thumbdirpath =
-		g_build_filename(g_get_user_cache_dir(), APPNAME, thumb_dir, NULL));
+		g_build_filename(g_get_user_cache_dir(), "thumbnails", thumb_dir, NULL));
 }
 static void set_thumb_size()
 {
