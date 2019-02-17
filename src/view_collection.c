@@ -542,9 +542,8 @@ static void draw_cursor(GtkWidget *widget,
 
 static gboolean next_thumb(ViewCollection *vc)
 {
-	int i;
-
-	for (i = 0; i < 3; i++)
+	int max = 3 * ++vc->thumbcount;
+	for (int i = 0; i < max; i++)
 	{
 		if (g_queue_is_empty(vc->thumbs_queue))
 		{
@@ -1757,6 +1756,8 @@ static void view_collection_clear(ViewIface *view)
 {
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
+
+	view_collection->thumbcount = 0;
 
 	collection_clear(collection);
 }

@@ -26,6 +26,8 @@ struct _ViewCollection {
 
 	GQueue		*thumbs_queue;
 	guint		thumb_func;
+
+	int thumbcount;
 };
 
 #endif /* __VIEW_COLLECTION_H__ */
