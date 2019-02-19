@@ -126,7 +126,6 @@ struct _FilerWindow
 
 	gfloat		icon_scale; /* temporary scale */
 	GdkColor	*dir_colour;
-	MaskedPixmap *dir_icon;
 
 	gboolean	under_init;
 	gboolean	first_scan;

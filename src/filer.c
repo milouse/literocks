@@ -616,9 +616,6 @@ static void update_display(Directory *dir,
 			g_free(fw->dir_colour);
 			fw->dir_colour = tmpc;
 
-			if (filer_window->dir_icon)
-				g_object_unref(filer_window->dir_icon);
-
 			MaskedPixmap
 				*fi = get_globicon(filer_window->sym_path);
 			if (!fi)
@@ -627,8 +624,8 @@ static void update_display(Directory *dir,
 				fi = type_to_icon(mime_type_lookup("inode/directory"));
 
 			set_icon(filer_window, fi ? fi->src_pixbuf : NULL);
-
-			filer_window->dir_icon = fi;
+			if (fi)
+				g_object_unref(fi);
 
 			set_scanning_display(filer_window, FALSE);
 			toolbar_update_info(filer_window);
@@ -1016,9 +1013,6 @@ static void filer_window_destroyed(GtkWidget *widget, FilerWindow *filer_window)
 		g_free(filer_window->regexp);
 		g_free(filer_window->temp_filter_string);
 	}
-
-	if (filer_window->dir_icon)
-		g_object_unref(filer_window->dir_icon);
 
 	g_free(filer_window->dir_colour);
 	g_free(filer_window->auto_select);
@@ -1928,7 +1922,6 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->configured = 0;
 	filer_window->last_width = -1;
 	filer_window->last_height = -1;
-	filer_window->dir_icon = NULL;
 	filer_window->right_link = NULL;
 	filer_window->left_link = NULL;
 	filer_window->right_link_idle = 0;
