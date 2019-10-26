@@ -11,7 +11,7 @@ dnl Checks for programs.
 AC_PROG_CC
 
 dnl Use -Wall, etc if possible
-dnl Note: GTK uses func(), so can't use -Wstrict-prototypes 
+dnl Note: GTK uses func(), so can't use -Wstrict-prototypes
 dnl -fno-stack-protector must be used to avoid GLIBC2.4 dependency,
 dnl but is only available from 4.1 onwards
 [
@@ -19,7 +19,7 @@ if test "x$GCC" = "xyes"; then
   CFLAGS="$CFLAGS -Wall -Wmissing-prototypes"
 ]
   AC_MSG_CHECKING(for GCC version)
-  if $CC --version | grep -i gcc > /dev/null; then 
+  if $CC --version | grep -i gcc > /dev/null; then
 [
     ver=`$CC --version | head -1 | sed -e 's/.* \([0-9][0-9]*\.[0-9][0-9]*\.[0-9][-_0-9a-zA-Z]*\).*/\1/'`
 ]
@@ -28,7 +28,7 @@ if test "x$GCC" = "xyes"; then
     AC_MSG_RESULT($ver)
 [
     case $major in
-      [1-3]) 
+      [1-3])
         gcc_pointer=no
         gcc_stack=no;;
       4)
