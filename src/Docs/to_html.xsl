@@ -10,7 +10,7 @@
   <xsl:param name="generate.component.toc">0</xsl:param>
 -->
   <xsl:template name="head.content">
-    <link rel="stylesheet" href="../style.css" type="text/css" media="all"/>
+    <link rel="stylesheet" href="style.css" type="text/css" media="all"/>
     <title><xsl:value-of select='/book/bookinfo/title'/></title>
   </xsl:template>
 

@@ -282,7 +282,7 @@
     between systems (which is why this isn't built in to the filer!).
 
    </para>
-   
+
    <para>
     Note: <command>gnomesu</command> can also be used to run the filer as root,
     but you'll need to use <command>setsid</command> to run it in a new
@@ -975,7 +975,7 @@
        <row><entry>Directory</entry><entry>
          Create a new directory.
          </entry></row>
-	 
+
 	 <row><entry>File</entry><entry>
          Create a blank file.
          </entry></row>
@@ -984,7 +984,7 @@
          Open the <filename>Templates</filename> directory so that you can
 	 add extra items to the menu.
          </entry></row>
-	 
+
 	 <row><entry>&lt;user entries&gt;</entry><entry>
          Copy a file from your Templates directory.
        </entry></row>
@@ -1394,7 +1394,7 @@ generated.
 
    <para>
     Tab completion tries to fill in as many characters for you as it can.
-    For example, if there are two files in a directory called 
+    For example, if there are two files in a directory called
     <filename>save-mail-nov-1999</filename> and
     <filename>save-mail-dec-1999</filename> then typing
     <userinput>save</userinput> and pressing <keycap>Tab</keycap> will expand
@@ -2641,13 +2641,13 @@ generated.
      Right-click on the ROX-Filer line in the window and choose <guimenuitem>Compile...</guimenuitem>
      from the menu.
    </para></step>
-     
+
    <step><para>
      It will prompt you to choose a version of ROX-Filer to compile and of some
      required header files. You should be able to just accept the defaults and let
      it download them.
    </para></step>
-     
+
    <step><para>
      Choose a directory in which to store the compiled code when prompted
      and then click on the <guibutton>Build</guibutton> button to compile it.
@@ -2950,14 +2950,14 @@ EOF</screen>
      <parameter>Class</parameter> can be used to set the WM_CLASS property on the new window. You can
      use this to get your window manager to treat the window
 specially.
-     <parameter>ID</parameter> is a string used to identify the 
+     <parameter>ID</parameter> is a string used to identify the
 opened window. If a window with this ID already exists, it is changed to the
 given directory. Otherwise, a new window is created and given this ID.
 If used from a program, ensure the IDs you generate are unique, for example
 by including your process name, PID and a timestamp in the ID.
 <parameter>Hidden</parameter> if <userinput>true</userinput> means
 that hidden files (those that start with a dot character) are shown,
-or not shown if <userinput>false</userinput>.  If ommitted then the 
+or not shown if <userinput>false</userinput>.  If ommitted then the
 configured setting is used.
 <parameter>Filter</parameter> can be used to filter files shown by
 their name.  For example using a filter of <userinput>*.c</userinput>
@@ -2978,7 +2978,6 @@ means that only files ending in .c are shown.
      as it's only argument after invoking this method, and whenever the pinboard is
      reloaded. DO NOT use this method if invoked with <option>--backdrop</option> or
      you will get stuck in an infinite loop!
-     See <xref linkend="backdropapp"/> for a guide to writing backdrop applications.
    </para></listitem>
 
    <listitem><para><function>SetBackdrop</function>(<parameter>Filename</parameter>,
