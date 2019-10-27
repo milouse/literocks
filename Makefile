@@ -4,8 +4,8 @@ DESTDIR=$(shell realpath build)
 
 all:
 	[ ! -f src/configure ] && cd src && autoconf
-	cd src && ./configure --prefix=$(DESTDIR)
-	$(MAKE) -C src DESTDIR=$(DESTDIR)
+	[ ! -f src/Makefile ] && cd src && ./configure --prefix=$(DESTDIR)
+	$(MAKE) -C src install DESTDIR=$(DESTDIR)
 
 clean:
 	rm -rf build

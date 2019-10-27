@@ -34,7 +34,7 @@ OBJECTS = $(SRCS:%.c=%.o)
 
 .PHONY: clean install
 
-all: install
+all: $(PROG) Docs/literocks.1 Docs/Manual.html
 
 install: $(PROG) Docs/literocks.1 Docs/Manual.html
 	install -D -m755 $(PROG) $(bindir)/$(PROG)
