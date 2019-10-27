@@ -245,7 +245,7 @@ int main(int argc, char **argv)
 
 	home_dir = g_get_home_dir();
 	home_dir_len = strlen(home_dir);
-	app_dir = g_strdup(getenv("APP_DIR"));
+	app_dir = g_strdup(DATA_DIR"/"APPNAME);
 
 	/* Get internationalisation up and running. This requires the
 	 * choices system, to discover the user's preferred language.
@@ -257,17 +257,9 @@ int main(int argc, char **argv)
 
 	if (!app_dir)
 	{
-		g_warning("APP_DIR environment variable was unset!\n"
-			"Use the AppRun script to invoke this...\n");
+		g_warning("APP_DIR not set, using current dir instead.");
 		app_dir = g_get_current_dir();
 	}
-#ifdef HAVE_UNSETENV
-	else
-	{
-		/* Don't pass it on to our child processes... */
-		unsetenv("APP_DIR");
-	}
-#endif
 
 	/* Sometimes we want to take special action when a child
 	 * process exits. This hash table is used to convert the

@@ -1,9 +1,11 @@
+DESTDIR=$(shell realpath build)
+
 .PHONY: clean docs
 
 all:
 	[ ! -f src/configure ] && cd src && autoconf
-	cd src && ./configure
-	$(MAKE) -C src DESTDIR=$(shell realpath build)
+	cd src && ./configure --prefix=$(DESTDIR)
+	$(MAKE) -C src DESTDIR=$(DESTDIR)
 
 clean:
 	rm -rf build

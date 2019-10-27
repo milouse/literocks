@@ -189,4 +189,8 @@ VERSION="2.99"
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
 AC_MSG_RESULT(version $VERSION)
 
+DATA_DIR="$prefix/usr/share"
+AC_DEFINE_UNQUOTED(DATA_DIR, "$prefix/usr/share")
+AC_MSG_RESULT(Data dir $DATA_DIR)
+
 AC_OUTPUT(Makefile)

@@ -37,11 +37,10 @@ OBJECTS = $(SRCS:%.c=%.o)
 all: install
 
 install: $(PROG) Docs/literocks.1 Docs/Manual.html
-	install -D -m755 $(PROG) $(APP_DIR)/$(PROG)
-	install -D -m644 $(OBJECTS) Data/Templates.ui Data/Options.xml $(APP_DIR)
+	install -D -m755 $(PROG) $(bindir)/$(PROG)
 
-	install -D -m755 Data/literocks.sh $(bindir)/$(PROG)
-	sed -i 's|{APP_DIR}|$(APP_DIR)|g' $(bindir)/$(PROG)
+	install -d -m755 $(APP_DIR)
+	install -D -m644 $(OBJECTS) Data/Templates.ui Data/Options.xml $(APP_DIR)
 
 	install -d -m755 $(APP_DIR)/images
 	install -D -m644 $(wildcard Data/images/*.png) $(APP_DIR)/images
