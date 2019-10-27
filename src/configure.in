@@ -2,11 +2,6 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(main.c)
 AC_CONFIG_HEADER(config.h)
 
-[ if [ -f configure ]; then ]
-	AC_MSG_ERROR([Please run configure from the build directory (try ../AppRun --compile)])
-	exit 1
-fi
-
 dnl Checks for programs.
 AC_PROG_CC
 
@@ -190,11 +185,7 @@ AS_IF(test "x$enable_xattr" != "xno",
 
 dnl AC_FUNC_MMAP
 
-dnl Extract version info from AppInfo.xml
-AC_MSG_CHECKING(extracting version information)
-[
-VERSION="2.11.h"
-]
+VERSION="2.99"
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
 AC_MSG_RESULT(version $VERSION)
 

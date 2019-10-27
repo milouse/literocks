@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=literocks
-Exec=literocks
+Exec={exec}
 Icon=literocks
 Terminal=false
 Type=Application

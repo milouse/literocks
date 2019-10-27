@@ -1,9 +1,14 @@
+DESTDIR =
+
+prefix = $(DESTDIR)/usr
+datarootdir = $(prefix)/share
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
+
 SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
-PLATFORM_DIR = $(srcdir)/..
 CC = @CC@
-.SUFFIXES:
 .SUFFIXES: .c .o
 
 PKG_CONFIG = @PKG_CONFIG@
@@ -13,58 +18,54 @@ DEFS = @DEFS@
 
 PKG_CONFIG_FLAGS=
 
-CFLAGS = -I. -I${srcdir} ${DEFS} ${PROF} @CFLAGS@ @LFS_CFLAGS@ \
-	 `${PKG_CONFIG} ${PKG_CONFIG_FLAGS} --cflags gtk+-2.0 libxml-2.0 gio-unix-2.0 sm ice`
-LDFLAGS = ${PROF} @LDFLAGS@ `${PKG_CONFIG} ${PKG_CONFIG_FLAGS} --libs gtk+-2.0 libxml-2.0 gio-unix-2.0 sm ice| sed 's/-lpangoxft-[^ ]*//'` ${LIBS}
+CFLAGS = -I. -I$(srcdir) $(DEFS) $(PROF) @CFLAGS@ @LFS_CFLAGS@ \
+	 `$(PKG_CONFIG) $(PKG_CONFIG_FLAGS) --cflags gtk+-2.0 libxml-2.0 gio-unix-2.0 sm ice`
+LDFLAGS = $(PROF) @LDFLAGS@ `$(PKG_CONFIG) $(PKG_CONFIG_FLAGS) --libs gtk+-2.0 libxml-2.0 gio-unix-2.0 sm ice| sed 's/-lpangoxft-[^ ]*//'` $(LIBS)
 
 ############ Things to change for different programs
 
 PROG = literocks
+APP_DIR = @datarootdir@/$(PROG)
 
-SRCS = abox.c action.c appmenu.c bind.c bookmarks.c		\
-	bulk_rename.c cell_icon.c choices.c collection.c dir.c 		\
-	diritem.c display.c dnd.c dropbox.c filer.c find.c fscache.c	\
-	gtksavebox.c							\
-	gui_support.c i18n.c infobox.c log.c main.c menu.c minibuffer.c\
-	modechange.c mount.c options.c pixmaps.c	\
-	remote.c run.c support.c 		\
-	toolbar.c type.c usericons.c view_collection.c	\
-	view_details.c view_iface.c xml.c xtypes.c \
-
-OBJECTS = abox.o action.o appmenu.o bind.o bookmarks.o	\
-	bulk_rename.o cell_icon.o choices.o collection.o dir.o		\
-	diritem.o display.o dnd.o dropbox.o filer.o find.o fscache.o	\
-	gtksavebox.o							\
-	gui_support.o i18n.o infobox.o log.o main.o menu.o minibuffer.o\
-	modechange.o mount.o options.o pixmaps.o	\
-	remote.o run.o support.o		\
-	toolbar.o type.o usericons.o view_collection.o	\
-	view_details.o view_iface.o xml.o xtypes.o \
+SRCS = $(wildcard *.c)
+OBJECTS = $(SRCS:%.c=%.o)
 
 ############ Things to keep the same
 
-${PROG}: ${OBJECTS}
-	${CC} -o "${PROG}" ${OBJECTS} ${LDFLAGS}
-	mv "${PROG}" "${PLATFORM_DIR}"
-	-(cd "${PLATFORM_DIR}" && \
-	 objcopy --only-keep-debug literocks literocks.dbg && \
-#	 strip literocks && \
-	 objcopy --add-gnu-debuglink=literocks.dbg literocks)
+.PHONY: clean install
+
+all: install
+
+install: $(PROG) Docs/literocks.1 Docs/Manual.html
+	install -D -m755 $(PROG) $(APP_DIR)/$(PROG)
+	install -D -m644 $(OBJECTS) Data/Templates.ui Data/Options.xml $(APP_DIR)
+
+	install -D -m755 Data/literocks.sh $(bindir)/$(PROG)
+	sed -i 's|{APP_DIR}|$(APP_DIR)|g' $(bindir)/$(PROG)
+
+	install -d -m755 $(APP_DIR)/images
+	install -D -m644 $(wildcard Data/images/*.png) $(APP_DIR)/images
+	cd $(APP_DIR)/images && ln -s symlink.png rox-symlink.png
+
+	install -D -m644 Data/literocks.desktop @datarootdir@/applications/$(PROG).desktop
+	sed -i 's|{exec}|$(bindir)/$(PROG)|' @datarootdir@/applications/$(PROG).desktop
+
+	install -D -m644 Docs/Manual.html $(APP_DIR)/Help/Manual.html
+	install -D -m644 Docs/style.css $(APP_DIR)/Help/style.css
+	install -D -m644 Docs/literocks.1 @datarootdir@/man/man1/literocks.1
+	install -D -m644 Data/literocks.png @datarootdir@/pixmaps/$(PROG).png
+	install -D -m644 ../Help/COPYING @datarootdir@/licenses/$(PROG)/LICENSE
+
+$(PROG): $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS) $(LDFLAGS)
+
+Docs/literocks.1:
+	$(MAKE) -C Docs literocks.1
+
+Docs/Manual.html:
+	$(MAKE) -C Docs Manual.html
 
 clean:
-	rm -f *.o Makefile.bak
-
-depend:
-	makedepend -- ${CFLAGS} -- ${SRCS}
-
-Makefile: Makefile.in config.status
-	./config.status
-
-config.h: config.h.in
-	./config.status
-
-config.status: configure
-	APP_DIR="$(srcdir)/.." $(srcdir)/configure
-
-configure: configure.in
-	cd $(srcdir) && autoconf
+	rm -f Makefile configure config.h config.log config.status $(OBJECTS)
+	rm -rf autom4te.cache
+	$(MAKE) -C Docs clean
