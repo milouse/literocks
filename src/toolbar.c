@@ -94,7 +94,7 @@ static void toolbar_sort_clicked(GtkWidget *widget,
 				   FilerWindow *filer_window);
 static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 				FilerWindow *filer_window);
-static GtkWidget *create_toolbar(FilerWindow *filer_window);
+static void create_toolbar(GtkWidget *bar, FilerWindow *filer_window);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
                             gint		x,
@@ -340,13 +340,16 @@ void toolbar_update_toolbar(FilerWindow *filer_window)
 
 	if (o_toolbar.int_value != TOOLBAR_NONE)
 	{
-		filer_window->toolbar = create_toolbar(filer_window);
+		filer_window->toolbar = gtk_toolbar_new();
+
 		gtk_box_pack_start(filer_window->toplevel_vbox,
 				filer_window->toolbar, FALSE, TRUE, 0);
 		gtk_box_reorder_child(filer_window->toplevel_vbox,
 				filer_window->toolbar, 0);
-		gtk_widget_show_all(filer_window->toolbar);
 
+		create_toolbar(filer_window->toolbar, filer_window);
+
+		gtk_widget_show_all(filer_window->toolbar);
 //		g_signal_connect_swapped(filer_window->toolbar, "style-changed",
 //				G_CALLBACK(idle_update), NULL);
 	}
@@ -862,14 +865,11 @@ static void toolbar_new_clicked(GtkWidget *widget, FilerWindow *filer_window)
 }
 
 /* If filer_window is NULL, the toolbar is for the options window */
-static GtkWidget *create_toolbar(FilerWindow *filer_window)
+static void create_toolbar(GtkWidget *bar, FilerWindow *filer_window)
 {
-	GtkWidget	*bar;
 	GtkWidget	*b;
 	int i;
 	int added = 0;
-
-	bar = gtk_toolbar_new();
 
 	if (filer_window)
 		toolbar_min_width = 0;
@@ -883,6 +883,11 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 
 		b = add_button(bar, tool, filer_window);
 		added++;
+
+		GtkRequisition req;
+		gtk_widget_size_request(b, &req);
+		if (toolbar_min_width < req.width)
+			toolbar_min_width = req.width;
 
 		if (filer_window && tool->drop_action != DROP_NONE)
 			handle_drops(filer_window, b, tool->drop_action);
@@ -919,8 +924,6 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 		g_signal_connect(bar, "scroll_event",
 			G_CALLBACK(bar_scrolled), filer_window);
 	}
-
-	return bar;
 }
 
 /* This is used to simulate a click when button 3 is used (GtkButton
@@ -1071,11 +1074,6 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 
 	gtk_widget_show_all(button);
 
-	GtkRequisition req;
-	gtk_widget_size_request(button, &req);
-	if (toolbar_min_width < req.width)
-		toolbar_min_width = req.width;
-
 	gtk_widget_set_tooltip_text(button, _(tool->tip));
 
 	GtkToolItem *item = gtk_tool_item_new();
@@ -1130,7 +1128,6 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 		if (tool->clicked == toolbar_settings_clicked)
 			if (o_toolbar.int_value != TOOLBAR_NORMAL)
 				filer_window->toolbar_settings_text = GTK_LABEL(lbl);
-
 	}
 	else
 	{
@@ -1305,15 +1302,13 @@ static guchar *read_tools(Option *option)
 
 static GList *build_tool_options(Option *option, xmlNode *node, guchar *label)
 {
-	GtkWidget	*bar;
-
 	g_return_val_if_fail(option != NULL, NULL);
 
-	bar = create_toolbar(NULL);
+	option->widget = gtk_toolbar_new();
+	create_toolbar(option->widget, NULL);
 
 	option->update_widget = update_tools;
 	option->read_widget = read_tools;
-	option->widget = bar;
 
-	return g_list_append(NULL, bar);
+	return g_list_append(NULL, option->widget);
 }
