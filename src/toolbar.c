@@ -901,7 +901,7 @@ static void create_toolbar(GtkWidget *bar, FilerWindow *filer_window)
 		   Probably it can't get current icon size.
 		   */
 		toolbar_min_width = toolbar_min_width * added +
-			small_width * (o_toolbar_info.int_value ? 3 : 0);
+			small_width * (o_toolbar_info.int_value ? 3.3 : 0);
 
 		gtk_widget_set_size_request(bar, 100, -1);
 
