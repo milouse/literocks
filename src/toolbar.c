@@ -895,22 +895,25 @@ static void create_toolbar(GtkWidget *bar, FilerWindow *filer_window)
 
 	if (filer_window)
 	{
-		/* Make the toolbar wide enough for all icons to be
-		   seen, plus a little for the (start of the) text
-		   label. Though the return of size_request is incorrect.
-		   Probably it can't get current icon size.
-		   */
-		toolbar_min_width = toolbar_min_width * added +
-			small_width * (o_toolbar_info.int_value ? 3.3 : 0);
-
-		gtk_widget_set_size_request(bar, 100, -1);
-
-		filer_window->toolbar_text = gtk_label_new("");
+		filer_window->toolbar_text = gtk_label_new(
+				o_toolbar_info.int_value ? _("n Items  ") : "");
 		gtk_misc_set_alignment(GTK_MISC(filer_window->toolbar_text), 0, 0.5);
 
 		GtkToolItem *item = gtk_tool_item_new();
 		gtk_container_add(GTK_CONTAINER(item), filer_window->toolbar_text);
 		gtk_toolbar_insert(GTK_TOOLBAR(bar), item, -1);
+
+		/* Make the toolbar wide enough for all icons to be
+		   seen, plus a little for the (start of the) text
+		   label. Though the return of size_request is incorrect.
+		   Probably it can't get current icon size.
+		   */
+		GtkRequisition req;
+		gtk_widget_size_request(filer_window->toolbar_text, &req);
+
+		toolbar_min_width = toolbar_min_width * added + req.width;
+
+		gtk_widget_set_size_request(bar, 100, -1);
 
 		gtk_widget_add_events(bar, GDK_BUTTON_RELEASE | GDK_MOTION_NOTIFY);
 		g_signal_connect(bar, "motion-notify-event",
