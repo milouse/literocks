@@ -442,13 +442,17 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 
 	time_t now = time(NULL);
 	GtkIconInfo *full;
+	static GMutex funcm;
+	MaskedPixmap *ret;
+
+	g_mutex_lock(&funcm);
 
 	/* Already got an image? */
 	if (type->image)
 	{
 		/* Yes - don't recheck too often */
 		if (labs(now - type->image_time) < 9)
-			return g_object_ref(type->image);
+			goto ret;
 
 		g_clear_object(&type->image);
 	}
@@ -497,7 +501,10 @@ again:
 out:
 	type->image_time = now;
 
-	return g_object_ref(type->image);
+ret:
+	ret = g_object_ref(type->image);
+	g_mutex_unlock(&funcm);
+	return ret;
 }
 
 GdkAtom type_to_atom(MIME_type *type)
