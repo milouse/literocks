@@ -1997,6 +1997,12 @@ MIME_type *menu_selection_type(FilerWindow *fw)
 	view_get_iter(fw->view, &iter, VIEW_ITER_SELECTED);
 	while ((item = iter.next(&iter)))
 	{
+		if (item->mime_type == NULL)
+		{
+			same = same_media = FALSE;
+			break;
+		}
+
 		if(!type)
 			type=item->mime_type;
 		else
@@ -2004,8 +2010,7 @@ MIME_type *menu_selection_type(FilerWindow *fw)
 			if(type!=item->mime_type)
 			{
 				same=FALSE;
-				if(!item->mime_type ||
-						strcmp(type->media_type, item->mime_type->media_type))
+				if(strcmp(type->media_type, item->mime_type->media_type))
 				{
 					same_media=FALSE;
 					break;
