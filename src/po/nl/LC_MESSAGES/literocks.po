@@ -1,0 +1,4118 @@
+# Dutch translations for PACKAGE package.
+# Copyright (C) 2020 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-03-26 19:16+0100\n"
+"PO-Revision-Date: 2020-03-26 19:16+0100\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../abox.c:127
+msgid "<src>"
+msgstr ""
+
+#: ../abox.c:170 ../abox.c:172
+msgid "+.Num"
+msgstr ""
+
+#: ../abox.c:229
+msgid "_Quiet"
+msgstr ""
+
+#: ../abox.c:242
+msgid "Quiet"
+msgstr ""
+
+#: ../abox.c:242
+msgid "Don't confirm every operation"
+msgstr ""
+
+#: ../abox.c:435 ../infobox.c:717 tips.c:50 tips.c:108
+msgid "Name"
+msgstr ""
+
+#: ../abox.c:441 ../menu.c:752
+msgid "Directory"
+msgstr ""
+
+#: ../abox.c:539
+msgid "Expression:"
+msgstr ""
+
+#: ../action.c:56
+msgid "See the attr(5) man page for full details."
+msgstr ""
+
+#: ../action.c:58
+msgid "See the fsattr(5) man page for full details."
+msgstr ""
+
+#: ../action.c:60
+msgid "You do not appear to have OS support."
+msgstr ""
+
+#: ../action.c:196
+msgid "Find expression reference"
+msgstr ""
+
+#: ../action.c:207
+msgid ""
+"<u>Quick Start</u>\n"
+"Just put the name of the file you're looking for in single quotes:\n"
+"<b>'index.html'</b> (to find a file called 'index.html')\n"
+"\n"
+"<u>Examples</u>\n"
+"<b>'*.htm', '*.html'</b> (finds HTML files)\n"
+"<b>IsDir 'lib'</b> (finds directories called 'lib')\n"
+"<b>IsReg 'core'</b> (finds a regular file called 'core')\n"
+"<b>! (IsDir, IsReg)</b> (is neither a directory nor a regular file)\n"
+"<b>mtime after 1 day ago and size > 1Mb</b> (big, and recently modified)\n"
+"<b>'CVS' prune, isreg</b> (a regular file not in CVS)\n"
+"<b>IsReg system(grep -q fred \"%\")</b> (contains the word 'fred')\n"
+"\n"
+"<u>Simple Tests</u>\n"
+"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</"
+"b> (types)\n"
+"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> "
+"(permissions)\n"
+"<b>IsEmpty, IsMine</b>\n"
+"A pattern in single quotes is a shell-style wildcard pattern to match. If "
+"it\n"
+"contains a slash then the match is against the full path; otherwise it is\n"
+"against the leafname only.\n"
+"\n"
+"<u>Comparisons</u>\n"
+"<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (compare two values)\n"
+"<b>5 bytes, 1Kb, 2Mb, 3Gb</b> (file sizes)\n"
+"<b>2 secs|mins|hours|days|weeks|years  ago|hence</b> (times)\n"
+"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> "
+"(values)\n"
+"\n"
+"<u>Specials</u>\n"
+"<b>system(command)</b> (true if 'command' returns with a zero exit status;\n"
+"a % in 'command' is replaced with the path of the current file)\n"
+"<b>prune</b> (false, and prevents searching the contents of a directory)."
+msgstr ""
+
+#: ../action.c:254
+msgid "Change permissions reference"
+msgstr ""
+
+#: ../action.c:265
+msgid ""
+"Normally, you can just select a command from the menu (click \n"
+"on the arrow beside the command box). Sometimes, you need more...\n"
+"\n"
+"The format of a command is: <b>CHANGE, CHANGE, ...</b>\n"
+"Each <b>CHANGE</b> is: <b>WHO HOW PERMISSIONS</b>\n"
+"<b>WHO</b> is some combination of <b>u</b>, <b>g</b> and <b>o</b> which "
+"determines whether to\n"
+"change the permissions for the User (owner), Group or Others.\n"
+"<b>HOW</b> is <b>+</b>, <b>-</b> or <b>=</b> to add, remove or set exactly "
+"the permissions.\n"
+"<b>PERMISSIONS</b> is some combination of the letters <b>rwxXstugo</b>\n"
+"\n"
+"Bracketed text and spaces are ignored.\n"
+"\n"
+"<u>Examples</u>\n"
+"<b>u+rw</b>: the file owner gains read and write permission\n"
+"<b>g=u</b>: the group permissions are set to be the same as the user's\n"
+"<b>o=u-w</b>: others get the same permissions as the owner, but without "
+"write permission\n"
+"<b>a+x</b>: <b>a</b>ll get execute/access permission - same as <b>ugo+x</b>\n"
+"<b>a+X</b>: directories become accessable by everyone; files which were\n"
+"executable by anyone become executable by everyone\n"
+"<b>u+rw, go+r</b>: two commands at once!\n"
+"<b>u+s</b>: set the SetUID bit - often has no effect on script files\n"
+"<b>755</b>: set the permissions directly\n"
+"\n"
+"See the chmod(1) man page for full details."
+msgstr ""
+
+#: ../action.c:306
+msgid "Set type reference"
+msgstr ""
+
+#: ../action.c:317
+msgid ""
+"Normally ROX-Filer determines the type of a regular file\n"
+"by matching it's name against a pattern. To change the\n"
+"type of the file you must rename it.\n"
+"\n"
+"Newer file systems can support something called 'Extended\n"
+"Attributes' which can be used to store additional data with\n"
+"each file as named parameters. ROX-Filer uses the\n"
+"'user.mime_type' attribute to store file types.\n"
+"\n"
+"File types are only supported for regular files, not\n"
+"directories, devices, pipes or sockets, and then only\n"
+"on certain file systems and where the OS implements them.\n"
+msgstr ""
+
+#: ../action.c:458
+msgid ""
+"\n"
+"Process terminated."
+msgstr ""
+
+#: ../action.c:478
+msgid " - There was one error."
+msgstr ""
+
+#: ../action.c:480
+#, c-format
+msgid " - There were %d errors."
+msgstr ""
+
+#: ../action.c:515
+msgid "ERROR reading"
+msgstr ""
+
+#: ../action.c:564
+msgid ""
+"'\n"
+"Done"
+msgstr ""
+
+#: ../action.c:620 ../support.c:414
+msgid "ERROR"
+msgstr ""
+
+#: ../action.c:797 ../main.c:597 ../main.c:611
+msgid "Yes"
+msgstr ""
+
+#: ../action.c:800 ../main.c:599 ../main.c:611
+msgid "No"
+msgstr ""
+
+#: ../action.c:805
+msgid "Add seq num"
+msgstr ""
+
+#: ../action.c:823
+msgid ""
+"\n"
+"Asking child process to terminate...\n"
+msgstr ""
+
+#: ../action.c:830
+msgid ""
+"\n"
+"Trying to KILL run-away process...\n"
+msgstr ""
+
+#: ../action.c:1005
+#, c-format
+msgid "?Count contents of %s?"
+msgstr ""
+
+#: ../action.c:1043
+#, c-format
+msgid "?Delete %s'%s'?"
+msgstr ""
+
+#: ../action.c:1044
+msgid "WRITE-PROTECTED "
+msgstr ""
+
+#: ../action.c:1052
+#, c-format
+msgid "'Deleting '%s'\n"
+msgstr ""
+
+#: ../action.c:1067
+#, c-format
+msgid "'Directory '%s' deleted\n"
+msgstr ""
+
+#: ../action.c:1092
+#, c-format
+msgid "?Eject '%s'?"
+msgstr ""
+
+#: ../action.c:1099
+#, c-format
+msgid "'Eject '%s'\n"
+msgstr ""
+
+#: ../action.c:1118
+#, c-format
+msgid ""
+"!%s\n"
+"eject failed\n"
+msgstr ""
+
+#: ../action.c:1138 ../action.c:1157
+#, c-format
+msgid "?Check '%s'?"
+msgstr ""
+
+#: ../action.c:1154
+msgid "!Invalid find condition - change it and try again\n"
+msgstr ""
+
+#: ../action.c:1164
+#, c-format
+msgid "'(while checking '%s')\n"
+msgstr ""
+
+#: ../action.c:1239 ../action.c:1264
+#, c-format
+msgid "?Change permissions of '%s'?"
+msgstr ""
+
+#: ../action.c:1245
+#, c-format
+msgid "'Changing permissions of '%s'\n"
+msgstr ""
+
+#: ../action.c:1262
+msgid "!Invalid mode command - change it and try again\n"
+msgstr ""
+
+#: ../action.c:1320
+#, c-format
+msgid "?Change contents of '%s'?"
+msgstr ""
+
+#: ../action.c:1323 ../action.c:1343
+#, c-format
+msgid "?Change type of '%s'?"
+msgstr ""
+
+#: ../action.c:1340
+msgid "!Invalid type - change it and try again\n"
+msgstr ""
+
+#: ../action.c:1362
+#, c-format
+msgid "'Changing type of '%s' to '%s'\n"
+msgstr ""
+
+#: ../action.c:1385
+#, c-format
+msgid "'Not changing type of directory '%s'\n"
+msgstr ""
+
+#: ../action.c:1391
+#, c-format
+msgid "'Non-regular file '%s' not changed\n"
+msgstr ""
+
+#: ../action.c:1536 ../action.c:1847
+#, c-format
+msgid "?'%s' already exists - %s?"
+msgstr ""
+
+#: ../action.c:1538 ../action.c:1849
+msgid "merge contents"
+msgstr ""
+
+#: ../action.c:1539 ../action.c:1850
+msgid "overwrite"
+msgstr ""
+
+#: ../action.c:1558
+msgid "'Trying copy anyway...\n"
+msgstr ""
+
+#: ../action.c:1567
+#, c-format
+msgid "?Copy %s as %s?"
+msgstr ""
+
+#: ../action.c:1572 ../action.c:1707
+#, c-format
+msgid "'Copying %s as %s\n"
+msgstr ""
+
+#: ../action.c:1589 ../action.c:1896
+msgid "!ERROR: Destination already exists, but is not a directory\n"
+msgstr ""
+
+#: ../action.c:1673
+#, c-format
+msgid ""
+"!%s\n"
+"Failed to copy '%s'\n"
+msgstr ""
+
+#: ../action.c:1759
+#, c-format
+msgid ""
+"!%s\n"
+"Failed to move %s as %s\n"
+msgstr ""
+
+#: ../action.c:1870
+msgid "'Trying move anyway...\n"
+msgstr ""
+
+#: ../action.c:1879
+#, c-format
+msgid "?Move %s as %s?"
+msgstr ""
+
+#: ../action.c:1884
+#, c-format
+msgid "'Moving %s as %s\n"
+msgstr ""
+
+#: ../action.c:1942
+msgid "!ERROR: Can't copy object into itself\n"
+msgstr ""
+
+#: ../action.c:1954
+msgid "!ERROR: Can't move/rename object into itself\n"
+msgstr ""
+
+#: ../action.c:1963
+#, c-format
+msgid "'Linking %s as %s\n"
+msgstr ""
+
+#: ../action.c:1968
+#, c-format
+msgid "?Link %s as %s?"
+msgstr ""
+
+#: ../action.c:2011
+#, c-format
+msgid "'Mounting %s\n"
+msgstr ""
+
+#: ../action.c:2012
+#, c-format
+msgid "'Unmounting %s\n"
+msgstr ""
+
+#: ../action.c:2015
+#, c-format
+msgid "?Mount %s?"
+msgstr ""
+
+#: ../action.c:2016
+#, c-format
+msgid "?Unmount %s?"
+msgstr ""
+
+#: ../action.c:2037
+#, c-format
+msgid ""
+"!%s\n"
+"Mount failed\n"
+msgstr ""
+
+#: ../action.c:2038
+#, c-format
+msgid ""
+"!%s\n"
+"Unmount failed\n"
+msgstr ""
+
+#: ../action.c:2046
+msgid "'(seems to be mounted now anyway)\n"
+msgstr ""
+
+#: ../action.c:2091
+#, c-format
+msgid ""
+"'\n"
+"Total: %s ("
+msgstr ""
+
+#: ../action.c:2097
+msgid "file"
+msgstr ""
+
+#: ../action.c:2097
+msgid "files"
+msgstr ""
+
+#: ../action.c:2101
+msgid "no directories)\n"
+msgstr ""
+
+#: ../action.c:2105
+msgid "directory"
+msgstr ""
+
+#: ../action.c:2106
+msgid "directories"
+msgstr ""
+
+#: ../action.c:2143
+msgid "!No mount points selected!\n"
+msgstr ""
+
+#: ../action.c:2212
+msgid "?Another search?"
+msgstr ""
+
+#: ../action.c:2239 ../action.c:2270
+#, c-format
+msgid "!'%s' is a symbolic link\n"
+msgstr ""
+
+#: ../action.c:2322
+msgid "You need to select some items to search through"
+msgstr ""
+
+#: ../action.c:2332 ../menu.c:729
+msgid "Find"
+msgstr ""
+
+#: ../action.c:2367
+msgid "You need to select some items to count"
+msgstr ""
+
+#: ../action.c:2371
+msgid "Disk Usage"
+msgstr ""
+
+#: ../action.c:2409
+msgid "Mount / Unmount"
+msgstr ""
+
+#: ../action.c:2428
+msgid " does not yet support mount points on your system. Sorry."
+msgstr ""
+
+#: ../action.c:2439 ../menu.c:702 tips.c:175
+msgid "Delete"
+msgstr ""
+
+#: ../action.c:2453 ../action.c:2657 ../action.c:2714
+msgid "Force"
+msgstr ""
+
+#: ../action.c:2453
+msgid "Don't confirm deletion of non-writeable items"
+msgstr ""
+
+#: ../action.c:2456 ../action.c:2517 ../action.c:2582 ../action.c:2672
+#: ../action.c:2729 tips.c:182
+msgid "Brief"
+msgstr ""
+
+#: ../action.c:2456
+msgid "Only log directories being deleted"
+msgstr ""
+
+#: ../action.c:2475
+msgid "You need to select the items whose permissions you want to change"
+msgstr ""
+
+#: ../action.c:2483
+msgid "a+x (Make executable/searchable)"
+msgstr ""
+
+#: ../action.c:2485
+msgid "a-x (Make non-executable/non-searchable)"
+msgstr ""
+
+#: ../action.c:2487
+msgid "u+rw (Give owner read+write)"
+msgstr ""
+
+#: ../action.c:2489
+msgid "go-rwx (Private - owner access only)"
+msgstr ""
+
+#: ../action.c:2491
+msgid "go=u-w (Public access, not write)"
+msgstr ""
+
+#: ../action.c:2502 ../menu.c:725 tips.c:71 tips.c:114
+msgid "Permissions"
+msgstr ""
+
+#: ../action.c:2517 ../action.c:2582
+msgid "Don't list processed files"
+msgstr ""
+
+#: ../action.c:2520 ../action.c:2585 tips.c:184
+msgid "Recurse"
+msgstr ""
+
+#: ../action.c:2520
+msgid "Also change contents of subdirectories"
+msgstr ""
+
+#: ../action.c:2524
+msgid "Command:"
+msgstr ""
+
+#: ../action.c:2554
+msgid "You need to select the items whose type you want to change"
+msgstr ""
+
+#: ../action.c:2567
+msgid "Set type"
+msgstr ""
+
+#: ../action.c:2585
+msgid "Change contents of subdirectories"
+msgstr ""
+
+#: ../action.c:2592 ../infobox.c:647
+msgid "Type:"
+msgstr ""
+
+#: ../action.c:2639 ../dnd.c:1022 ../menu.c:694 tips.c:169
+msgid "Copy"
+msgstr ""
+
+#: ../action.c:2657 ../action.c:2714
+msgid "Don't confirm over-write."
+msgstr ""
+
+#: ../action.c:2660 ../action.c:2717 tips.c:190
+msgid "Ignore Older"
+msgstr ""
+
+#: ../action.c:2661 ../action.c:2718 tips.c:191
+msgid "Silently ignore if source is older than destination."
+msgstr ""
+
+#: ../action.c:2664 ../action.c:2721 tips.c:188
+msgid "Newer"
+msgstr ""
+
+#: ../action.c:2665 ../action.c:2722 tips.c:189
+msgid "Always over-write if source is newer than destination."
+msgstr ""
+
+#: ../action.c:2668 ../action.c:2725 tips.c:186
+msgid "Merge"
+msgstr ""
+
+#: ../action.c:2669 ../action.c:2726 tips.c:187
+msgid "Always merge directories."
+msgstr ""
+
+#: ../action.c:2672
+msgid "Only log directories as they are copied"
+msgstr ""
+
+#: ../action.c:2696 ../dnd.c:1023 tips.c:171
+msgid "Move"
+msgstr ""
+
+#: ../action.c:2729
+msgid "Don't log each file as it is moved"
+msgstr ""
+
+#: ../action.c:2752 tips.c:173
+msgid "Link"
+msgstr ""
+
+#: ../action.c:2777 ../appmenu.c:116 ../filer.c:907 ../infobox.c:989
+msgid "Eject"
+msgstr ""
+
+#: ../appmenu.c:202
+msgid "<missing label>"
+msgstr ""
+
+#: ../appmenu.c:306
+#, c-format
+msgid ""
+"Symlink any programs you want into this directory. They will appear in the "
+"menu for all items of this type (%s/%s)."
+msgstr ""
+
+#: ../appmenu.c:320 ../menu.c:754
+msgid "Customise Menu..."
+msgstr ""
+
+#: ../bookmarks.c:268
+msgid "Title"
+msgstr ""
+
+#: ../bookmarks.c:276 ../log.c:176
+msgid "Path"
+msgstr ""
+
+#: ../bookmarks.c:466
+#, c-format
+msgid "Can't bookmark non-local resource '%s'\n"
+msgstr ""
+
+#: ../bookmarks.c:474 ../bookmarks.c:822
+#, c-format
+msgid "'%s' isn't a directory"
+msgstr ""
+
+#: ../bookmarks.c:710
+msgid "You should first select some rows to delete"
+msgstr ""
+
+#: ../bookmarks.c:734
+msgid "Put the cursor on an entry in the list to move it"
+msgstr ""
+
+#: ../bookmarks.c:754
+msgid "This item is already at the end"
+msgstr ""
+
+#: ../bookmarks.c:828
+#, c-format
+msgid "Can't bookmark non-local directories like '%s'"
+msgstr ""
+
+#: ../bookmarks.c:997
+msgid "Add New Bookmark"
+msgstr ""
+
+#: ../bookmarks.c:1004
+msgid "Edit Bookmarks"
+msgstr ""
+
+#: ../bookmarks.c:1009
+msgid "Recently Visited"
+msgstr ""
+
+#: ../bulk_rename.c:69
+msgid "Bulk rename files"
+msgstr ""
+
+#: ../bulk_rename.c:72
+msgid "Reset"
+msgstr ""
+
+#: ../bulk_rename.c:77
+msgid "Make the New column a copy of Old"
+msgstr ""
+
+#: ../bulk_rename.c:82
+msgid "_Rename"
+msgstr ""
+
+#: ../bulk_rename.c:94
+msgid "Replace:"
+msgstr ""
+
+#: ../bulk_rename.c:101
+msgid ""
+"This is a regular expression to search for.\n"
+"^ matches the start of a filename\n"
+"$ matches the end\n"
+"\\. matches a dot\n"
+"\\.htm$ matches the '.htm' in 'index.htm', etc"
+msgstr ""
+
+#: ../bulk_rename.c:108
+msgid "With:"
+msgstr ""
+
+#: ../bulk_rename.c:115
+msgid ""
+"The first match in each filename will be replaced by this string. The only "
+"special characters are back-references from \\0 to \\9. To use them "
+"literally, they have to be escaped with a backslash."
+msgstr ""
+
+#: ../bulk_rename.c:121
+msgid "Apply"
+msgstr ""
+
+#: ../bulk_rename.c:124
+msgid ""
+"Do a search-and-replace in the New column. The files are not actually "
+"renamed until you click on the Rename button below."
+msgstr ""
+
+#: ../bulk_rename.c:143
+msgid "Old name"
+msgstr ""
+
+#: ../bulk_rename.c:152
+msgid "New name"
+msgstr ""
+
+#: ../bulk_rename.c:294
+msgid "No strings (in the New column) matched the given expression"
+msgstr ""
+
+#: ../bulk_rename.c:299
+msgid "One name matched, but the result was the same"
+msgstr ""
+
+#: ../bulk_rename.c:302
+#, c-format
+msgid "%d names matched, but the results were all the same"
+msgstr ""
+
+#: ../bulk_rename.c:329
+msgid ""
+"Specify a regular expression to match, and a string to replace matches with."
+msgstr ""
+
+#: ../bulk_rename.c:346
+#, c-format
+msgid "%s (for '%s')"
+msgstr ""
+
+#: ../bulk_rename.c:379
+#, c-format
+msgid "A file called '%s' already exists. Aborting bulk rename."
+msgstr ""
+
+#: ../bulk_rename.c:384
+#, c-format
+msgid ""
+"Failed to rename '%s' as '%s':\n"
+"%s\n"
+"Aborting bulk rename."
+msgstr ""
+
+#: ../bulk_rename.c:446
+#, c-format
+msgid "A file called '%s' already exists"
+msgstr ""
+
+#: ../bulk_rename.c:457
+#, c-format
+msgid ""
+"Some of the New names contain / characters (eg '%s'). This will cause the "
+"files to end up in different directories. Continue?"
+msgstr ""
+
+#: ../bulk_rename.c:472
+msgid "None of the names have changed. Nothing to do!"
+msgstr ""
+
+#: ../dir.c:1079
+#, c-format
+msgid "Can't stat directory: %s"
+msgstr ""
+
+#: ../dir.c:1089
+#, c-format
+msgid "Can't open directory: %s"
+msgstr ""
+
+#: ../display.c:696 tips.c:55 tips.c:112
+msgid "Size"
+msgstr ""
+
+#: ../display.c:697
+msgid "┤"
+msgstr ""
+
+#: ../display.c:698
+msgid "┐"
+msgstr ""
+
+#: ../display.c:699
+msgid "┘"
+msgstr ""
+
+#: ../display.c:701
+msgid "├"
+msgstr ""
+
+#: ../display.c:701
+msgid "┌"
+msgstr ""
+
+#: ../display.c:702
+msgid "┼"
+msgstr ""
+
+#: ../display.c:946
+#, c-format
+msgid "lstat(2) failed: %s"
+msgstr ""
+
+#: ../dnd.c:414
+msgid "Internal error - bad info type"
+msgstr ""
+
+#: ../dnd.c:539
+msgid "Drag a directory here to bookmark it."
+msgstr ""
+
+#: ../dnd.c:554
+msgid "XDS protocol error: leafname may not contain '/'\n"
+msgstr ""
+
+#: ../dnd.c:579
+msgid ""
+"XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
+"plain) did not contain a leafname\n"
+msgstr ""
+
+#: ../dnd.c:592
+msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
+msgstr ""
+
+#: ../dnd.c:595
+msgid ""
+"Sorry - I require a target type of text/uri-list or application/octet-stream."
+msgstr ""
+
+#: ../dnd.c:679
+msgid "Unknown target"
+msgstr ""
+
+#: ../dnd.c:712
+msgid "Remote app can't or won't send me the data - sorry"
+msgstr ""
+
+#: ../dnd.c:725
+msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
+msgstr ""
+
+#: ../dnd.c:758
+msgid "Sorry, can't display a menu of actions for a remote file / raw data."
+msgstr ""
+
+#: ../dnd.c:775
+msgid "UntitledData"
+msgstr ""
+
+#: ../dnd.c:802
+#, c-format
+msgid "Error saving file: %s"
+msgstr ""
+
+#: ../dnd.c:875
+msgid "No URIs in the text/uri-list (nothing to do!)"
+msgstr ""
+
+#: ../dnd.c:908
+msgid ""
+"Can't get data from remote machine (application/octet-stream not provided)"
+msgstr ""
+
+#: ../dnd.c:930 ../menu.c:2404
+msgid ""
+"Some of these files are on a different machine - they will be ignored - sorry"
+msgstr ""
+
+#: ../dnd.c:941 ../menu.c:2412
+msgid ""
+"None of these files are on the local machine - I can't operate on multiple "
+"remote files - sorry."
+msgstr ""
+
+#: ../dnd.c:957
+msgid "Unknown action requested"
+msgstr ""
+
+#: ../dnd.c:966 ../menu.c:2430
+#, c-format
+msgid "Error getting file list: %s"
+msgstr ""
+
+#: ../dnd.c:1024
+msgid "Link (relative)"
+msgstr ""
+
+#: ../dnd.c:1025
+msgid "Link (absolute)"
+msgstr ""
+
+#: ../dnd.c:1026
+msgid "Link (relative, sym path)"
+msgstr ""
+
+#: ../dnd.c:1027
+msgid "Link (absolute, sym path)"
+msgstr ""
+
+#: ../dropbox.c:112
+msgid "Show"
+msgstr ""
+
+#: ../dropbox.c:118
+msgid "Show the current choice in a filer window"
+msgstr ""
+
+#: ../dropbox.c:172
+msgid "<nothing>"
+msgstr ""
+
+#: ../dropbox.c:237
+msgid ""
+"I can't show you the currently set item, because nothing is currently set. "
+"Drag something onto me!"
+msgstr ""
+
+#: ../dropbox.c:261
+msgid "Sorry, you need to drop exactly one file onto the drop area."
+msgstr ""
+
+#: ../dropbox.c:271
+#, c-format
+msgid "Sorry, I can't use '%s' because it's not a local file."
+msgstr ""
+
+#: ../dropbox.c:278
+#, c-format
+msgid ""
+"Can't access '%s':\n"
+"%s"
+msgstr ""
+
+#: ../filer.c:716
+#, c-format
+msgid ""
+"Error scanning '%s':\n"
+"%s\n"
+msgstr ""
+
+#: ../filer.c:882
+msgid ""
+"Do you want to unmount this device?\n"
+"\n"
+"Unmounting a device makes it safe to remove the disk."
+msgstr ""
+
+#: ../filer.c:887
+msgid "Perform the same action in future for this mount point"
+msgstr ""
+
+#: ../filer.c:894
+msgid "No change"
+msgstr ""
+
+#: ../filer.c:900 ../infobox.c:987 ../menu.c:1093
+msgid "Unmount"
+msgstr ""
+
+#: ../filer.c:1479
+#, c-format
+msgid ""
+"Group %s is not set. Select some files and press Ctrl+%s to set the group. "
+"Press %s on its own to reselect the files later.\n"
+"Make sure NumLock is on if you use the keypad."
+msgstr ""
+
+#: ../filer.c:2640
+msgid "A"
+msgstr ""
+
+#: ../filer.c:2641 ../filer.c:2653
+msgid "!"
+msgstr ""
+
+#: ../filer.c:2644 ../find.c:923
+msgid "G"
+msgstr ""
+
+#: ../filer.c:2649
+msgid "S"
+msgstr ""
+
+#: ../filer.c:2654
+msgid "T"
+msgstr ""
+
+#: ../filer.c:2655
+msgid "D"
+msgstr ""
+
+#: ../filer.c:2656
+msgid "F"
+msgstr ""
+
+#: ../filer.c:2666
+msgid "ALL, "
+msgstr ""
+
+#: ../filer.c:2666
+msgid "Not ALL, "
+msgstr ""
+
+#: ../filer.c:2671
+#, c-format
+msgid "Glob (%s), "
+msgstr ""
+
+#: ../filer.c:2679
+msgid "Scanning, "
+msgstr ""
+
+#: ../filer.c:2682
+msgid "Thumbs, "
+msgstr ""
+
+#: ../filer.c:2682
+msgid "Not Thumbs, "
+msgstr ""
+
+#: ../filer.c:2683
+msgid "Dirs only, "
+msgstr ""
+
+#: ../filer.c:2684
+msgid "Files only, "
+msgstr ""
+
+#: ../filer.c:3150
+msgid "Symbolic link to "
+msgstr ""
+
+#: ../filer.c:3171
+msgid "This filename is not valid UTF-8. You should rename it.\n"
+msgstr ""
+
+#: ../filer.c:3602 ../menu.c:2597
+msgid "Item no longer exists!"
+msgstr ""
+
+#: ../filer.c:4369
+msgid "▼"
+msgstr ""
+
+#: ../filer.c:4369
+msgid "▽"
+msgstr ""
+
+#: ../filer.c:4380
+msgid "▷"
+msgstr ""
+
+#: ../filer.c:4380
+msgid "▶"
+msgstr ""
+
+#: ../filer.c:4625
+msgid "Select display properties to save"
+msgstr ""
+
+#: ../filer.c:4630
+msgid "<b>Save display settings for parent directory/*</b>"
+msgstr ""
+
+#: ../filer.c:4631
+msgid "<b>Save display settings for directory</b>"
+msgstr ""
+
+#: ../filer.c:4638
+msgid "Select settings to save"
+msgstr ""
+
+#: ../filer.c:4645
+msgid "Position"
+msgstr ""
+
+#: ../filer.c:4650
+msgid "Window size"
+msgstr ""
+
+#: ../filer.c:4655
+msgid "Show hidden"
+msgstr ""
+
+#: ../filer.c:4661
+msgid "Display style (Icon size)"
+msgstr ""
+
+#: ../filer.c:4667
+msgid "Sort type and order"
+msgstr ""
+
+#: ../filer.c:4672
+msgid "Details"
+msgstr ""
+
+#: ../filer.c:4677 tips.c:148 tips.c:149
+msgid "Thumbnails"
+msgstr ""
+
+#: ../filer.c:4683
+msgid "Filter"
+msgstr ""
+
+#: ../find.c:485
+msgid "And"
+msgstr ""
+
+#: ../find.c:509
+msgid "Not"
+msgstr ""
+
+#: ../find.c:552
+msgid "system"
+msgstr ""
+
+#: ../find.c:560
+msgid "prune"
+msgstr ""
+
+#: ../find.c:648
+msgid "After"
+msgstr ""
+
+#: ../find.c:650
+msgid "Before"
+msgstr ""
+
+#: ../find.c:744
+msgid "IsReg"
+msgstr ""
+
+#: ../find.c:746
+msgid "IsLink"
+msgstr ""
+
+#: ../find.c:748
+msgid "IsDir"
+msgstr ""
+
+#: ../find.c:750
+msgid "IsChar"
+msgstr ""
+
+#: ../find.c:752
+msgid "IsBlock"
+msgstr ""
+
+#: ../find.c:754
+msgid "IsDev"
+msgstr ""
+
+#: ../find.c:756
+msgid "IsPipe"
+msgstr ""
+
+#: ../find.c:758
+msgid "IsSocket"
+msgstr ""
+
+#: ../find.c:760
+msgid "IsDoor"
+msgstr ""
+
+#: ../find.c:762
+msgid "IsSUID"
+msgstr ""
+
+#: ../find.c:764
+msgid "IsSGID"
+msgstr ""
+
+#: ../find.c:766
+msgid "IsSticky"
+msgstr ""
+
+#: ../find.c:768
+msgid "IsReadable"
+msgstr ""
+
+#: ../find.c:770
+msgid "IsWriteable"
+msgstr ""
+
+#: ../find.c:772
+msgid "IsExecutable"
+msgstr ""
+
+#: ../find.c:774
+msgid "IsEmpty"
+msgstr ""
+
+#: ../find.c:776
+msgid "IsMine"
+msgstr ""
+
+#: ../find.c:904
+msgid "Now"
+msgstr ""
+
+#: ../find.c:917
+msgid "Byte"
+msgstr ""
+
+#: ../find.c:917
+msgid "Bytes"
+msgstr ""
+
+#: ../find.c:919
+msgid "Kb"
+msgstr ""
+
+#: ../find.c:919
+msgid "K"
+msgstr ""
+
+#: ../find.c:921
+msgid "Mb"
+msgstr ""
+
+#: ../find.c:921
+msgid "M"
+msgstr ""
+
+#: ../find.c:923
+msgid "Gb"
+msgstr ""
+
+#: ../find.c:925
+msgid "Sec"
+msgstr ""
+
+#: ../find.c:925
+msgid "Secs"
+msgstr ""
+
+#: ../find.c:927
+msgid "Min"
+msgstr ""
+
+#: ../find.c:927
+msgid "Mins"
+msgstr ""
+
+#: ../find.c:929
+msgid "Hour"
+msgstr ""
+
+#: ../find.c:929
+msgid "Hours"
+msgstr ""
+
+#: ../find.c:931
+msgid "Day"
+msgstr ""
+
+#: ../find.c:931
+msgid "Days"
+msgstr ""
+
+#: ../find.c:933
+msgid "Week"
+msgstr ""
+
+#: ../find.c:933
+msgid "Weeks"
+msgstr ""
+
+#: ../find.c:935
+msgid "Year"
+msgstr ""
+
+#: ../find.c:935
+msgid "Years"
+msgstr ""
+
+#: ../find.c:944
+msgid "Ago"
+msgstr ""
+
+#: ../find.c:946
+msgid "Hence"
+msgstr ""
+
+#: ../find.c:961
+msgid "atime"
+msgstr ""
+
+#: ../find.c:963
+msgid "ctime"
+msgstr ""
+
+#: ../find.c:965
+msgid "mtime"
+msgstr ""
+
+#: ../find.c:967
+msgid "size"
+msgstr ""
+
+#: ../find.c:969
+msgid "inode"
+msgstr ""
+
+#: ../find.c:971
+msgid "nlinks"
+msgstr ""
+
+#: ../find.c:973
+msgid "uid"
+msgstr ""
+
+#: ../find.c:975
+msgid "gid"
+msgstr ""
+
+#: ../find.c:977
+msgid "blocks"
+msgstr ""
+
+#: ../gtksavebox.c:243
+msgid "Save As:"
+msgstr ""
+
+#: ../gtksavebox.c:395
+msgid "Unnamed"
+msgstr ""
+
+#: ../gtksavebox.c:471
+msgid ""
+"Remote application wants to use Direct Save, but I can't read the "
+"XdndDirectSave0 (type text/plain) property.\n"
+msgstr ""
+
+#: ../gtksavebox.c:596
+msgid ""
+"Drag the icon to a directory viewer\n"
+"(or enter a full pathname)"
+msgstr ""
+
+#: ../gui_support.c:220
+msgid ""
+"\n"
+"---\n"
+msgstr ""
+
+#: ../gui_support.c:289
+#, c-format
+msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
+msgstr ""
+
+#: ../gui_support.c:306
+#, c-format
+msgid ""
+"Error in '%s' file at line %d: \n"
+"\"%s\"\n"
+"This may be due to upgrading from a previous version of "
+msgstr ""
+
+#: ../gui_support.c:753
+msgid "Incorrect or missing line break in text/uri-list data"
+msgstr ""
+
+#: ../gui_support.c:852
+#, c-format
+msgid "Failed to open file '%s': %s"
+msgstr ""
+
+#: ../gui_support.c:896
+#, c-format
+msgid ""
+"Failed to load image '%s': reason not known, probably a corrupt image file"
+msgstr ""
+
+#: ../i18n.c:40
+msgid ""
+"Note that you must save your choices and restart the filer for the new "
+"language setting to take full effect."
+msgstr ""
+
+#: ../infobox.c:111
+#, c-format
+msgid "Are you sure you want to open %d windows?"
+msgstr ""
+
+#: ../infobox.c:112
+msgid "Show Info"
+msgstr ""
+
+#: ../infobox.c:134 ../menu.c:992
+msgid "(bad utf-8)"
+msgstr ""
+
+#: ../infobox.c:271
+msgid "Show _Help Files"
+msgstr ""
+
+#: ../infobox.c:284
+msgid "<b>Permissions</b>"
+msgstr ""
+
+#: ../infobox.c:300
+msgid "<b>Contents indicate...</b>"
+msgstr ""
+
+#: ../infobox.c:310
+msgid "<b>When all directories are closed</b>"
+msgstr ""
+
+#: ../infobox.c:443 ../infobox.c:588 ../support.c:368
+msgid "bytes"
+msgstr ""
+
+#: ../infobox.c:468
+msgid "Failed to read size"
+msgstr ""
+
+#: ../infobox.c:531
+#, c-format
+msgid "'%s' is no longer a symlink"
+msgstr ""
+
+#: ../infobox.c:538
+#, c-format
+msgid ""
+"Failed to unlink '%s':\n"
+"%s"
+msgstr ""
+
+#: ../infobox.c:543
+#, c-format
+msgid ""
+"Failed to create symlink from '%s':\n"
+"%s\n"
+"(note: old link has been deleted)"
+msgstr ""
+
+#: ../infobox.c:567 tips.c:242
+msgid "Error:"
+msgstr ""
+
+#: ../infobox.c:574
+msgid "Real directory:"
+msgstr ""
+
+#: ../infobox.c:577
+msgid "Owner, Group:"
+msgstr ""
+
+#: ../infobox.c:584 ../infobox.c:599 ../infobox.c:608
+msgid "Size:"
+msgstr ""
+
+#: ../infobox.c:609
+msgid "Scanning"
+msgstr ""
+
+#: ../infobox.c:634
+msgid "Failed to scan"
+msgstr ""
+
+#: ../infobox.c:643
+msgid "Change time:"
+msgstr ""
+
+#: ../infobox.c:644
+msgid "Modify time:"
+msgstr ""
+
+#: ../infobox.c:645
+msgid "Access time:"
+msgstr ""
+
+#: ../infobox.c:653
+msgid "Extended attributes:"
+msgstr ""
+
+#: ../infobox.c:655
+msgid "Present"
+msgstr ""
+
+#: ../infobox.c:656
+msgid "None"
+msgstr ""
+
+#: ../infobox.c:657
+msgid "Not supported"
+msgstr ""
+
+#: ../infobox.c:669
+msgid "Link target:"
+msgstr ""
+
+#: ../infobox.c:681 ../infobox.c:684
+msgid "Run action:"
+msgstr ""
+
+#: ../infobox.c:681
+msgid "Execute file"
+msgstr ""
+
+#: ../infobox.c:719
+msgid "Comment"
+msgstr ""
+
+#: ../infobox.c:721
+msgid "Execute"
+msgstr ""
+
+#: ../infobox.c:736
+msgid "<nothing yet>"
+msgstr ""
+
+#: ../infobox.c:809
+#, c-format
+msgid "file(1) says... %s"
+msgstr ""
+
+#: ../infobox.c:866
+#, c-format
+msgid "Could not change permissions: %s"
+msgstr ""
+
+#: ../infobox.c:884 tips.c:116
+msgid "Owner"
+msgstr ""
+
+#: ../infobox.c:886 tips.c:118
+msgid "Group"
+msgstr ""
+
+#: ../infobox.c:888
+msgid "World"
+msgstr ""
+
+#: ../infobox.c:891
+msgid "Read"
+msgstr ""
+
+#: ../infobox.c:894
+msgid "Write"
+msgstr ""
+
+#: ../infobox.c:897
+msgid "Exec"
+msgstr ""
+
+#: ../infobox.c:915
+msgid "SUID"
+msgstr ""
+
+#: ../infobox.c:922
+msgid "SGID"
+msgstr ""
+
+#: ../infobox.c:929
+msgid "Sticky"
+msgstr ""
+
+#: ../infobox.c:985
+msgid "Do nothing"
+msgstr ""
+
+#: ../infobox.c:991
+msgid "Ask"
+msgstr ""
+
+#: ../infobox.c:1003
+msgid "Symbolic link"
+msgstr ""
+
+#: ../infobox.c:1011
+msgid "mounted"
+msgstr ""
+
+#: ../infobox.c:1011
+msgid "unmounted"
+msgstr ""
+
+#: ../infobox.c:1015
+#, c-format
+msgid "Mount point for %s (%s)"
+msgstr ""
+
+#: ../infobox.c:1018
+#, c-format
+msgid "Mount point (%s)"
+msgstr ""
+
+#: ../log.c:54
+msgid "App started"
+msgstr ""
+
+#: ../log.c:111 ../menu.c:987
+#, c-format
+msgid "%s '%s'"
+msgstr ""
+
+#: ../log.c:115
+#, c-format
+msgid "%s on %d items"
+msgstr ""
+
+#: ../log.c:132
+msgid "..."
+msgstr ""
+
+#: ../log.c:139
+msgid "Item"
+msgstr ""
+
+#: ../log.c:165
+msgid "Time"
+msgstr ""
+
+#: ../log.c:170
+msgid "Action"
+msgstr ""
+
+#: ../main.c:92
+msgid ""
+"Copyright (C) 2005 Thomas Leonard.\n"
+"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
+"to the extent permitted by law.\n"
+"You may redistribute copies of ROX-Filer\n"
+"under the terms of the GNU General Public License.\n"
+"For more information about these matters, see the file named COPYING.\n"
+msgstr ""
+
+#: ../main.c:101
+msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
+msgstr ""
+
+#: ../main.c:104
+msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
+msgstr ""
+
+#: ../main.c:106
+msgid ""
+"NOTE: Your system does not support long options - \n"
+"you must use the short versions instead.\n"
+"\n"
+msgstr ""
+
+#: ../main.c:112
+#, c-format
+msgid ""
+"Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
+"Open each directory or file listed, or the current working\n"
+"directory if no arguments are given.\n"
+"\n"
+"  -d, --dir=DIR\t\topen DIR as directory (not application)\n"
+"  -D, --close=DIR\tclose DIR and its subdirectories\n"
+"  -h, --help\t\tdisplay this help and exit\n"
+"  -m, --mime-type=FILE\tprint MIME type of FILE and exit\n"
+"  -n, --new\t\tstart new copy; for debugging the filer\n"
+"  -R, --RPC\t\tinvoke method call read from stdin\n"
+"  -s, --show=FILE\topen a directory showing FILE\n"
+"  -u, --user\t\tshow user name in each window \n"
+"  -U, --url=URL\t\topen file or directory in URI form\n"
+"  -v, --version\t\tdisplay the version information and exit\n"
+"  -x, --examine=FILE\tFILE has changed - re-examine it\n"
+"\n"
+"Report bugs to %s.\n"
+"Home page (including updated versions): http://rox.sourceforge.net/\n"
+msgstr ""
+
+#: ../main.c:204
+msgid ""
+"We got a BadWindow error from the X server. This might be due to this GTK "
+"bug (during drag-and-drop?):\n"
+"http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
+"Trying to continue..."
+msgstr ""
+
+#: ../main.c:439
+#, c-format
+msgid "Running as user '%s'"
+msgstr ""
+
+#: ../main.c:589
+#, c-format
+msgid "Compiled with GTK version %s\n"
+msgstr ""
+
+#: ../main.c:590
+#, c-format
+msgid "Running with GTK version %d.%d.%d\n"
+msgstr ""
+
+#: ../main.c:594
+msgid "features set at compile time"
+msgstr ""
+
+#: ../main.c:595
+msgid "Large File Support"
+msgstr ""
+
+#: ../main.c:602
+msgid "Binary compatibility"
+msgstr ""
+
+#: ../main.c:604
+msgid "Yes (can run with older glibc versions)"
+msgstr ""
+
+#: ../main.c:606
+msgid "No (apsymbols.h not found)"
+msgstr ""
+
+#: ../main.c:610
+msgid "Extended attribute support"
+msgstr ""
+
+#: ../main.c:729 ../menu.c:1724 ../menu.c:1730
+#, c-format
+msgid "Error creating '%s': %s"
+msgstr ""
+
+#: ../main.c:760
+msgid "Save"
+msgstr ""
+
+#: ../main.c:765
+msgid "Start script"
+msgstr ""
+
+#: ../main.c:790
+msgid ""
+"Click to save a script to run ROX-Filer.\n"
+"If you are using Zero Install you should use 0alias instead."
+msgstr ""
+
+#: ../menu.c:640
+msgid "Display"
+msgstr ""
+
+#: ../menu.c:642 tips.c:47
+msgid "Icons View"
+msgstr ""
+
+#: ../menu.c:643
+msgid "Icons With Sizes"
+msgstr ""
+
+#: ../menu.c:644
+msgid "Icons With Times"
+msgstr ""
+
+#: ../menu.c:645
+msgid "Icons With Permissions"
+msgstr ""
+
+#: ../menu.c:646
+msgid "Icons With Types"
+msgstr ""
+
+#: ../menu.c:648 tips.c:48 tips.c:94 tips.c:95
+msgid "List View"
+msgstr ""
+
+#: ../menu.c:652
+msgid "Bigger Icons"
+msgstr ""
+
+#: ../menu.c:654
+msgid "Smaller Icons"
+msgstr ""
+
+#: ../menu.c:656 tips.c:67
+msgid "Automatic"
+msgstr ""
+
+#: ../menu.c:662
+msgid "Sort by Name"
+msgstr ""
+
+#: ../menu.c:663
+msgid "Sort by Type"
+msgstr ""
+
+#: ../menu.c:664
+msgid "Sort by Date (atime)"
+msgstr ""
+
+#: ../menu.c:665
+msgid "Sort by Date (ctime)"
+msgstr ""
+
+#: ../menu.c:666
+msgid "Sort by Date (mtime)"
+msgstr ""
+
+#: ../menu.c:667
+msgid "Sort by Size"
+msgstr ""
+
+#: ../menu.c:668 ../toolbar.c:556
+msgid "Sort by permissions"
+msgstr ""
+
+#: ../menu.c:669
+msgid "Sort by Owner"
+msgstr ""
+
+#: ../menu.c:670
+msgid "Sort by Group"
+msgstr ""
+
+#: ../menu.c:672
+msgid "Reversed"
+msgstr ""
+
+#: ../menu.c:676
+msgid "Show Hidden"
+msgstr ""
+
+#: ../menu.c:678
+msgid "Show Only Files"
+msgstr ""
+
+#: ../menu.c:679
+msgid "Show Only Directories"
+msgstr ""
+
+#: ../menu.c:680
+msgid "Filter Files..."
+msgstr ""
+
+#: ../menu.c:681
+msgid "Temp Filter..."
+msgstr ""
+
+#: ../menu.c:682
+msgid "Filter Directories With Files"
+msgstr ""
+
+#: ../menu.c:683
+msgid "Show Thumbnails"
+msgstr ""
+
+#: ../menu.c:684
+msgid "Refresh"
+msgstr ""
+
+#: ../menu.c:685
+msgid "Refresh Thumbs"
+msgstr ""
+
+#: ../menu.c:687
+msgid "Save Display Settings..."
+msgstr ""
+
+#: ../menu.c:688
+msgid "Save Display Settings to parent ..."
+msgstr ""
+
+#: ../menu.c:696
+msgid "Cut"
+msgstr ""
+
+#: ../menu.c:698
+msgid "Duplicate..."
+msgstr ""
+
+#: ../menu.c:700
+msgid "Rename..."
+msgstr ""
+
+#: ../menu.c:701
+msgid "Link..."
+msgstr ""
+
+#: ../menu.c:708 ../menu.c:1106
+msgid "Shift Open"
+msgstr ""
+
+#: ../menu.c:709
+msgid "Send To..."
+msgstr ""
+
+#: ../menu.c:713
+msgid "Set Run Action..."
+msgstr ""
+
+#: ../menu.c:715
+msgid "Set Icon..."
+msgstr ""
+
+#: ../menu.c:718
+msgid "Extended attributes..."
+msgstr ""
+
+#: ../menu.c:720
+msgid "Properties"
+msgstr ""
+
+#: ../menu.c:722
+msgid "Count"
+msgstr ""
+
+#: ../menu.c:724
+msgid "Set Type..."
+msgstr ""
+
+#: ../menu.c:732 ../toolbar.c:179
+msgid "Select"
+msgstr ""
+
+#: ../menu.c:734
+msgid "Select All"
+msgstr ""
+
+#: ../menu.c:736
+msgid "Clear Selection"
+msgstr ""
+
+#: ../menu.c:737
+msgid "Invert Selection"
+msgstr ""
+
+#: ../menu.c:738
+msgid "Select by Name..."
+msgstr ""
+
+#: ../menu.c:740
+msgid "Reg Select..."
+msgstr ""
+
+#: ../menu.c:742
+msgid "Select If..."
+msgstr ""
+
+#: ../menu.c:746
+msgid "Options..."
+msgstr ""
+
+#: ../menu.c:747
+msgid "Paste"
+msgstr ""
+
+#: ../menu.c:750 ../toolbar.c:184
+msgid "New"
+msgstr ""
+
+#: ../menu.c:753
+msgid "Blank file"
+msgstr ""
+
+#: ../menu.c:757
+msgid "Window"
+msgstr ""
+
+#: ../menu.c:759
+msgid "Parent, New Window"
+msgstr ""
+
+#: ../menu.c:760
+msgid "Parent, Same Window"
+msgstr ""
+
+#: ../menu.c:762 tips.c:42
+msgid "New Window"
+msgstr ""
+
+#: ../menu.c:763
+msgid "Home Directory"
+msgstr ""
+
+#: ../menu.c:765
+msgid "Show Bookmarks"
+msgstr ""
+
+#: ../menu.c:767
+msgid "Show Log"
+msgstr ""
+
+#: ../menu.c:769
+msgid "Follow Symbolic Links"
+msgstr ""
+
+#: ../menu.c:770
+msgid "Resize Window"
+msgstr ""
+
+#: ../menu.c:772
+msgid "Close Window"
+msgstr ""
+
+#: ../menu.c:777
+msgid "Enter Path..."
+msgstr ""
+
+#: ../menu.c:779
+msgid "Shell Command..."
+msgstr ""
+
+#: ../menu.c:781
+msgid "Terminal Here"
+msgstr ""
+
+#: ../menu.c:783
+msgid "Switch to Terminal"
+msgstr ""
+
+#: ../menu.c:786 ../toolbar.c:202
+msgid "Help"
+msgstr ""
+
+#: ../menu.c:788 ../menu.c:791
+msgid "About "
+msgstr ""
+
+#: ../menu.c:789
+msgid "Show Help Files"
+msgstr ""
+
+#: ../menu.c:794
+msgid "Customise Dir Menu..."
+msgstr ""
+
+#: ../menu.c:977
+msgid "Next Click"
+msgstr ""
+
+#: ../menu.c:999
+#, c-format
+msgid "%d items"
+msgstr ""
+
+#: ../menu.c:1095
+msgid "Open unmounted"
+msgstr ""
+
+#: ../menu.c:1098
+msgid "Show Target"
+msgstr ""
+
+#: ../menu.c:1100
+msgid "Look Inside"
+msgstr ""
+
+#: ../menu.c:1102
+msgid "Open As Text"
+msgstr ""
+
+#: ../menu.c:1321
+msgid ""
+"Extended attributes, used to store types, are not supported for this file or "
+"files.\n"
+"This may be due to lack of support from the filesystem or the C library, or "
+"it may simply be that the filesystem needs to be mounted with the right "
+"mount option ('user_xattr' on Linux)."
+msgstr ""
+
+#: ../menu.c:1327
+msgid "Setting type not supported for some of these files"
+msgstr ""
+
+#: ../menu.c:1365
+msgid "_Relative link"
+msgstr ""
+
+#: ../menu.c:1371
+msgid ""
+"If on, the symlink will store the path from the symlink to the target file. "
+"Use this if the symlink and the target will be moved together.\n"
+"If off, the path from the root directory is stored - use this if the symlink "
+"may move but the target will stay put."
+msgstr ""
+
+#: ../menu.c:1383
+msgid "_Sym path"
+msgstr ""
+
+#: ../menu.c:1389
+msgid "If on, the symlink will use target path as Sym path."
+msgstr ""
+
+#: ../menu.c:1461
+msgid "New pathname is not absolute"
+msgstr ""
+
+#: ../menu.c:1541
+#, c-format
+msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
+msgstr ""
+
+#: ../menu.c:1547
+msgid "_Replace"
+msgstr ""
+
+#: ../menu.c:1587
+msgid "You can only set the run action for a regular file"
+msgstr ""
+
+#: ../menu.c:1705
+msgid "NewDir"
+msgstr ""
+
+#: ../menu.c:1707 ../menu.c:1758 ../menu.c:1828
+msgid "Create"
+msgstr ""
+
+#: ../menu.c:1756
+msgid "NewFile"
+msgstr ""
+
+#: ../menu.c:1780
+#, c-format
+msgid "Error creating file: could not find the template for %s"
+msgstr ""
+
+#: ../menu.c:1848
+msgid ""
+"Symlink any programs you want into this directory. \n"
+"\n"
+"Tip: Directories and `Set Icon' may make it more usefull."
+msgstr ""
+
+#: ../menu.c:1884
+#, c-format
+msgid ""
+"The `Send To' menu provides a quick way to send some files to an "
+"application. The applications listed are those in the following "
+"directories:\n"
+"\n"
+"%s\n"
+"%s\n"
+"The `Send To' menu may be opened by Shift+Menu clicking over a file.\n"
+"\n"
+"Advanced use:\n"
+"You can also create subdirectories called `.text_html', `.text', etc which "
+"will only be shown for files of that type and shared with the file menu. In "
+"addition, `.group' is shown only when multiple files are selected. `.all' is "
+"all."
+msgstr ""
+
+#: ../menu.c:1896
+msgid ""
+"I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
+"drag) any applications you want into it."
+msgstr ""
+
+#: ../menu.c:1899 ../menu.c:1938
+msgid "Customisations cannot be saved."
+msgstr ""
+
+#: ../menu.c:1931
+#, c-format
+msgid ""
+"Any files placed in your Templates directories will appear on the `New' "
+"menu. Choosing one of them will make a copy of it as the new file.\n"
+"\n"
+"The following directories contain templates:\n"
+"\n"
+"%s\n"
+"%s\n"
+msgstr ""
+
+#: ../menu.c:1936
+msgid ""
+"I'll show you your Templates directory now; you should place any template "
+"files you want inside it."
+msgstr ""
+
+#: ../menu.c:2079
+msgid "Customise..."
+msgstr ""
+
+#: ../menu.c:2104
+msgid "Customise Dir menu..."
+msgstr ""
+
+#: ../menu.c:2167
+msgid "This is already the canonical name for this directory."
+msgstr ""
+
+#: ../menu.c:2198
+msgid ""
+"You can't open a second view onto this directory because the `Unique "
+"Windows' option is turned on in the Options window."
+msgstr ""
+
+#: ../menu.c:2346
+msgid "The clipboard is empty."
+msgstr ""
+
+#: ../menu.c:2382
+#, c-format
+msgid "Copy of %s"
+msgstr ""
+
+#: ../menu.c:2388
+#, c-format
+msgid "Copy(%d) of %s"
+msgstr ""
+
+#: ../menu.c:2454
+msgid "Duplicate ... ?"
+msgstr ""
+
+#: ../menu.c:2457
+msgid "Rename ... ?"
+msgstr ""
+
+#: ../menu.c:2460
+msgid "Symlink ... ?"
+msgstr ""
+
+#: ../menu.c:2463
+msgid "Shift Open ... ?"
+msgstr ""
+
+#: ../menu.c:2466
+msgid "Properties of ... ?"
+msgstr ""
+
+#: ../menu.c:2470
+msgid "Extended attributes of ... ?"
+msgstr ""
+
+#: ../menu.c:2474
+msgid "Set type of ... ?"
+msgstr ""
+
+#: ../menu.c:2477
+msgid "Set run action for ... ?"
+msgstr ""
+
+#: ../menu.c:2480
+msgid "Set icon for ... ?"
+msgstr ""
+
+#: ../menu.c:2483
+msgid "Send ... to ... ?"
+msgstr ""
+
+#: ../menu.c:2486
+msgid "DELETE ... ?"
+msgstr ""
+
+#: ../menu.c:2489
+msgid "Count the size of ... ?"
+msgstr ""
+
+#: ../menu.c:2492
+msgid "Set permissions on ... ?"
+msgstr ""
+
+#: ../menu.c:2495
+msgid "Search inside ... ?"
+msgstr ""
+
+#: ../menu.c:2498
+msgid "Copy ... to clipboard ?"
+msgstr ""
+
+#: ../menu.c:2501
+msgid "Cut ... to clipboard ?"
+msgstr ""
+
+#: ../menu.c:2580
+msgid "You cannot do this to more than one item at a time"
+msgstr ""
+
+#: ../menu.c:2607
+msgid "Duplicate"
+msgstr ""
+
+#: ../menu.c:2612
+msgid "Rename"
+msgstr ""
+
+#: ../menu.c:2617
+msgid "Symlink"
+msgstr ""
+
+#: ../menu.c:2652
+msgid ""
+"User-definable shortcuts are disabled by default in Gtk2, and you have not "
+"enabled them. You can turn this feature on by:\n"
+"\n"
+"1) using an XSettings manager, such as ROX-Session or gnome-settings-daemon, "
+"or\n"
+"\n"
+"2) adding this line to ~/.gtkrc-2.0:\n"
+"\tgtk-can-change-accels = 1\n"
+"\t(this only works if NOT using XSETTINGS)"
+msgstr ""
+
+#: ../menu.c:2663
+msgid ""
+"To set a keyboard short-cut for a menu item:\n"
+"\n"
+"- Open the menu over a filer window,\n"
+"- Move the pointer over the item you want to use,\n"
+"- Press the key you want attached to it.\n"
+"\n"
+"The key will appear next to the menu item and you can just press that key "
+"without opening the menu in future."
+msgstr ""
+
+#: ../menu.c:2678
+msgid "Set keyboard shortcuts"
+msgstr ""
+
+#: ../minibuffer.c:140
+msgid "Goto:"
+msgstr ""
+
+#: ../minibuffer.c:141
+msgid "Shell:"
+msgstr ""
+
+#: ../minibuffer.c:142
+msgid "Select If:"
+msgstr ""
+
+#: ../minibuffer.c:143
+msgid "Select Named:"
+msgstr ""
+
+#: ../minibuffer.c:144
+msgid "Reg Select (i):"
+msgstr ""
+
+#: ../minibuffer.c:145
+msgid "Pattern:"
+msgstr ""
+
+#: ../minibuffer.c:146
+msgid "Temp Filter (reg-i):"
+msgstr ""
+
+#: ../minibuffer.c:320
+msgid ""
+"Enter the name of a file and I'll display it for you. Press Tab to fill in "
+"the longest match. Escape to close the minibuffer."
+msgstr ""
+
+#: ../minibuffer.c:326
+msgid ""
+"Enter a shell command to execute. Click on a file to add it to the buffer."
+msgstr ""
+
+#: ../minibuffer.c:331
+msgid ""
+"Enter a file name pattern to select all matching files:\n"
+"\n"
+". means any character\n"
+".* means zero or more characters\n"
+"[a-z] means any character from a to z\n"
+"\\.png$ means any name ending in '.png'\n"
+"\n"
+"Shift + Enter: switch to Temp Filter."
+msgstr ""
+
+#: ../minibuffer.c:340
+msgid ""
+"Enter a file name pattern to select all matching files:\n"
+"\n"
+"? means any character\n"
+"* means zero or more characters\n"
+"[aA] means 'a' or 'A'\n"
+"[a-z] means any character from a to z (lowercase)\n"
+"*.png means any name ending in '.png'"
+msgstr ""
+
+#: ../minibuffer.c:352
+msgid ""
+"Enter a pattern to match for files to be shown.  An empty filter turns the "
+"filter off."
+msgstr ""
+
+#: ../minibuffer.c:358
+msgid ""
+"Enter a pattern to match for files to be shown and press Enter Key.\n"
+"It is active until the minibuffer is closed."
+msgstr ""
+
+#: ../minibuffer.c:1044
+msgid "Invalid Find condition"
+msgstr ""
+
+#: ../mount.c:103
+#, c-format
+msgid "File system table \"%s\" not found, cannot monitor system mounts"
+msgstr ""
+
+#: ../mount.c:393
+#, c-format
+msgid "%s total, %s used, %s free (%.1f %%)"
+msgstr ""
+
+#: ../options.c:272
+msgid " has converted your Options file to the new XML format"
+msgstr ""
+
+#: ../options.c:565 ../options.c:1255
+msgid "(use default)"
+msgstr ""
+
+#: ../options.c:849
+#, c-format
+msgid "Internal error: %s unreadable"
+msgstr ""
+
+#: ../options.c:934
+msgid "Options"
+msgstr ""
+
+#: ../options.c:979
+msgid "_Revert"
+msgstr ""
+
+#: ../options.c:986
+msgid "Restore all choices to how they were when the Options box was opened."
+msgstr ""
+
+#: ../options.c:1001
+#, c-format
+msgid ""
+"Choices will be saved as:\n"
+"%s"
+msgstr ""
+
+#: ../options.c:1009
+msgid "(saving disabled)"
+msgstr ""
+
+#: ../options.c:1165 ../usericons.c:406
+#, c-format
+msgid "Error saving %s: %s"
+msgstr ""
+
+#: ../options.c:1818
+msgid "Missing '='"
+msgstr ""
+
+#: ../pixmaps.c:998
+#, c-format
+msgid ""
+"Can't delete thumbnails in %s:\n"
+"%s"
+msgstr ""
+
+#: ../pixmaps.c:1029
+msgid "There are no thumbnails to delete"
+msgstr ""
+
+#: ../pixmaps.c:1042
+msgid "Purge thumbnails disk cache"
+msgstr ""
+
+#: ../remote.c:743
+#, c-format
+msgid "Unknown style '%s'"
+msgstr ""
+
+#: ../remote.c:765
+#, c-format
+msgid "Unknown details type '%s'"
+msgstr ""
+
+#: ../remote.c:794
+#, c-format
+msgid "Unknown sorting type '%s'"
+msgstr ""
+
+#: ../remote.c:1086
+#, c-format
+msgid "Attempt to invoke unknown SOAP method '%s'"
+msgstr ""
+
+#: ../run.c:96 ../run.c:150
+#, c-format
+msgid "Program %s not found - deleted?"
+msgstr ""
+
+#: ../run.c:352
+#, c-format
+msgid ""
+"No run action specified for files of this type (%s/%s) - you can set a run "
+"action by choosing `Set Run Action' from the File menu, or you can just drag "
+"the file to an application.%s"
+msgstr ""
+
+#: ../run.c:358
+msgid ""
+"\n"
+"\n"
+"Note: If this is a computer program which you want to run, you need to set "
+"the execute bit by choosing Permissions from the File menu."
+msgstr ""
+
+#: ../run.c:366
+#, c-format
+msgid "File doesn't exist, or I can't access it: %s"
+msgstr ""
+
+#: ../run.c:371
+#, c-format
+msgid "I don't know how to open '%s'"
+msgstr ""
+
+#: ../run.c:402
+#, c-format
+msgid "'%s' is not a valid URI"
+msgstr ""
+
+#: ../run.c:413
+#, c-format
+msgid "%s not accessable"
+msgstr ""
+
+#: ../run.c:421
+#, c-format
+msgid "Non-local URL %s"
+msgstr ""
+
+#: ../run.c:438
+#, c-format
+msgid "%s: no handler for %s"
+msgstr ""
+
+#: ../run.c:458
+msgid ""
+"Application:\n"
+"This is an application directory - you can run it as a program, or open it "
+"(hold down Shift while you open it). Most applications provide their own "
+"help here, but this one doesn't."
+msgstr ""
+
+#: ../run.c:539
+#, c-format
+msgid "Could not send data to program: %s"
+msgstr ""
+
+#: ../run.c:568
+#, c-format
+msgid "Could not read link: %s"
+msgstr ""
+
+#: ../run.c:596
+#, c-format
+msgid "Broken symlink (or you don't have permission to follow it): %s"
+msgstr ""
+
+#: ../run.c:782
+#, c-format
+msgid ""
+"Executable '%s' is world-writeable! Refusing to run. Please change the "
+"permissions now (this problem may have been caused by a bug in earlier "
+"versions of the filer).\n"
+"\n"
+"Having (non-symlink) run actions world-writeable means that other people who "
+"use your computer can replace your run actions with malicious versions.\n"
+"\n"
+"If you trust everyone who could write to these files then you needn't worry. "
+"Otherwise, you should check, or even just delete, all the existing run "
+"actions."
+msgstr ""
+
+#: ../run.c:795
+msgid "go-w (Fix security problem)"
+msgstr ""
+
+#: ../support.c:277
+msgid " "
+msgstr ""
+
+#: ../support.c:370
+msgid "byte"
+msgstr ""
+
+#: ../support.c:1530 ../support.c:1584
+#, c-format
+msgid "Failed to open and stat file '%s': %s"
+msgstr ""
+
+#: ../support.c:1541 ../support.c:1595
+#, c-format
+msgid "Failed to mmap file '%s': %s"
+msgstr ""
+
+#: ../toolbar.c:116
+msgid "Close"
+msgstr ""
+
+#: ../toolbar.c:116
+msgid "Close filer window"
+msgstr ""
+
+#: ../toolbar.c:120
+msgid "Up"
+msgstr ""
+
+#: ../toolbar.c:120
+msgid ""
+"Change to parent directory\n"
+"  Right: Open parent directory\n"
+"  Middle: Change to parent in real path"
+msgstr ""
+
+#: ../toolbar.c:126
+msgid "Home"
+msgstr ""
+
+#: ../toolbar.c:126
+msgid ""
+"Change to home directory\n"
+"  Right: Open home directory\n"
+"  Middle: Change to first bookmark"
+msgstr ""
+
+#: ../toolbar.c:132
+msgid "Jump"
+msgstr ""
+
+#: ../toolbar.c:132
+msgid ""
+"Bookmarks menu\n"
+"  Right: Edit Bookmarks\n"
+"  Middle: Jump to last visited directory"
+msgstr ""
+
+#: ../toolbar.c:138
+msgid "Scan"
+msgstr ""
+
+#: ../toolbar.c:138
+msgid ""
+"Rescan directory contents\n"
+"  Middle: Delete/re-create thumbnail cache"
+msgstr ""
+
+#: ../toolbar.c:143
+msgid "Size┼"
+msgstr ""
+
+#: ../toolbar.c:143
+msgid ""
+"Change icon size\n"
+"  Right: Change to smaller\n"
+"  Middle: Change to Auto Size\n"
+"  Scroll: Temporary huge zoom\n"
+"Current size:\n"
+"  ┘ : Huge\n"
+"  ┤ : Large\n"
+"  ┐ : Small\n"
+"  ┌, ├ : Auto"
+msgstr ""
+
+#: ../toolbar.c:155
+msgid "Auto"
+msgstr ""
+
+#: ../toolbar.c:155
+msgid "Automatic size mode"
+msgstr ""
+
+#: ../toolbar.c:159
+msgid "List"
+msgstr ""
+
+#: ../toolbar.c:159
+msgid ""
+"Show extra details\n"
+"  Right: Rotate Icons with details\n"
+"  Middle: Return to normal Icons View"
+msgstr ""
+
+#: ../toolbar.c:165
+msgid "Sort"
+msgstr ""
+
+#: ../toolbar.c:165
+msgid "Change sort criteria"
+msgstr ""
+
+#: ../toolbar.c:169
+msgid "Hide"
+msgstr ""
+
+#: ../toolbar.c:169
+msgid ""
+"Left: Show/hide hidden files\n"
+"Right: Show/hide thumbnails"
+msgstr ""
+
+#: ../toolbar.c:174
+msgid "Dirs"
+msgstr ""
+
+#: ../toolbar.c:174
+msgid ""
+"Left: Show only directories\n"
+"Right: Show only files"
+msgstr ""
+
+#: ../toolbar.c:179
+msgid ""
+"Left: Select all\n"
+"Right: Invert selection"
+msgstr ""
+
+#: ../toolbar.c:184
+msgid ""
+"Left: New Directory\n"
+"Middle: New Blank file\n"
+"Right: Menu"
+msgstr ""
+
+#: ../toolbar.c:190
+msgid "○"
+msgstr ""
+
+#: ../toolbar.c:190
+msgid ""
+"Save Current Display Settings...\n"
+"  Right: for parent/* \n"
+"  Middle: Clear to default settings\n"
+"Under:\n"
+"  ▽: No settings\n"
+"  ▼: Own settings\n"
+"  ▶: Parent settings\n"
+"  ▷: Far parent settings"
+msgstr ""
+
+#: ../toolbar.c:202
+msgid "Show help"
+msgstr ""
+
+#: ../toolbar.c:270
+#, c-format
+msgid " (%u hidden)"
+msgstr ""
+
+#: ../toolbar.c:276 tips.c:75
+msgid "items"
+msgstr ""
+
+#: ../toolbar.c:276
+msgid "item"
+msgstr ""
+
+#: ../toolbar.c:279
+#, c-format
+msgid "No items%s"
+msgstr ""
+
+#: ../toolbar.c:298
+#, c-format
+msgid "%u selected (%s)"
+msgstr ""
+
+#: ../toolbar.c:555
+msgid "Sort by name"
+msgstr ""
+
+#: ../toolbar.c:555
+msgid "Sort by type"
+msgstr ""
+
+#: ../toolbar.c:555
+msgid "Sort by date"
+msgstr ""
+
+#: ../toolbar.c:555
+msgid "Sort by size"
+msgstr ""
+
+#: ../toolbar.c:556
+msgid "Sort by owner"
+msgstr ""
+
+#: ../toolbar.c:556
+msgid "Sort by group"
+msgstr ""
+
+#: ../toolbar.c:588
+msgid "ascending"
+msgstr ""
+
+#: ../toolbar.c:588
+msgid "descending"
+msgstr ""
+
+#: ../toolbar.c:899
+msgid "_N_Items_"
+msgstr ""
+
+#: ../type.c:207
+msgid "Sym link"
+msgstr ""
+
+#: ../type.c:209
+msgid "Mount point"
+msgstr ""
+
+#: ../type.c:214
+msgid "File"
+msgstr ""
+
+#: ../type.c:216
+msgid "Dir"
+msgstr ""
+
+#: ../type.c:218
+msgid "Char dev"
+msgstr ""
+
+#: ../type.c:220
+msgid "Block dev"
+msgstr ""
+
+#: ../type.c:222
+msgid "Pipe"
+msgstr ""
+
+#: ../type.c:224
+msgid "Socket"
+msgstr ""
+
+#: ../type.c:226
+msgid "Door"
+msgstr ""
+
+#: ../type.c:229
+msgid "Unknown"
+msgstr ""
+
+#: ../type.c:526
+msgid ""
+"Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
+"\n"
+"gimp \"$@\""
+msgstr ""
+
+#: ../type.c:719
+msgid "This is not a program! Give me an application instead!"
+msgstr ""
+
+#: ../type.c:779
+msgid "No run action defined"
+msgstr ""
+
+#: ../type.c:783
+#, c-format
+msgid "Error in handler %s: %s"
+msgstr ""
+
+#: ../type.c:798
+#, c-format
+msgid "Invalid application %s (bad AppRun)"
+msgstr ""
+
+#: ../type.c:809
+#, c-format
+msgid "Non-executable %s"
+msgstr ""
+
+#: ../type.c:842
+msgid "Set run action"
+msgstr ""
+
+#: ../type.c:848
+msgid ""
+"If a handler for the specific type isn't set up, use this as the default."
+msgstr ""
+
+#: ../type.c:850
+#, c-format
+msgid "Set default for all `%s/<anything>'"
+msgstr ""
+
+#: ../type.c:854
+msgid "Use this application for all files with this MIME type."
+msgstr ""
+
+#: ../type.c:856
+#, c-format
+msgid "Only for the type `%s' (%s/%s)"
+msgstr ""
+
+#: ../type.c:862
+msgid "Drop a suitable application here"
+msgstr ""
+
+#: ../type.c:903
+msgid "OR"
+msgstr ""
+
+#: ../type.c:911
+msgid "Enter a shell command:"
+msgstr ""
+
+#: ../type.c:940
+msgid "_Use Command"
+msgstr ""
+
+#: ../type.c:970
+msgid ""
+"A run action already exists and is quite a big program - are you sure you "
+"want to delete it?"
+msgstr ""
+
+#: ../type.c:981
+#, c-format
+msgid "Can't remove %s: %s"
+msgstr ""
+
+#: ../type.c:1018
+msgid "Choices saving is disabled"
+msgstr ""
+
+#: ../usericons.c:165
+msgid "The pathname you gave does not exist. The icon has not been changed."
+msgstr ""
+
+#: ../usericons.c:175 ../usericons.c:584
+msgid ""
+"Unable to load image file -- maybe it's not in a format I understand, or "
+"maybe the permissions are wrong?\n"
+"The icon has not been changed."
+msgstr ""
+
+#: ../usericons.c:221
+#, c-format
+msgid "Really delete icon '%s'?"
+msgstr ""
+
+#: ../usericons.c:225
+#, c-format
+msgid ""
+"Can't delete '%s':\n"
+"%s"
+msgstr ""
+
+#: ../usericons.c:254
+msgid "Set icon"
+msgstr ""
+
+#: ../usericons.c:263
+msgid ""
+"Use a copy of the image as the default for all files of these MIME types."
+msgstr ""
+
+#: ../usericons.c:265
+#, c-format
+msgid "Set icon for all `%s/<anything>'"
+msgstr ""
+
+#: ../usericons.c:270
+msgid "Use a copy of the image for all files of this MIME type."
+msgstr ""
+
+#: ../usericons.c:272
+#, c-format
+msgid "For all files of type `%s' (%s/%s)"
+msgstr ""
+
+#: ../usericons.c:278
+msgid ""
+"Add the file and image filenames to your personal list. The setting will be "
+"lost if the image or the file is moved."
+msgstr ""
+
+#: ../usericons.c:281
+#, c-format
+msgid "Only for the file `%s'"
+msgstr ""
+
+#: ../usericons.c:285
+msgid "Drop an icon file here"
+msgstr ""
+
+#: ../usericons.c:555
+msgid "Setting icon disabled"
+msgstr ""
+
+#: ../usericons.c:599
+#, c-format
+msgid ""
+"Error creating image '%s':\n"
+"%s"
+msgstr ""
+
+#: ../view_collection.c:326
+msgid "- Double click here to close the windows"
+msgstr ""
+
+#: ../view_details.c:1050
+msgid "Mono font"
+msgstr ""
+
+#: ../view_details.c:1051
+msgid "Font for displaying mono-spaced text"
+msgstr ""
+
+#: ../view_details.c:1268
+msgid "_Name"
+msgstr ""
+
+#: ../view_details.c:1271
+msgid "_Type"
+msgstr ""
+
+#: ../view_details.c:1273
+msgid "_Size"
+msgstr ""
+
+#: ../view_details.c:1279
+msgid "_Permissions"
+msgstr ""
+
+#: ../view_details.c:1285
+msgid "_Owner"
+msgstr ""
+
+#: ../view_details.c:1287
+msgid "_Group"
+msgstr ""
+
+#: ../view_details.c:1289
+msgid "Last _Modified"
+msgstr ""
+
+#: ../view_details.c:1295
+msgid "Last _Changed"
+msgstr ""
+
+#: ../view_details.c:1301
+msgid "Last _Accessed"
+msgstr ""
+
+#: ../xtypes.c:755
+msgid "Extended attributes"
+msgstr ""
+
+#: tips.c:1
+msgid "Filer windows"
+msgstr ""
+
+#: tips.c:2
+msgid "Auto-resize filer windows"
+msgstr ""
+
+#: tips.c:3
+msgid "Never automatically resize"
+msgstr ""
+
+#: tips.c:4
+msgid ""
+"You'll have to resize windows manually, using the window manager, the "
+"`Resize Window' menu entry or by double-clicking on the window background."
+msgstr ""
+
+#: tips.c:5
+msgid "Resize when changing the display style"
+msgstr ""
+
+#: tips.c:6
+msgid ""
+"Changing the size of the icons or which details are displayed will resize "
+"the window for you."
+msgstr ""
+
+#: tips.c:7
+msgid "Always resize"
+msgstr ""
+
+#: tips.c:8
+msgid ""
+"The filer will resize windows whenever it seems useful (that is, when "
+"changing directory or display style)."
+msgstr ""
+
+#: tips.c:9
+msgid "Largest window size:"
+msgstr ""
+
+#: tips.c:10 tips.c:13 tips.c:254
+msgid "%"
+msgstr ""
+
+#: tips.c:11
+msgid ""
+"The largest size, as a percentage of the screen size, that the auto-resizer "
+"will resize a window to."
+msgstr ""
+
+#: tips.c:12
+msgid "Largest window width:"
+msgstr ""
+
+#: tips.c:14
+msgid ""
+"The largest width, as a percentage of the screen size, that the auto-resizer "
+"will resize a window to."
+msgstr ""
+
+#: tips.c:15
+msgid "Window behaviour"
+msgstr ""
+
+#: tips.c:16
+msgid "Short titlebar flags"
+msgstr ""
+
+#: tips.c:17
+msgid ""
+"Use single letters instead of words for Scanning, All and Thumbs indicators "
+"in the titlebar."
+msgstr ""
+
+#: tips.c:18
+msgid "Unique windows"
+msgstr ""
+
+#: tips.c:19
+msgid ""
+"If you open a directory and that directory is already displayed in another "
+"window, then this option causes the other window to be closed."
+msgstr ""
+
+#: tips.c:20
+msgid "Close window when dir missing"
+msgstr ""
+
+#: tips.c:21
+msgid ""
+"If a directory that is open in a window disappears, (deleted or unmounted) "
+"automatically close window."
+msgstr ""
+
+#: tips.c:22
+msgid "Window Link"
+msgstr ""
+
+#: tips.c:23
+msgid ""
+"If this is on and you open a directory by middle button, the new window and "
+"the source window are toggled into link mode. In link mode, left-click a "
+"directory to open it in a window placed to the right of the source window. "
+"If this value is off, ctrl + middle button toggles the linked window."
+msgstr ""
+
+#: tips.c:24
+msgid "New window on button 1"
+msgstr ""
+
+#: tips.c:25
+msgid ""
+"Clicking with mouse button 1 (usually the left button) opens a directory in "
+"a new window with this turned on. Clicking with the button-2 (middle) will "
+"reuse the current window."
+msgstr ""
+
+#: tips.c:26
+msgid "Single-click navigation"
+msgstr ""
+
+#: tips.c:27
+msgid ""
+"Clicking on an item opens it with this on. Hold down Control to select the "
+"item instead. If off, clicking once selects an item; double click to open "
+"things."
+msgstr ""
+
+#: tips.c:28
+msgid "Double-click on background resizes"
+msgstr ""
+
+#: tips.c:29
+msgid ""
+"If on then double clicking on the window background resizes the window, just "
+"like clicking on the Automatic size mode button in the toolbar."
+msgstr ""
+
+#: tips.c:30
+msgid "Sorting"
+msgstr ""
+
+#: tips.c:31
+msgid "Directories come first (for sort by name)"
+msgstr ""
+
+#: tips.c:32
+msgid ""
+"If this is on then directories will always appear before anything else when "
+"sorting by name."
+msgstr ""
+
+#: tips.c:33
+msgid "Capitalised names first (for sort by name)"
+msgstr ""
+
+#: tips.c:34
+msgid ""
+"If on, all filenames starting with a capital letter come before filenames "
+"starting with lowercase ones."
+msgstr ""
+
+#: tips.c:35
+msgid "Newly comes first (for sort by Date)"
+msgstr ""
+
+#: tips.c:36
+msgid "If on, the Sort by Dates are reversed."
+msgstr ""
+
+#: tips.c:37 tips.c:262
+msgid "etc"
+msgstr ""
+
+#: tips.c:38
+msgid "Show extended attribute indicator"
+msgstr ""
+
+#: tips.c:39
+msgid ""
+"If this is on then files which have one or more extended attributes set will "
+"have an emblem added to indicate this."
+msgstr ""
+
+#: tips.c:40
+msgid "Hide the message bar Running as user 'root'"
+msgstr ""
+
+#: tips.c:41
+msgid ""
+"This hides the bar even with the command-line option -u, --user if user is "
+"the root."
+msgstr ""
+
+#: tips.c:43
+msgid "Default settings for new windows"
+msgstr ""
+
+#: tips.c:44
+msgid "Inherit options from source window"
+msgstr ""
+
+#: tips.c:45
+msgid ""
+"If this is on then display options for a new window are inherited from the "
+"source window if possible, otherwise they are set to the defaults below."
+msgstr ""
+
+#: tips.c:46
+msgid "View type:"
+msgstr ""
+
+#: tips.c:49
+msgid "Sort by:"
+msgstr ""
+
+#: tips.c:51 tips.c:72 tips.c:110
+msgid "Type"
+msgstr ""
+
+#: tips.c:52
+msgid "Date (m)"
+msgstr ""
+
+#: tips.c:53
+msgid "Date (c)"
+msgstr ""
+
+#: tips.c:54
+msgid "Date (a)"
+msgstr ""
+
+#: tips.c:56
+msgid "Show hidden files"
+msgstr ""
+
+#: tips.c:57
+msgid ""
+"If this is on then files whose names start with a dot are shown too, "
+"otherwise they are hidden."
+msgstr ""
+
+#: tips.c:58
+msgid "Huge Icons size:"
+msgstr ""
+
+#: tips.c:59 tips.c:78 tips.c:81 tips.c:86 tips.c:105 tips.c:270 tips.c:273
+msgid "pixels"
+msgstr ""
+
+#: tips.c:60
+msgid "Resolution depends on 'Thumbnails->Cache File Size'."
+msgstr ""
+
+#: tips.c:61 tips.c:62
+msgid "Icon View"
+msgstr ""
+
+#: tips.c:63
+msgid "Default size:"
+msgstr ""
+
+#: tips.c:64
+msgid "Huge Icons"
+msgstr ""
+
+#: tips.c:65 tips.c:225
+msgid "Large Icons"
+msgstr ""
+
+#: tips.c:66 tips.c:224
+msgid "Small Icons"
+msgstr ""
+
+#: tips.c:68
+msgid "Default details:"
+msgstr ""
+
+#: tips.c:69
+msgid "No details"
+msgstr ""
+
+#: tips.c:70
+msgid "Sizes"
+msgstr ""
+
+#: tips.c:73
+msgid "Times"
+msgstr ""
+
+#: tips.c:74
+msgid "Automatic small icons: Change at:"
+msgstr ""
+
+#: tips.c:76
+msgid ""
+"When automatic icon sizing is selected: If the directory contains this many "
+"items then it will be shown using Small Icons, otherwise Large Icons will be "
+"used."
+msgstr ""
+
+#: tips.c:77
+msgid "Large Icons: (Max width):"
+msgstr ""
+
+#: tips.c:79
+msgid "Text wider than this is broken onto two lines in Large Icons mode."
+msgstr ""
+
+#: tips.c:80
+msgid "(Wrapped, Details):"
+msgstr ""
+
+#: tips.c:82
+msgid ""
+"Maximum length for Large Icons mode and Details. This can be changed "
+"temporarily by right dragging of the toolbar."
+msgstr ""
+
+#: tips.c:83
+msgid "Wrap by characters"
+msgstr ""
+
+#: tips.c:84
+msgid ""
+"If this option is on, file names will wrap by characters instead of words."
+msgstr ""
+
+#: tips.c:85
+msgid "Small Icons (Max width):"
+msgstr ""
+
+#: tips.c:87
+msgid "Maximum width for the text beside a Small Icon."
+msgstr ""
+
+#: tips.c:88
+msgid "Order small icons vertically"
+msgstr ""
+
+#: tips.c:89
+msgid ""
+"If this option is on, then small icons are arranged in columns, not rows."
+msgstr ""
+
+#: tips.c:90
+msgid "Order large icons vertically"
+msgstr ""
+
+#: tips.c:91
+msgid ""
+"If this option is on, then large icons are arranged in columns, not rows."
+msgstr ""
+
+#: tips.c:92
+msgid "Scroll speed: 1/"
+msgstr ""
+
+#: tips.c:93
+msgid "view"
+msgstr ""
+
+#: tips.c:96
+msgid "Show column headings"
+msgstr ""
+
+#: tips.c:97
+msgid "If this is on then column headings will be shown in the list view."
+msgstr ""
+
+#: tips.c:98
+msgid "Show full type"
+msgstr ""
+
+#: tips.c:99
+msgid ""
+"If this is on then the full description of each object's type will be show "
+"rather than a short summary of its basic type."
+msgstr ""
+
+#: tips.c:100
+msgid "Only icons and names are clickable"
+msgstr ""
+
+#: tips.c:101
+msgid "For lasso."
+msgstr ""
+
+#: tips.c:102
+msgid "Save columns order"
+msgstr ""
+
+#: tips.c:103
+msgid "If this is on reordering columns is saved"
+msgstr ""
+
+#: tips.c:104
+msgid "Name column width (Max):"
+msgstr ""
+
+#: tips.c:106
+msgid "Maximum width for the Name Column."
+msgstr ""
+
+#: tips.c:107
+msgid "Show Columns"
+msgstr ""
+
+#: tips.c:109
+msgid "If this is on then Name column will be shown in the list view."
+msgstr ""
+
+#: tips.c:111
+msgid "If this is on then Type column will be shown in the list view."
+msgstr ""
+
+#: tips.c:113
+msgid "If this is on then Size column will be shown in the list view."
+msgstr ""
+
+#: tips.c:115
+msgid "If this is on then Permissions column will be shown in the list view."
+msgstr ""
+
+#: tips.c:117
+msgid "If this is on then Owner column will be shown in the list view."
+msgstr ""
+
+#: tips.c:119
+msgid "If this is on then Group column will be shown in the list view."
+msgstr ""
+
+#: tips.c:120
+msgid "Last Modified"
+msgstr ""
+
+#: tips.c:121
+msgid "If this is on then Last Modified column will be shown in the list view."
+msgstr ""
+
+#: tips.c:122
+msgid "Last Changed"
+msgstr ""
+
+#: tips.c:123
+msgid "If this is on then Last Changed column will be shown in the list view."
+msgstr ""
+
+#: tips.c:124
+msgid "Last Accessed"
+msgstr ""
+
+#: tips.c:125
+msgid "If this is on then Last Accessed column will be shown in the list view."
+msgstr ""
+
+#: tips.c:126
+msgid "Tools/Minibuffer"
+msgstr ""
+
+#: tips.c:127
+msgid "Toolbar"
+msgstr ""
+
+#: tips.c:128
+msgid "Toolbar type:"
+msgstr ""
+
+#: tips.c:129
+msgid "No toolbar"
+msgstr ""
+
+#: tips.c:130
+msgid "Icons only"
+msgstr ""
+
+#: tips.c:131
+msgid "Text under icons"
+msgstr ""
+
+#: tips.c:132
+msgid "Text beside icons"
+msgstr ""
+
+#: tips.c:133
+msgid "Text only"
+msgstr ""
+
+#: tips.c:134
+msgid "Show totals of items"
+msgstr ""
+
+#: tips.c:135
+msgid ""
+"Show the number of items displayed in a filer window, as well as the number "
+"of hidden items (if any). When there's a selection, show the number of "
+"selected items and their combined size."
+msgstr ""
+
+#: tips.c:136
+msgid "Select the buttons you want on the bar:"
+msgstr ""
+
+#: tips.c:137
+msgid "Width of toolbar sets minimum width of window"
+msgstr ""
+
+#: tips.c:138
+msgid ""
+"Each filer window is constrained to be wide enough to show the whole of the "
+"toolbar"
+msgstr ""
+
+#: tips.c:139
+msgid "Minibuffer"
+msgstr ""
+
+#: tips.c:140
+msgid "Beep if Tab-completion fails"
+msgstr ""
+
+#: tips.c:141
+msgid ""
+"When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
+"nothing happens (eg, because there are several possibilities and the next "
+"letter varies)."
+msgstr ""
+
+#: tips.c:142
+msgid "Beep if there are several matches"
+msgstr ""
+
+#: tips.c:143
+msgid ""
+"When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
+"is more than one matching file, even though some more letters were added."
+msgstr ""
+
+#: tips.c:144
+msgid "Stdout handler"
+msgstr ""
+
+#: tips.c:145
+msgid ""
+"This will be run when Mini Shell puts out string to stdout. $1 is the string."
+msgstr ""
+
+#: tips.c:146
+msgid "Errout handler"
+msgstr ""
+
+#: tips.c:147
+msgid ""
+"This will be run when Mini Shell puts out string to errout. $1 is the string."
+msgstr ""
+
+#: tips.c:150
+msgid "Show image thumbnails"
+msgstr ""
+
+#: tips.c:151
+msgid ""
+"This is the default setting for new windows. Use the Display menu to turn "
+"thumbnails on and off for individual windows."
+msgstr ""
+
+#: tips.c:152
+msgid "Show image thumbnail for directory."
+msgstr ""
+
+#: tips.c:153
+msgid ""
+"When no items in a sub-directory have a thumbnail, this process tries to "
+"create a thumbnail. If you don't like the choice, visit the sub-directory "
+"and middle-click the scan button in the toolbar to choose the first item."
+msgstr ""
+
+#: tips.c:154
+msgid "Video Thumbnailer:"
+msgstr ""
+
+#: tips.c:155
+msgid "Default generator For video/*."
+msgstr ""
+
+#: tips.c:156
+msgid "Thumbnails cache"
+msgstr ""
+
+#: tips.c:157
+msgid ""
+"To speed things up, the generated thumbnails are stored in the hidden ~/."
+"cache/literocks directory. Click here to remove the cached thumbnails. They "
+"will be created again as needed."
+msgstr ""
+
+#: tips.c:158
+msgid " being left over "
+msgstr ""
+
+#: tips.c:159
+msgid "days"
+msgstr ""
+
+#: tips.c:160
+msgid "0 is all."
+msgstr ""
+
+#: tips.c:161
+msgid "Cache File Size:"
+msgstr ""
+
+#: tips.c:162
+msgid "Small (64px)"
+msgstr ""
+
+#: tips.c:163
+msgid "Normal (128px)"
+msgstr ""
+
+#: tips.c:164
+msgid "Large (256px)"
+msgstr ""
+
+#: tips.c:165
+msgid "Huge (512px)"
+msgstr ""
+
+#: tips.c:166
+msgid "Action windows"
+msgstr ""
+
+#: tips.c:167
+msgid ""
+"Action windows appear when you start a background\n"
+"operation, such as copying or deleting some files."
+msgstr ""
+
+#: tips.c:168
+msgid "Auto-start (Quiet) these actions"
+msgstr ""
+
+#: tips.c:170
+msgid "Copy files without confirming first."
+msgstr ""
+
+#: tips.c:172
+msgid "Move files without confirming first."
+msgstr ""
+
+#: tips.c:174
+msgid "Create links to files without confirming first."
+msgstr ""
+
+#: tips.c:176
+msgid "Delete files without confirming first."
+msgstr ""
+
+#: tips.c:177
+msgid "Mount"
+msgstr ""
+
+#: tips.c:178
+msgid "Mount and unmount filesystems without confirming first."
+msgstr ""
+
+#: tips.c:179
+msgid "Default settings"
+msgstr ""
+
+#: tips.c:180
+msgid "Force Del"
+msgstr ""
+
+#: tips.c:181
+msgid "Don't confirm deletion of non-writeable items."
+msgstr ""
+
+#: tips.c:183
+msgid "Don't display so much information in the message area."
+msgstr ""
+
+#: tips.c:185
+msgid "Also change contents of subdirectories."
+msgstr ""
+
+#: tips.c:192
+msgid "Mount commands"
+msgstr ""
+
+#: tips.c:193
+msgid "Mount command"
+msgstr ""
+
+#: tips.c:194
+msgid "The command used to mount a filesystem. If unsure, use \"mount\"."
+msgstr ""
+
+#: tips.c:195
+msgid "Unmount command"
+msgstr ""
+
+#: tips.c:196
+msgid ""
+"The command used to unmount a filesystem. If unsure, use \"umount\" (yes, "
+"without the first \"n\")."
+msgstr ""
+
+#: tips.c:197
+msgid "Eject command"
+msgstr ""
+
+#: tips.c:198
+msgid "The command used to eject removable media. If unsure, use \"eject\"."
+msgstr ""
+
+#: tips.c:199
+msgid "Wink"
+msgstr ""
+
+#: tips.c:200
+msgid "Wink last move/copy/linked item"
+msgstr ""
+
+#: tips.c:201
+msgid "Drag and Drop"
+msgstr ""
+
+#: tips.c:202
+msgid "Dragging to icons"
+msgstr ""
+
+#: tips.c:203
+msgid "Allow dragging to icons in filer windows"
+msgstr ""
+
+#: tips.c:204
+msgid ""
+"When this is on you can drag a file over a sub-directory or program in a "
+"filer window. The item will highlight when you do this and dropping the file "
+"will put it into that directory, or load it into the program."
+msgstr ""
+
+#: tips.c:205
+msgid "Directories spring open"
+msgstr ""
+
+#: tips.c:206
+msgid ""
+"This option, which requires the above option to be turned on too, causes the "
+"highlighted directory to 'spring open' after the file is held over it for a "
+"short while."
+msgstr ""
+
+#: tips.c:207
+msgid "Spring delay:"
+msgstr ""
+
+#: tips.c:208
+msgid "ms"
+msgstr ""
+
+#: tips.c:209
+msgid ""
+"This option sets how long, in ms, you must hold a file over a directory "
+"before it will spring open. The above option must be turned on for this to "
+"have any effect."
+msgstr ""
+
+#: tips.c:210
+msgid "When dragging files with the left mouse button"
+msgstr ""
+
+#: tips.c:211 tips.c:215
+msgid "Show a menu of possible actions"
+msgstr ""
+
+#: tips.c:212
+msgid "Copy the files"
+msgstr ""
+
+#: tips.c:213
+msgid ""
+"Note that you can still get the menu to appear, by dragging with Alt held "
+"down."
+msgstr ""
+
+#: tips.c:214
+msgid "When dragging files with the middle mouse button"
+msgstr ""
+
+#: tips.c:216
+msgid "Move the files"
+msgstr ""
+
+#: tips.c:217
+msgid ""
+"Note that you can still get the menu to appear, by dragging with the left "
+"button and holding down the Alt key."
+msgstr ""
+
+#: tips.c:218
+msgid "Download handler"
+msgstr ""
+
+#: tips.c:219
+msgid ""
+"When you drag a file from a web browser or other remote source, this program "
+"will be run to download it. $1 is the URI dragged to the filer, and the "
+"current directory is the destination. Eg:\n"
+"xterm -e wget $1"
+msgstr ""
+
+#: tips.c:220
+msgid "Menus"
+msgstr ""
+
+#: tips.c:221
+msgid "Appearance"
+msgstr ""
+
+#: tips.c:222
+msgid "Size of icons in menus:"
+msgstr ""
+
+#: tips.c:223
+msgid "No Icons"
+msgstr ""
+
+#: tips.c:226
+msgid "Same as current window"
+msgstr ""
+
+#: tips.c:227
+msgid "Same as default"
+msgstr ""
+
+#: tips.c:228
+msgid "Behaviour"
+msgstr ""
+
+#: tips.c:229
+msgid "File menu on right-click"
+msgstr ""
+
+#: tips.c:230
+msgid ""
+"Show the File menu instead of the main menu when right-clicking with files "
+"selected (the main menu can be accessed by holding down Control)."
+msgstr ""
+
+#: tips.c:231
+msgid "Terminal emulator program"
+msgstr ""
+
+#: tips.c:232
+msgid "The program to launch when you choose `Terminal Here' from the menu."
+msgstr ""
+
+#: tips.c:233
+msgid "Keyboard shortcuts"
+msgstr ""
+
+#: tips.c:234
+msgid "Colours"
+msgstr ""
+
+#: tips.c:235
+msgid "File type colours"
+msgstr ""
+
+#: tips.c:236
+msgid "Colour files based on their types"
+msgstr ""
+
+#: tips.c:237
+msgid "Filenames (and details) are coloured according to the file's type."
+msgstr ""
+
+#: tips.c:238
+msgid "Directory:"
+msgstr ""
+
+#: tips.c:239
+msgid "Regular file:"
+msgstr ""
+
+#: tips.c:240
+msgid "Pipe:"
+msgstr ""
+
+#: tips.c:241
+msgid "Socket:"
+msgstr ""
+
+#: tips.c:243
+msgid ""
+"Error, such as a symlink which points to a non-existant file, or a file "
+"which the filer does not have permission to examine."
+msgstr ""
+
+#: tips.c:244
+msgid "Character device:"
+msgstr ""
+
+#: tips.c:245
+msgid "Block device:"
+msgstr ""
+
+#: tips.c:246
+msgid "Door:"
+msgstr ""
+
+#: tips.c:247
+msgid ""
+"Door files are a bit like sockets or pipes, and have only been seen on "
+"Solaris."
+msgstr ""
+
+#: tips.c:248
+msgid "Executable file:"
+msgstr ""
+
+#: tips.c:249
+msgid "Application directory:"
+msgstr ""
+
+#: tips.c:250
+msgid "Unknown type:"
+msgstr ""
+
+#: tips.c:251
+msgid "Background colour"
+msgstr ""
+
+#: tips.c:252
+msgid "Use custom background colour:"
+msgstr ""
+
+#: tips.c:253
+msgid "Transparency:"
+msgstr ""
+
+#: tips.c:255
+msgid ""
+"This depends on your environment. Basically if your windows have shadows, "
+"then they can also be transparent."
+msgstr ""
+
+#: tips.c:256
+msgid "Compatibility"
+msgstr ""
+
+#: tips.c:257
+msgid "Command line program"
+msgstr ""
+
+#: tips.c:258
+msgid "Make script"
+msgstr ""
+
+#: tips.c:259
+msgid "Drag and drop"
+msgstr ""
+
+#: tips.c:260
+msgid "Don't use hostnames"
+msgstr ""
+
+#: tips.c:261
+msgid ""
+"Some older applications don't support XDND fully and may need to have this "
+"option turned on. Use this if dragging files to an application shows a + "
+"sign on the pointer but the drop doesn't work."
+msgstr ""
+
+#: tips.c:263
+msgid "Fast width calculating"
+msgstr ""
+
+#: tips.c:264
+msgid ""
+"If this is on, string width calculations will be faster but less accurate in "
+"Small Icons mode."
+msgstr ""
+
+#: tips.c:265
+msgid "Purge Dir Cache"
+msgstr ""
+
+#: tips.c:266
+msgid "Don't check this if you haven't problems with RAM."
+msgstr ""
+
+#: tips.c:267
+msgid "Take control of window move on auto-resize"
+msgstr ""
+
+#: tips.c:268
+msgid ""
+"When this is on, rox rather than the window manager, handles window move. "
+"When this is off, pointer warp on auto-move is disabled."
+msgstr ""
+
+#: tips.c:269
+msgid "Bottom gap:"
+msgstr ""
+
+#: tips.c:271 tips.c:274
+msgid ""
+"For the overridden auto-move in the auto-resize and the display settings."
+msgstr ""
+
+#: tips.c:272
+msgid "Right gap:"
+msgstr ""
+
+#: tips.c:275
+msgid "Disable pointer warp"
+msgstr ""
+
+#: tips.c:276
+msgid ""
+"Check this if you don't want your mouse pointer to be moved on window shrink/"
+"auto-move."
+msgstr ""
+
+#: ../Data/Templates.ui:9
+msgid "Log viewer"
+msgstr ""
+
+#: ../Data/Templates.ui:56
+msgid "Recently performed actions..."
+msgstr ""
+
+#: ../Data/Templates.ui:123
+msgid "Open Directory"
+msgstr ""

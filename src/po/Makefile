@@ -1,3 +1,5 @@
+VERSION    = $(shell sed -n "s/^VERSION=\"\(.*\)\"$$/\1/p" ../configure.in)
+
 L10N_LANGS = fr
 PO_FILES   = $(L10N_LANGS:%=%/LC_MESSAGES/literocks.po)
 MO_FILES   = $(PO_FILES:%.po=%.mo)
@@ -15,8 +17,9 @@ tips:
 
 literocks.pot: tips
 	xgettext --keyword=_ --keyword=N_ --from-code=UTF-8 \
-		--package-name=$(PROG) --output=literocks.pot \
-		$(TRANSLATABLE)
+		--copyright-holder="Literocks volunteers" \
+		--package-name=$(PROG) --package-version=$(VERSION) \
+		--output=literocks.pot $(TRANSLATABLE)
 	xgettext --join-existing --language=Glade --output=literocks.pot \
 		../Data/Templates.ui
 
@@ -32,7 +35,8 @@ literocks.pot: tips
 	msgmerge --lang $(@:%/LC_MESSAGES/literocks.po~=%) \
 		-o $@ $(@:%~=%) literocks.pot
 	sed -i -e "s|Copyright (C) [0-9]*|Copyright (C) $(shell date +%Y)|" \
-		-e "s|Id-Version: Literocks [0-9.]*|Id-Version: Literocks $(VERSION)|" \
+		-e "s|Id-Version: Literocks [0-9.-]*|Id-Version: Literocks $(VERSION)|" \
+		-e "s|Id-Version: ROX-Filer [0-9.-]*|Id-Version: Literocks $(VERSION)|" \
 		$@
 	cp $@ $(@:%~=%) && rm $@
 
