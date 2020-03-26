@@ -13,7 +13,7 @@ Quick start
 If you downloaded a source or binary tarball directly, type this ($ is the
 shell prompt) to compile the filer.
 
-    $ make
+    $ make install
 
 Then, type the following to run it:
 

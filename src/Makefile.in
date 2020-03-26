@@ -37,12 +37,14 @@ DEST_MO    = $(L10N_LANGS:%=$(datarootdir)/locale/%/LC_MESSAGES/literocks.mo)
 
 ############ Things to keep the same
 
-.PHONY: clean install
+.PHONY: build clean install
 
-all: $(PROG) Docs/literocks.1 Docs/Manual.html
+all: build
 
-install: $(PROG) Docs/literocks.1 Docs/Manual.html
+build: $(PROG) Docs/literocks.1 Docs/Manual.html
 	$(MAKE) -C po
+
+install: build $(DEST_MO)
 	install -D -m755 $(PROG) $(bindir)/$(PROG)
 
 	install -d -m755 $(APP_DIR)
