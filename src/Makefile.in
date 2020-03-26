@@ -30,6 +30,11 @@ APP_DIR = @datarootdir@/$(PROG)
 SRCS = $(wildcard *.c)
 OBJECTS = $(SRCS:%.c=%.o)
 
+############ Translations
+
+L10N_LANGS = fr
+DEST_MO    = $(L10N_LANGS:%=$(datarootdir)/locale/%/LC_MESSAGES/literocks.mo)
+
 ############ Things to keep the same
 
 .PHONY: clean install
@@ -37,6 +42,7 @@ OBJECTS = $(SRCS:%.c=%.o)
 all: $(PROG) Docs/literocks.1 Docs/Manual.html
 
 install: $(PROG) Docs/literocks.1 Docs/Manual.html
+	$(MAKE) -C po
 	install -D -m755 $(PROG) $(bindir)/$(PROG)
 
 	install -d -m755 $(APP_DIR)
@@ -64,7 +70,14 @@ Docs/literocks.1:
 Docs/Manual.html:
 	$(MAKE) -C Docs Manual.html
 
+po/%/LC_MESSAGES/literocks.mo:
+	$(MAKE) -C po $(@:po/%=%)
+
+$(datarootdir)/locale/%/LC_MESSAGES/literocks.mo: po/%/LC_MESSAGES/literocks.mo
+	install -D -m644 $< $@
+
 clean:
 	rm -f Makefile configure config.h config.log config.status $(OBJECTS)
 	rm -rf autom4te.cache
 	$(MAKE) -C Docs clean
+	$(MAKE) -C po clean
