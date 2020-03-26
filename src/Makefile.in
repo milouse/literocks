@@ -50,7 +50,9 @@ install: $(PROG) Docs/literocks.1 Docs/Manual.html
 
 	install -d -m755 $(APP_DIR)/images
 	install -D -m644 $(wildcard Data/images/*.png) $(APP_DIR)/images
-	cd $(APP_DIR)/images && ln -s symlink.png rox-symlink.png
+	[ ! -e $(APP_DIR)/images/rox-symlink.png ] && \
+		cd $(APP_DIR)/images && ln -s symlink.png rox-symlink.png \
+		|| /usr/bin/true
 
 	install -D -m644 Data/literocks.desktop @datarootdir@/applications/$(PROG).desktop
 	sed -i 's|{exec}|$(bindir)/$(PROG)|' @datarootdir@/applications/$(PROG).desktop
