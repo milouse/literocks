@@ -184,6 +184,8 @@ void diritem_restat(
 		 * of the *symlink*, but we really want the uid of the dir
 		 * to which the symlink points.
 		 */
+		check_globicon(path, item);
+
 		if (item->flags & ITEM_FLAG_MOUNT_POINT)
 		{
 			item->mime_type = inode_mountpoint;
@@ -240,6 +242,8 @@ void diritem_restat(
 		if (!item->mime_type)
 			item->mime_type = text_plain;
 
+		check_globicon(path, item);
+
 		if (item->mime_type == application_x_desktop && item->_image == NULL)
 		{
 			g_mutex_lock(&m_diritems);
@@ -247,6 +251,8 @@ void diritem_restat(
 			g_mutex_unlock(&m_diritems);
 		}
 	}
+	else
+		check_globicon(path, item);
 
 	if (!item->mime_type)
 		item->mime_type = mime_type_from_base_type(item->base_type);

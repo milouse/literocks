@@ -342,26 +342,12 @@ void toolbar_update_toolbar(FilerWindow *filer_window)
 	{
 		filer_window->toolbar = gtk_toolbar_new();
 
-	GtkWidget *hbox;
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(filer_window->toplevel_vbox, hbox, FALSE, TRUE, 0);
-	gtk_box_reorder_child(filer_window->toplevel_vbox,
-			hbox, 0);
-
-	gtk_box_pack_start(GTK_BOX(hbox),
-			filer_window->toolbar, TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox),
-				gtk_label_new("foobarfoobarfoobar"), FALSE, TRUE, 0);
-
-
-//		gtk_box_pack_start(filer_window->toplevel_vbox,
-//				filer_window->toolbar, FALSE, TRUE, 0);
-//		gtk_box_reorder_child(filer_window->toplevel_vbox,
-//				filer_window->toolbar, 0);
+		gtk_box_pack_start(filer_window->toplevel_vbox,
+				filer_window->toolbar, FALSE, TRUE, 0);
+		gtk_box_reorder_child(filer_window->toplevel_vbox,
+				filer_window->toolbar, 0);
 
 		create_toolbar(filer_window->toolbar, filer_window);
-
-gtk_widget_show_all(hbox);
 
 		gtk_widget_show_all(filer_window->toolbar);
 //		g_signal_connect_swapped(filer_window->toolbar, "style-changed",

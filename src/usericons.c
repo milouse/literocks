@@ -131,6 +131,19 @@ out:
 	g_free(path);
 }
 
+/* Set an item's image field according to the globicons patterns if
+ * it matches one of them and the file exists.
+ */
+void check_globicon(const guchar *path, DirItem *item)
+{
+	gchar *gi;
+
+	g_return_if_fail(item && !item->_image);
+
+	gi = g_hash_table_lookup(glob_icons, path);
+	if (gi)
+		item->_image = g_fscache_lookup(pixmap_cache, gi);
+}
 MaskedPixmap *get_globicon(const guchar *path)
 {
 	gchar *gi;
