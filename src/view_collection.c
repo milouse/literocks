@@ -505,7 +505,6 @@ static void draw_dir_mark(cairo_t *cr,
 	cairo_line_to(cr, right - size, mid);
 	cairo_line_to(cr, right, mid - size);
 	size -= 2.1;
-	right += 1;
 	cairo_move_to(cr, right, mid + size);
 	cairo_line_to(cr, right - size, mid);
 	cairo_line_to(cr, right, mid - size);
@@ -969,7 +968,7 @@ static void large_template(
 
 	if (full)
 	{
-		template->icon.width += 3;
+		template->icon.width += 2;
 		int max_text_width = area->width - ICON_WIDTH - 4;
 
 		template->icon.x = area->x + (ICON_WIDTH - iw) / 2 + 2;
@@ -1013,7 +1012,7 @@ static void large_template(
 static void small_template(GdkRectangle *area, CollectionItem *colitem,
 			   ViewCollection *view_collection, Template *template)
 {
-	int margin = small_height / 4;
+	int margin = 2;
 
 	int	text_x = area->x + small_width + margin;
 	int	low_text_y;
@@ -1027,9 +1026,9 @@ static void small_template(GdkRectangle *area, CollectionItem *colitem,
 	template->leafname.width = MIN(max_text_width, view->name_width);
 	template->leafname.height = view->name_height;
 
-	template->icon.x = area->x + 2;
+	template->icon.x = area->x + margin/2;
 	template->icon.y = area->y + 1;
-	template->icon.width = small_width;
+	template->icon.width = small_width + margin/2;
 	template->icon.height = small_height;
 }
 
@@ -1043,8 +1042,6 @@ static void small_full_template(GdkRectangle *area, CollectionItem *colitem,
 
 	small_template(&temparea, colitem, view_collection, template);
 
-	template->icon.x = area->x + 2;
-	template->icon.y = area->y + 1;
 	template->details.x = area->x + col_width - template->details.width;
 	template->details.y =
 		area->y + area->height / 2 - template->details.height / 2;
@@ -1074,7 +1071,7 @@ static gboolean test_point(Collection *collection,
 
 	DisplayStyle style = view_collection->filer_window->display_style;
 	int ladj = style == LARGE_ICONS ?  0 : small_height / 4;
-	int radj = style == HUGE_ICONS ?  ladj : -ladj;
+	int radj = style == HUGE_ICONS ?  ladj : -1;
 
 	return INSIDE(point_x, point_y, template.leafname, 0, 0) ||
 	       INSIDE(point_x, point_y, template.icon, ladj, radj) ||
