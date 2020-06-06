@@ -775,10 +775,7 @@ end_image:
 	if (item->base_type == TYPE_DIRECTORY)
 	{
 		gboolean link = is_linked(fw, item);
-		if (link || (view->thumb &&
-				(template.icon.width > small_width ||
-				 template.icon.height > small_height))
-				)
+		if (link || view->thumb)
 			draw_dir_mark(cr, widget, &template.icon,
 					link ? &red :
 						colitem->selected ? select_colour : type_colour);
@@ -1032,7 +1029,7 @@ static void small_template(GdkRectangle *area, CollectionItem *colitem,
 
 	template->icon.x = area->x + 2;
 	template->icon.y = area->y + 1;
-	template->icon.width = small_width + margin - 1;
+	template->icon.width = small_width;
 	template->icon.height = small_height;
 }
 
@@ -1077,7 +1074,7 @@ static gboolean test_point(Collection *collection,
 
 	DisplayStyle style = view_collection->filer_window->display_style;
 	int ladj = style == LARGE_ICONS ?  0 : small_height / 4;
-	int radj = style == HUGE_ICONS ?  ladj : 0;
+	int radj = style == HUGE_ICONS ?  ladj : -ladj;
 
 	return INSIDE(point_x, point_y, template.leafname, 0, 0) ||
 	       INSIDE(point_x, point_y, template.icon, ladj, radj) ||
