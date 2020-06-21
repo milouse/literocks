@@ -4369,7 +4369,7 @@ static gboolean check_settings(FilerWindow *filer_window, gboolean onlycheck)
 	status = set ? _("▼") : _("▽");
 
 	current = filer_window->sym_path;
-	while (!set && !(current[0] == '/' && current[1] == '\0'))
+	while (!set && current[0] && current[1])
 	{
 		current = g_path_get_dirname(current);
 
